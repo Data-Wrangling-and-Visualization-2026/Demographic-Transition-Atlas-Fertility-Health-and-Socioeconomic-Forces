@@ -1,0 +1,29 @@
+# Python
+__pycache__ /
+*. py [ cod ]
+* $py . class
+*. so
+. Python
+venv /
+env/
+. venv /
+# Environment variables
+.env
+.env. local
+# IDE
+. idea /
+. vscode /
+*. swp
+*. swo
+# OS
+. DS_Store
+Thumbs . db
+# Build artifacts
+build /
+dist /
+*. egg - info /
+# Node .js (for multi - tech projects )
+node_modules /
+npm - debug . log
+# Docker
+. docker /
