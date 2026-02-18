@@ -20,10 +20,11 @@ def check_clickhouse():
         raise RuntimeError(f"ClickHouse ping unexpected: {r.text}")
 
 if __name__ == "__main__":
-    while True:
-        try:
-            check_mongo()
-            check_clickhouse()
-        except Exception as e:
-            print(" Connection check failed:", e)
-        time.sleep(10)
+    try:
+        check_mongo()
+        check_clickhouse()
+        print("All connections OK")
+    except Exception as e:
+        print("Connection check failed:", e)
+        raise
+
