@@ -44,7 +44,7 @@ def main():
 
                 try:
                     year_int = int(year)
-                except:
+                except (TypeError, ValueError):
                     skipped += 1
                     continue
 
