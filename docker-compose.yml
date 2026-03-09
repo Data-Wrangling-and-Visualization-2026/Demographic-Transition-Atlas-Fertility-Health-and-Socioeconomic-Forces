@@ -1,4 +1,15 @@
 services:
+  pgadmin:
+    image: dpage/pgadmin4:9
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    depends_on:
+      postgres:
+        condition: service_healthy
   mongo:
     image: mongo:7
     restart: unless-stopped
@@ -31,6 +42,24 @@ services:
       retries: 30
       start_period: 20s
 
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dwv
+      POSTGRES_PASSWORD: dwv
+      POSTGRES_DB: dwv
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dwv -d dwv"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   scraper_scheduler:
     build:
       context: ./scraper
@@ -40,19 +69,30 @@ services:
         condition: service_healthy
       clickhouse:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       MONGO_URI: "mongodb://mongo:27017"
       CLICKHOUSE_HOST: "clickhouse"
       CLICKHOUSE_HTTP_PORT: "8123"
+
+      # Postgres (добавили)
+      POSTGRES_HOST: "postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "dwv"
+      POSTGRES_USER: "dwv"
+      POSTGRES_PASSWORD: "dwv"
 
       SCRAPE_INTERVAL_MINUTES: "60"
       SCRAPER_COMMAND: "python main.py"
 
       LOG_DIR: "/logs"
     volumes:
+      - ./scraper:/app
       - ./logs:/logs
     command: ["python", "scheduler.py"]
 
 volumes:
   mongo_data:
   ch_data:
+  pg_data:

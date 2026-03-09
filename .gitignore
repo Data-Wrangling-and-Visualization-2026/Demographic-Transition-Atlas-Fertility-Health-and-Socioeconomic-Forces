@@ -27,3 +27,18 @@ node_modules /
 npm - debug . log
 # Docker
 . docker /
+# logs
+*.log
+logs/
+
+# python
+__pycache__/
+*.pyc
+
+# ide
+.idea/
+.vscode/
+
+# env
+.venv/
+.env
