@@ -4,12 +4,12 @@
 We are building an interactive web atlas to explore how fertility changes over time across countries and how it relates to socioeconomic and health indicators.  
 The app will let users select a country or a world map view, choose a year and indicators, and compare time-series trends. In the final stage we will add an “event layer” (news/policy context) to help explain major changes using AI-assisted parsing.
 
-## Data sources 
+## Data sources
 - **World Bank API** — country-level indicators (fertility, GDP, health expenditure, etc.)
 - **UN Population Data Portal / WPP** — demographic indicators (e.g., mean age of childbearing / maternal age)
 - **GDELT** — news/event context for selected country-year “change points”
 
-## What we have implemented 
+## What we have implemented
 ### Infrastructure
 - Dockerized environment with **PostgreSQL** (main storage) and **pgAdmin** for GUI inspection.
 - SQL schema initialized via `db/init.sql`.
@@ -29,6 +29,12 @@ The app will let users select a country or a world map view, choose a year and i
   - `docs/validation_wb.md`
   - `docs/change_points_fertility.csv` (top fertility change points to be used later for GDELT events)
 
+### UN Data Portal integration (multi-source pipeline)
+- Implemented UN API client (`get_indicators`, `get_locations`, `get_data`) and country reconciliation support.
+- Downloaded UN data in batches and stored **raw payloads** in `raw_ingest` (`source='un'`).
+- Transformed UN raw payloads into `fact_indicator_value` (`source='un'`) using an MVP slice (consistent “one value per country-year” logic).
+- Result: **~12k cleaned UN rows** in `fact_indicator_value`, demonstrating a working **multi-source** pipeline (World Bank + UN) with unified country-year facts.
+
 ## Project structure (high level)
 - `docker-compose.yml` — services (postgres, pgadmin, scraper container)
 - `db/init.sql` — database schema
@@ -39,12 +45,3 @@ The app will let users select a country or a world map view, choose a year and i
 ### 1) Start services
 ```bash
 docker compose up -d
-```
-
-### Open http://localhost:5050
-- Register server:
-- Host: postgres
-- Port: 5432
-- DB: dwv
-- User: dwv
-- Password: dwv

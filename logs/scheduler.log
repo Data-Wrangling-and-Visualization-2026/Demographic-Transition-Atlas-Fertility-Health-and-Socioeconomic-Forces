@@ -65,3 +65,764 @@
 2026-02-19 15:51:11,095 | INFO | Scraper finished with code=0
 2026-02-19 15:51:11,095 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-19 16:51:10 UTC)" executed successfully
 2026-02-19 20:13:10,787 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-19 20:51:10 UTC)" was missed by 0:22:00.533202
+2026-02-19 20:51:10,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-19 21:51:10 UTC)" (scheduled at 2026-02-19 20:51:10.253798+00:00)
+2026-02-19 20:51:10,257 | INFO | Starting scraper: python main.py
+2026-02-19 20:51:11,805 | INFO | Scraper finished with code=0
+2026-02-19 20:51:11,807 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-19 21:51:10 UTC)" executed successfully
+2026-02-19 21:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-19 22:51:10 UTC)" (scheduled at 2026-02-19 21:51:10.253798+00:00)
+2026-02-19 21:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-19 21:51:11,581 | INFO | Scraper finished with code=0
+2026-02-19 21:51:11,582 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-19 22:51:10 UTC)" executed successfully
+2026-02-20 02:28:14,669 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 02:51:10 UTC)" was missed by 0:37:04.395492
+2026-02-20 08:03:51,053 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 08:51:10 UTC)" was missed by 0:12:40.799224
+2026-02-20 08:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 09:51:10 UTC)" (scheduled at 2026-02-20 08:51:10.253798+00:00)
+2026-02-20 08:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-20 08:51:11,158 | INFO | Scraper finished with code=0
+2026-02-20 08:51:11,159 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 09:51:10 UTC)" executed successfully
+2026-02-20 09:51:10,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 10:51:10 UTC)" (scheduled at 2026-02-20 09:51:10.253798+00:00)
+2026-02-20 09:51:10,258 | INFO | Starting scraper: python main.py
+2026-02-20 09:51:11,976 | INFO | Scraper finished with code=0
+2026-02-20 09:51:11,981 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 10:51:10 UTC)" executed successfully
+2026-02-20 12:53:41,556 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 13:51:10 UTC)" (scheduled at 2026-02-20 12:51:10.253798+00:00)
+2026-02-20 12:53:41,565 | INFO | Starting scraper: python main.py
+2026-02-20 12:53:44,439 | INFO | Scraper finished with code=0
+2026-02-20 12:53:44,440 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 13:51:10 UTC)" executed successfully
+2026-02-20 13:51:10,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 14:51:10 UTC)" (scheduled at 2026-02-20 13:51:10.253798+00:00)
+2026-02-20 13:51:10,257 | INFO | Starting scraper: python main.py
+2026-02-20 13:51:11,704 | INFO | Scraper finished with code=0
+2026-02-20 13:51:11,705 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 14:51:10 UTC)" executed successfully
+2026-02-20 14:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 15:51:10 UTC)" (scheduled at 2026-02-20 14:51:10.253798+00:00)
+2026-02-20 14:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-20 14:51:11,128 | INFO | Scraper finished with code=0
+2026-02-20 14:51:11,129 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 15:51:10 UTC)" executed successfully
+2026-02-20 15:51:10,262 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 16:51:10 UTC)" (scheduled at 2026-02-20 15:51:10.253798+00:00)
+2026-02-20 15:51:10,263 | INFO | Starting scraper: python main.py
+2026-02-20 15:51:11,132 | INFO | Scraper finished with code=0
+2026-02-20 15:51:11,133 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-20 16:51:10 UTC)" executed successfully
+2026-02-21 06:41:16,638 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-21 06:51:10 UTC)" was missed by 0:50:06.384238
+2026-02-21 06:51:10,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-21 07:51:10 UTC)" (scheduled at 2026-02-21 06:51:10.253798+00:00)
+2026-02-21 06:51:10,258 | INFO | Starting scraper: python main.py
+2026-02-21 06:51:11,736 | INFO | Scraper finished with code=0
+2026-02-21 06:51:11,739 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-21 07:51:10 UTC)" executed successfully
+2026-02-21 23:03:10,681 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-21 23:51:10 UTC)" was missed by 0:12:00.427906
+2026-02-22 12:27:31,956 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-22 12:51:10 UTC)" was missed by 0:36:21.702647
+2026-02-22 12:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-22 13:51:10 UTC)" (scheduled at 2026-02-22 12:51:10.253798+00:00)
+2026-02-22 12:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-22 12:51:11,106 | INFO | Scraper finished with code=0
+2026-02-22 12:51:11,107 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-22 13:51:10 UTC)" executed successfully
+2026-02-22 19:43:27,986 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-22 19:51:10 UTC)" was missed by 0:52:17.732720
+2026-02-23 16:02:52,549 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 16:51:10 UTC)" was missed by 0:11:42.295634
+2026-02-23 16:51:10,263 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 16:51:10 UTC)" (scheduled at 2026-02-23 16:51:10.253798+00:00)
+2026-02-23 16:51:10,266 | INFO | Starting scraper: python main.py
+2026-02-23 16:51:11,878 | INFO | Scraper finished with code=0
+2026-02-23 16:51:11,879 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 17:51:10 UTC)" executed successfully
+2026-02-23 18:46:01,412 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 18:51:10 UTC)" was missed by 0:54:51.158687
+2026-02-23 18:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 19:51:10 UTC)" (scheduled at 2026-02-23 18:51:10.253798+00:00)
+2026-02-23 18:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-23 18:51:11,088 | INFO | Scraper finished with code=0
+2026-02-23 18:51:11,088 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 19:51:10 UTC)" executed successfully
+2026-02-23 19:51:10,260 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 20:51:10 UTC)" (scheduled at 2026-02-23 19:51:10.253798+00:00)
+2026-02-23 19:51:10,267 | INFO | Starting scraper: python main.py
+2026-02-23 19:51:11,596 | INFO | Scraper finished with code=0
+2026-02-23 19:51:11,599 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 20:51:10 UTC)" executed successfully
+2026-02-23 20:51:10,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 21:51:10 UTC)" (scheduled at 2026-02-23 20:51:10.253798+00:00)
+2026-02-23 20:51:10,263 | INFO | Starting scraper: python main.py
+2026-02-23 20:51:11,763 | INFO | Scraper finished with code=0
+2026-02-23 20:51:11,764 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 21:51:10 UTC)" executed successfully
+2026-02-23 21:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 22:51:10 UTC)" (scheduled at 2026-02-23 21:51:10.253798+00:00)
+2026-02-23 21:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-23 21:51:11,138 | INFO | Scraper finished with code=0
+2026-02-23 21:51:11,138 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-23 22:51:10 UTC)" executed successfully
+2026-02-24 05:11:06,790 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 05:51:10 UTC)" was missed by 0:19:56.537043
+2026-02-24 09:27:30,041 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 09:51:10 UTC)" was missed by 0:36:19.787169
+2026-02-24 09:51:10,256 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 10:51:10 UTC)" (scheduled at 2026-02-24 09:51:10.253798+00:00)
+2026-02-24 09:51:10,258 | INFO | Starting scraper: python main.py
+2026-02-24 09:51:11,934 | INFO | Scraper finished with code=0
+2026-02-24 09:51:11,936 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 10:51:10 UTC)" executed successfully
+2026-02-24 10:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 11:51:10 UTC)" (scheduled at 2026-02-24 10:51:10.253798+00:00)
+2026-02-24 10:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-24 10:51:11,535 | INFO | Scraper finished with code=0
+2026-02-24 10:51:11,536 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 11:51:10 UTC)" executed successfully
+2026-02-24 11:51:10,254 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 12:51:10 UTC)" (scheduled at 2026-02-24 11:51:10.253798+00:00)
+2026-02-24 11:51:10,255 | INFO | Starting scraper: python main.py
+2026-02-24 11:51:11,104 | INFO | Scraper finished with code=0
+2026-02-24 11:51:11,104 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 12:51:10 UTC)" executed successfully
+2026-02-24 12:51:10,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 13:51:10 UTC)" (scheduled at 2026-02-24 12:51:10.253798+00:00)
+2026-02-24 12:51:10,256 | INFO | Starting scraper: python main.py
+2026-02-24 12:51:11,142 | INFO | Scraper finished with code=0
+2026-02-24 12:51:11,142 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 13:51:10 UTC)" executed successfully
+2026-02-24 13:51:10,263 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 14:51:10 UTC)" (scheduled at 2026-02-24 13:51:10.253798+00:00)
+2026-02-24 13:51:10,264 | INFO | Starting scraper: python main.py
+2026-02-24 13:51:11,537 | INFO | Scraper finished with code=0
+2026-02-24 13:51:11,538 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 14:51:10 UTC)" executed successfully
+2026-02-24 17:13:47,529 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 17:51:10 UTC)" was missed by 0:22:37.275772
+2026-02-24 19:19:30,430 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 19:51:10 UTC)" was missed by 0:28:20.176411
+2026-02-24 19:51:10,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 20:51:10 UTC)" (scheduled at 2026-02-24 19:51:10.253798+00:00)
+2026-02-24 19:51:10,263 | INFO | Starting scraper: python main.py
+2026-02-24 19:51:11,623 | INFO | Scraper finished with code=0
+2026-02-24 19:51:11,625 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-24 20:51:10 UTC)" executed successfully
+2026-02-28 09:02:50,170 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-02-28 09:02:50,171 | INFO | Scheduler started. Interval = 60 minutes
+2026-02-28 09:02:50,173 | INFO | Added job "run_scraper" to job store "default"
+2026-02-28 09:02:50,173 | INFO | Scheduler started
+2026-02-28 09:02:50,174 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 09:02:50 UTC)" (scheduled at 2026-02-28 09:02:50.170161+00:00)
+2026-02-28 09:02:50,174 | INFO | Starting scraper: python main.py
+2026-02-28 09:02:50,977 | INFO | Scraper finished with code=0
+2026-02-28 09:02:50,977 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 10:02:50 UTC)" executed successfully
+2026-02-28 10:03:04,210 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 11:02:50 UTC)" (scheduled at 2026-02-28 10:02:50.170161+00:00)
+2026-02-28 10:03:04,212 | INFO | Starting scraper: python main.py
+2026-02-28 10:03:05,643 | INFO | Scraper finished with code=0
+2026-02-28 10:03:05,644 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 11:02:50 UTC)" executed successfully
+2026-02-28 11:05:45,406 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 12:02:50 UTC)" (scheduled at 2026-02-28 11:02:50.170161+00:00)
+2026-02-28 11:05:45,408 | INFO | Starting scraper: python main.py
+2026-02-28 11:05:46,625 | INFO | Scraper finished with code=0
+2026-02-28 11:05:46,626 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 12:02:50 UTC)" executed successfully
+2026-02-28 12:02:50,170 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 13:02:50 UTC)" (scheduled at 2026-02-28 12:02:50.170161+00:00)
+2026-02-28 12:02:50,171 | INFO | Starting scraper: python main.py
+2026-02-28 12:02:51,027 | INFO | Scraper finished with code=0
+2026-02-28 12:02:51,027 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 13:02:50 UTC)" executed successfully
+2026-02-28 14:14:20,395 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 15:02:50 UTC)" was missed by 0:11:30.225646
+2026-02-28 15:06:00,706 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 16:02:50 UTC)" (scheduled at 2026-02-28 15:02:50.170161+00:00)
+2026-02-28 15:06:00,708 | INFO | Starting scraper: python main.py
+2026-02-28 15:06:02,894 | INFO | Scraper finished with code=0
+2026-02-28 15:06:02,895 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 16:02:50 UTC)" executed successfully
+2026-02-28 16:06:02,978 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 17:02:50 UTC)" (scheduled at 2026-02-28 16:02:50.170161+00:00)
+2026-02-28 16:06:02,979 | INFO | Starting scraper: python main.py
+2026-02-28 16:06:03,808 | INFO | Scraper finished with code=0
+2026-02-28 16:06:03,808 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 17:02:50 UTC)" executed successfully
+2026-02-28 17:05:45,255 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 18:02:50 UTC)" (scheduled at 2026-02-28 17:02:50.170161+00:00)
+2026-02-28 17:05:45,256 | INFO | Starting scraper: python main.py
+2026-02-28 17:05:46,126 | INFO | Scraper finished with code=0
+2026-02-28 17:05:46,127 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 18:02:50 UTC)" executed successfully
+2026-02-28 18:06:28,709 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 19:02:50 UTC)" (scheduled at 2026-02-28 18:02:50.170161+00:00)
+2026-02-28 18:06:28,710 | INFO | Starting scraper: python main.py
+2026-02-28 18:06:29,583 | INFO | Scraper finished with code=0
+2026-02-28 18:06:29,584 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 19:02:50 UTC)" executed successfully
+2026-02-28 19:03:49,160 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 20:02:50 UTC)" (scheduled at 2026-02-28 19:02:50.170161+00:00)
+2026-02-28 19:03:49,161 | INFO | Starting scraper: python main.py
+2026-02-28 19:03:50,032 | INFO | Scraper finished with code=0
+2026-02-28 19:03:50,032 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 20:02:50 UTC)" executed successfully
+2026-02-28 20:06:27,669 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 21:02:50 UTC)" (scheduled at 2026-02-28 20:02:50.170161+00:00)
+2026-02-28 20:06:27,670 | INFO | Starting scraper: python main.py
+2026-02-28 20:06:28,534 | INFO | Scraper finished with code=0
+2026-02-28 20:06:28,535 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 21:02:50 UTC)" executed successfully
+2026-02-28 21:05:45,391 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 22:02:50 UTC)" (scheduled at 2026-02-28 21:02:50.170161+00:00)
+2026-02-28 21:05:45,392 | INFO | Starting scraper: python main.py
+2026-02-28 21:05:46,356 | INFO | Scraper finished with code=0
+2026-02-28 21:05:46,357 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 22:02:50 UTC)" executed successfully
+2026-02-28 22:05:25,172 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 23:02:50 UTC)" (scheduled at 2026-02-28 22:02:50.170161+00:00)
+2026-02-28 22:05:25,173 | INFO | Starting scraper: python main.py
+2026-02-28 22:05:26,024 | INFO | Scraper finished with code=0
+2026-02-28 22:05:26,025 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-02-28 23:02:50 UTC)" executed successfully
+2026-02-28 23:07:11,483 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 00:02:50 UTC)" (scheduled at 2026-02-28 23:02:50.170161+00:00)
+2026-02-28 23:07:11,485 | INFO | Starting scraper: python main.py
+2026-02-28 23:07:12,853 | INFO | Scraper finished with code=0
+2026-02-28 23:07:12,854 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 00:02:50 UTC)" executed successfully
+2026-03-01 00:06:13,438 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 01:02:50 UTC)" (scheduled at 2026-03-01 00:02:50.170161+00:00)
+2026-03-01 00:06:13,439 | INFO | Starting scraper: python main.py
+2026-03-01 00:06:14,755 | INFO | Scraper finished with code=0
+2026-03-01 00:06:14,756 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 01:02:50 UTC)" executed successfully
+2026-03-01 08:58:17,620 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 09:02:50 UTC)" was missed by 0:55:27.450531
+2026-03-01 09:50:46,533 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 10:02:50 UTC)" was missed by 0:47:56.363407
+2026-03-01 10:03:41,323 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 11:02:50 UTC)" (scheduled at 2026-03-01 10:02:50.170161+00:00)
+2026-03-01 10:03:41,414 | INFO | Starting scraper: python main.py
+2026-03-01 10:03:42,529 | INFO | Scraper finished with code=0
+2026-03-01 10:03:42,530 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 11:02:50 UTC)" executed successfully
+2026-03-01 11:02:50,226 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 12:02:50 UTC)" (scheduled at 2026-03-01 11:02:50.170161+00:00)
+2026-03-01 11:02:50,228 | INFO | Starting scraper: python main.py
+2026-03-01 11:02:51,201 | INFO | Scraper finished with code=0
+2026-03-01 11:02:51,202 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 12:02:50 UTC)" executed successfully
+2026-03-01 12:52:20,621 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 13:02:50 UTC)" was missed by 0:49:30.401149
+2026-03-01 13:02:50,285 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 14:02:50 UTC)" (scheduled at 2026-03-01 13:02:50.170161+00:00)
+2026-03-01 13:02:50,291 | INFO | Starting scraper: python main.py
+2026-03-01 13:02:52,156 | INFO | Scraper finished with code=0
+2026-03-01 13:02:52,157 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 14:02:50 UTC)" executed successfully
+2026-03-01 14:02:50,203 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 15:02:50 UTC)" (scheduled at 2026-03-01 14:02:50.170161+00:00)
+2026-03-01 14:02:50,204 | INFO | Starting scraper: python main.py
+2026-03-01 14:02:51,224 | INFO | Scraper finished with code=0
+2026-03-01 14:02:51,224 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 15:02:50 UTC)" executed successfully
+2026-03-01 15:02:50,260 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 16:02:50 UTC)" (scheduled at 2026-03-01 15:02:50.170161+00:00)
+2026-03-01 15:02:50,261 | INFO | Starting scraper: python main.py
+2026-03-01 15:02:51,119 | INFO | Scraper finished with code=0
+2026-03-01 15:02:51,120 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 16:02:50 UTC)" executed successfully
+2026-03-01 16:02:50,219 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 17:02:50 UTC)" (scheduled at 2026-03-01 16:02:50.170161+00:00)
+2026-03-01 16:02:50,220 | INFO | Starting scraper: python main.py
+2026-03-01 16:02:51,059 | INFO | Scraper finished with code=0
+2026-03-01 16:02:51,060 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 17:02:50 UTC)" executed successfully
+2026-03-01 17:02:50,226 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 18:02:50 UTC)" (scheduled at 2026-03-01 17:02:50.170161+00:00)
+2026-03-01 17:02:50,227 | INFO | Starting scraper: python main.py
+2026-03-01 17:02:51,073 | INFO | Scraper finished with code=0
+2026-03-01 17:02:51,074 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 18:02:50 UTC)" executed successfully
+2026-03-01 18:02:50,244 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 19:02:50 UTC)" (scheduled at 2026-03-01 18:02:50.170161+00:00)
+2026-03-01 18:02:50,252 | INFO | Starting scraper: python main.py
+2026-03-01 18:02:51,086 | INFO | Scraper finished with code=0
+2026-03-01 18:02:51,086 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 19:02:50 UTC)" executed successfully
+2026-03-01 19:03:43,276 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 20:02:50 UTC)" (scheduled at 2026-03-01 19:02:50.170161+00:00)
+2026-03-01 19:03:43,278 | INFO | Starting scraper: python main.py
+2026-03-01 19:03:44,129 | INFO | Scraper finished with code=0
+2026-03-01 19:03:44,130 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 20:02:50 UTC)" executed successfully
+2026-03-01 20:06:16,193 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 21:02:50 UTC)" (scheduled at 2026-03-01 20:02:50.170161+00:00)
+2026-03-01 20:06:16,194 | INFO | Starting scraper: python main.py
+2026-03-01 20:06:17,027 | INFO | Scraper finished with code=0
+2026-03-01 20:06:17,028 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-01 21:02:50 UTC)" executed successfully
+2026-03-02 09:37:21,405 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 10:02:50 UTC)" was missed by 0:34:31.235385
+2026-03-02 13:07:13,466 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 14:02:50 UTC)" (scheduled at 2026-03-02 13:02:50.170161+00:00)
+2026-03-02 13:07:13,532 | INFO | Starting scraper: python main.py
+2026-03-02 13:06:29,567 | INFO | Scraper finished with code=0
+2026-03-02 13:06:29,568 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 14:02:50 UTC)" executed successfully
+2026-03-02 14:06:14,431 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 15:02:50 UTC)" (scheduled at 2026-03-02 14:02:50.170161+00:00)
+2026-03-02 14:06:14,452 | INFO | Starting scraper: python main.py
+2026-03-02 14:06:15,838 | INFO | Scraper finished with code=0
+2026-03-02 14:06:15,838 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 15:02:50 UTC)" executed successfully
+2026-03-02 15:31:45,271 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 16:02:50 UTC)" was missed by 0:28:55.094459
+2026-03-02 16:04:36,629 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 17:02:50 UTC)" (scheduled at 2026-03-02 16:02:50.170161+00:00)
+2026-03-02 16:04:36,638 | INFO | Starting scraper: python main.py
+2026-03-02 16:04:38,148 | INFO | Scraper finished with code=0
+2026-03-02 16:04:38,149 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 17:02:50 UTC)" executed successfully
+2026-03-02 16:09:59,588 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-02 16:09:59,588 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-02 16:09:59,592 | INFO | Added job "run_scraper" to job store "default"
+2026-03-02 16:09:59,592 | INFO | Scheduler started
+2026-03-02 16:09:59,593 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 17:09:59 UTC)" (scheduled at 2026-03-02 16:09:59.587835+00:00)
+2026-03-02 16:09:59,594 | INFO | Starting scraper: python main.py
+2026-03-02 16:10:00,569 | INFO | Scraper finished with code=0
+2026-03-02 16:10:00,570 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 17:09:59 UTC)" executed successfully
+2026-03-02 16:21:03,096 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-02 16:21:03,097 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-02 16:21:03,099 | INFO | Added job "run_scraper" to job store "default"
+2026-03-02 16:21:03,100 | INFO | Scheduler started
+2026-03-02 16:21:03,100 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 16:21:03 UTC)" (scheduled at 2026-03-02 16:21:03.095855+00:00)
+2026-03-02 16:21:03,101 | INFO | Starting scraper: python main.py
+2026-03-02 16:21:04,082 | INFO | Scraper finished with code=0
+2026-03-02 16:21:04,082 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 17:21:03 UTC)" executed successfully
+2026-03-02 17:04:26,268 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-02 17:04:26,269 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-02 17:04:26,270 | INFO | Added job "run_scraper" to job store "default"
+2026-03-02 17:04:26,270 | INFO | Scheduler started
+2026-03-02 17:04:26,271 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 18:04:26 UTC)" (scheduled at 2026-03-02 17:04:26.267466+00:00)
+2026-03-02 17:04:26,272 | INFO | Starting scraper: python main.py
+2026-03-02 17:04:27,458 | INFO | Scraper finished with code=0
+2026-03-02 17:04:27,459 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 18:04:26 UTC)" executed successfully
+2026-03-02 17:16:00,519 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-02 17:16:00,520 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-02 17:16:00,521 | INFO | Added job "run_scraper" to job store "default"
+2026-03-02 17:16:00,521 | INFO | Scheduler started
+2026-03-02 17:16:00,522 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 18:16:00 UTC)" (scheduled at 2026-03-02 17:16:00.518833+00:00)
+2026-03-02 17:16:00,522 | INFO | Starting scraper: python main.py
+2026-03-02 17:16:07,884 | INFO | Scraper finished with code=1
+2026-03-02 17:16:07,885 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 18:16:00 UTC)" executed successfully
+2026-03-02 18:19:51,291 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 19:16:00 UTC)" (scheduled at 2026-03-02 18:16:00.518833+00:00)
+2026-03-02 18:19:51,292 | INFO | Starting scraper: python main.py
+2026-03-02 18:19:58,662 | INFO | Scraper finished with code=1
+2026-03-02 18:19:58,663 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 19:16:00 UTC)" executed successfully
+2026-03-02 19:19:11,357 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 20:16:00 UTC)" (scheduled at 2026-03-02 19:16:00.518833+00:00)
+2026-03-02 19:19:11,359 | INFO | Starting scraper: python main.py
+2026-03-02 19:19:15,975 | INFO | Scraper finished with code=1
+2026-03-02 19:19:15,976 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 20:16:00 UTC)" executed successfully
+2026-03-02 20:18:20,669 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 21:16:00 UTC)" (scheduled at 2026-03-02 20:16:00.518833+00:00)
+2026-03-02 20:18:20,670 | INFO | Starting scraper: python main.py
+2026-03-02 20:17:36,438 | INFO | Scraper finished with code=1
+2026-03-02 20:17:36,439 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-02 21:16:00 UTC)" executed successfully
+2026-03-03 02:09:07,524 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 02:16:00 UTC)" was missed by 0:53:07.005495
+2026-03-03 09:32:48,899 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 10:16:00 UTC)" was missed by 0:16:48.380955
+2026-03-03 10:19:05,307 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 11:16:00 UTC)" (scheduled at 2026-03-03 10:16:00.518833+00:00)
+2026-03-03 10:19:05,308 | INFO | Starting scraper: python main.py
+2026-03-03 10:19:12,810 | INFO | Scraper finished with code=1
+2026-03-03 10:19:12,811 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 11:16:00 UTC)" executed successfully
+2026-03-03 11:20:50,590 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 12:16:00 UTC)" (scheduled at 2026-03-03 11:16:00.518833+00:00)
+2026-03-03 11:20:50,680 | INFO | Starting scraper: python main.py
+2026-03-03 11:20:06,035 | INFO | Scraper finished with code=1
+2026-03-03 11:20:06,035 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 12:16:00 UTC)" executed successfully
+2026-03-03 12:19:21,706 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 13:16:00 UTC)" (scheduled at 2026-03-03 12:16:00.518833+00:00)
+2026-03-03 12:19:21,707 | INFO | Starting scraper: python main.py
+2026-03-03 12:19:27,570 | INFO | Scraper finished with code=1
+2026-03-03 12:19:27,572 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 13:16:00 UTC)" executed successfully
+2026-03-03 15:14:40,627 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 15:16:00 UTC)" was missed by 0:58:40.108819
+2026-03-03 15:16:00,521 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 16:16:00 UTC)" (scheduled at 2026-03-03 15:16:00.518833+00:00)
+2026-03-03 15:16:00,522 | INFO | Starting scraper: python main.py
+2026-03-03 15:16:05,613 | INFO | Scraper finished with code=1
+2026-03-03 15:16:05,613 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 16:16:00 UTC)" executed successfully
+2026-03-03 16:19:36,834 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 17:16:00 UTC)" (scheduled at 2026-03-03 16:16:00.518833+00:00)
+2026-03-03 16:19:36,834 | INFO | Starting scraper: python main.py
+2026-03-03 16:19:41,493 | INFO | Scraper finished with code=1
+2026-03-03 16:19:41,494 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 17:16:00 UTC)" executed successfully
+2026-03-03 21:40:36,672 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 22:16:00 UTC)" was missed by 0:24:36.153577
+2026-03-03 22:18:44,160 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 23:16:00 UTC)" (scheduled at 2026-03-03 22:16:00.518833+00:00)
+2026-03-03 22:18:44,163 | INFO | Starting scraper: python main.py
+2026-03-03 22:18:49,398 | INFO | Scraper finished with code=1
+2026-03-03 22:18:49,400 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-03 23:16:00 UTC)" executed successfully
+2026-03-03 23:19:22,578 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 00:16:00 UTC)" (scheduled at 2026-03-03 23:16:00.518833+00:00)
+2026-03-03 23:19:22,581 | INFO | Starting scraper: python main.py
+2026-03-03 23:19:27,459 | INFO | Scraper finished with code=1
+2026-03-03 23:19:27,460 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 00:16:00 UTC)" executed successfully
+2026-03-04 10:04:03,281 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 10:16:00 UTC)" was missed by 0:48:02.763043
+2026-03-04 13:55:19,512 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 14:16:00 UTC)" was missed by 0:39:18.993664
+2026-03-04 14:16:59,039 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 15:16:00 UTC)" (scheduled at 2026-03-04 14:16:00.518833+00:00)
+2026-03-04 14:16:59,040 | INFO | Starting scraper: python main.py
+2026-03-04 14:17:03,727 | INFO | Scraper finished with code=1
+2026-03-04 14:17:03,727 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 15:16:00 UTC)" executed successfully
+2026-03-04 15:18:32,212 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 16:16:00 UTC)" (scheduled at 2026-03-04 15:16:00.518833+00:00)
+2026-03-04 15:18:32,213 | INFO | Starting scraper: python main.py
+2026-03-04 15:18:36,638 | INFO | Scraper finished with code=1
+2026-03-04 15:18:36,639 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 16:16:00 UTC)" executed successfully
+2026-03-04 16:18:42,125 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 17:16:00 UTC)" (scheduled at 2026-03-04 16:16:00.518833+00:00)
+2026-03-04 16:18:42,193 | INFO | Starting scraper: python main.py
+2026-03-04 16:17:58,520 | INFO | Scraper finished with code=1
+2026-03-04 16:17:58,521 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 17:16:00 UTC)" executed successfully
+2026-03-04 17:18:12,028 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 18:16:00 UTC)" (scheduled at 2026-03-04 17:16:00.518833+00:00)
+2026-03-04 17:18:12,035 | INFO | Starting scraper: python main.py
+2026-03-04 17:18:16,675 | INFO | Scraper finished with code=1
+2026-03-04 17:18:16,676 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 18:16:00 UTC)" executed successfully
+2026-03-04 19:18:40,508 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 20:16:00 UTC)" (scheduled at 2026-03-04 19:16:00.518833+00:00)
+2026-03-04 19:18:40,584 | INFO | Starting scraper: python main.py
+2026-03-04 19:17:57,745 | INFO | Scraper finished with code=1
+2026-03-04 19:17:57,746 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 20:16:00 UTC)" executed successfully
+2026-03-04 20:29:12,813 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 21:16:00 UTC)" was missed by 0:13:12.295010
+2026-03-04 21:18:26,423 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 22:16:00 UTC)" (scheduled at 2026-03-04 21:16:00.518833+00:00)
+2026-03-04 21:18:26,424 | INFO | Starting scraper: python main.py
+2026-03-04 21:18:31,181 | INFO | Scraper finished with code=1
+2026-03-04 21:18:31,187 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 22:16:00 UTC)" executed successfully
+2026-03-04 22:19:23,762 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 23:16:00 UTC)" (scheduled at 2026-03-04 22:16:00.518833+00:00)
+2026-03-04 22:19:23,762 | INFO | Starting scraper: python main.py
+2026-03-04 22:19:28,506 | INFO | Scraper finished with code=1
+2026-03-04 22:19:28,507 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-04 23:16:00 UTC)" executed successfully
+2026-03-04 23:19:26,915 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 00:16:00 UTC)" (scheduled at 2026-03-04 23:16:00.518833+00:00)
+2026-03-04 23:19:26,916 | INFO | Starting scraper: python main.py
+2026-03-04 23:19:32,062 | INFO | Scraper finished with code=1
+2026-03-04 23:19:32,062 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 00:16:00 UTC)" executed successfully
+2026-03-05 10:07:45,614 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 10:16:00 UTC)" was missed by 0:51:45.086231
+2026-03-05 10:16:00,526 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 11:16:00 UTC)" (scheduled at 2026-03-05 10:16:00.518833+00:00)
+2026-03-05 10:16:00,527 | INFO | Starting scraper: python main.py
+2026-03-05 10:16:05,737 | INFO | Scraper finished with code=1
+2026-03-05 10:16:05,739 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 11:16:00 UTC)" executed successfully
+2026-03-05 10:32:06,107 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-05 10:32:06,108 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-05 10:32:06,111 | INFO | Added job "run_scraper" to job store "default"
+2026-03-05 10:32:06,112 | INFO | Scheduler started
+2026-03-05 10:32:06,113 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 11:32:06 UTC)" (scheduled at 2026-03-05 10:32:06.099267+00:00)
+2026-03-05 10:32:06,114 | INFO | Starting scraper: python main.py
+2026-03-05 10:32:11,585 | INFO | Scraper finished with code=1
+2026-03-05 10:32:11,587 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 11:32:06 UTC)" executed successfully
+2026-03-05 11:35:40,899 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 12:32:06 UTC)" (scheduled at 2026-03-05 11:32:06.099267+00:00)
+2026-03-05 11:35:40,902 | INFO | Starting scraper: python main.py
+2026-03-05 11:35:45,982 | INFO | Scraper finished with code=1
+2026-03-05 11:35:45,983 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 12:32:06 UTC)" executed successfully
+2026-03-05 12:35:17,827 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 13:32:06 UTC)" (scheduled at 2026-03-05 12:32:06.099267+00:00)
+2026-03-05 12:35:17,828 | INFO | Starting scraper: python main.py
+2026-03-05 12:35:22,445 | INFO | Scraper finished with code=1
+2026-03-05 12:35:22,446 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 13:32:06 UTC)" executed successfully
+2026-03-05 14:27:18,357 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 14:32:06 UTC)" was missed by 0:55:12.258129
+2026-03-05 14:32:07,430 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 15:32:06 UTC)" (scheduled at 2026-03-05 14:32:06.099267+00:00)
+2026-03-05 14:32:07,431 | INFO | Starting scraper: python main.py
+2026-03-05 14:32:12,172 | INFO | Scraper finished with code=1
+2026-03-05 14:32:12,172 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 15:32:06 UTC)" executed successfully
+2026-03-05 16:23:05,827 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 16:32:06 UTC)" was missed by 0:50:59.727695
+2026-03-05 16:37:46,648 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 17:32:06 UTC)" was missed by 0:05:40.549552
+2026-03-05 17:36:14,288 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 18:32:06 UTC)" (scheduled at 2026-03-05 17:32:06.099267+00:00)
+2026-03-05 17:36:14,292 | INFO | Starting scraper: python main.py
+2026-03-05 17:36:19,838 | INFO | Scraper finished with code=1
+2026-03-05 17:36:19,840 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 18:32:06 UTC)" executed successfully
+2026-03-05 18:35:08,061 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 19:32:06 UTC)" (scheduled at 2026-03-05 18:32:06.099267+00:00)
+2026-03-05 18:35:08,065 | INFO | Starting scraper: python main.py
+2026-03-05 18:35:15,202 | INFO | Scraper finished with code=1
+2026-03-05 18:35:15,205 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 19:32:06 UTC)" executed successfully
+2026-03-05 19:34:57,659 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 20:32:06 UTC)" (scheduled at 2026-03-05 19:32:06.099267+00:00)
+2026-03-05 19:34:57,663 | INFO | Starting scraper: python main.py
+2026-03-05 19:35:03,600 | INFO | Scraper finished with code=1
+2026-03-05 19:35:03,600 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 20:32:06 UTC)" executed successfully
+2026-03-05 20:34:20,923 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 21:32:06 UTC)" (scheduled at 2026-03-05 20:32:06.099267+00:00)
+2026-03-05 20:34:20,926 | INFO | Starting scraper: python main.py
+2026-03-05 20:34:26,297 | INFO | Scraper finished with code=1
+2026-03-05 20:34:26,298 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 21:32:06 UTC)" executed successfully
+2026-03-05 21:34:18,957 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 22:32:06 UTC)" (scheduled at 2026-03-05 21:32:06.099267+00:00)
+2026-03-05 21:34:18,958 | INFO | Starting scraper: python main.py
+2026-03-05 21:34:23,710 | INFO | Scraper finished with code=1
+2026-03-05 21:34:23,711 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 22:32:06 UTC)" executed successfully
+2026-03-05 22:34:21,340 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 23:32:06 UTC)" (scheduled at 2026-03-05 22:32:06.099267+00:00)
+2026-03-05 22:34:21,341 | INFO | Starting scraper: python main.py
+2026-03-05 22:34:25,766 | INFO | Scraper finished with code=1
+2026-03-05 22:34:25,766 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-05 23:32:06 UTC)" executed successfully
+2026-03-05 23:34:27,583 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 00:32:06 UTC)" (scheduled at 2026-03-05 23:32:06.099267+00:00)
+2026-03-05 23:34:27,585 | INFO | Starting scraper: python main.py
+2026-03-05 23:34:32,841 | INFO | Scraper finished with code=1
+2026-03-05 23:34:32,843 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 00:32:06 UTC)" executed successfully
+2026-03-06 00:34:29,538 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 01:32:06 UTC)" (scheduled at 2026-03-06 00:32:06.099267+00:00)
+2026-03-06 00:34:29,540 | INFO | Starting scraper: python main.py
+2026-03-06 00:34:35,389 | INFO | Scraper finished with code=1
+2026-03-06 00:34:35,391 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 01:32:06 UTC)" executed successfully
+2026-03-06 01:34:27,221 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 02:32:06 UTC)" (scheduled at 2026-03-06 01:32:06.099267+00:00)
+2026-03-06 01:34:27,221 | INFO | Starting scraper: python main.py
+2026-03-06 01:34:31,931 | INFO | Scraper finished with code=1
+2026-03-06 01:34:31,932 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 02:32:06 UTC)" executed successfully
+2026-03-06 02:34:46,847 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 03:32:06 UTC)" (scheduled at 2026-03-06 02:32:06.099267+00:00)
+2026-03-06 02:34:46,848 | INFO | Starting scraper: python main.py
+2026-03-06 02:34:52,502 | INFO | Scraper finished with code=1
+2026-03-06 02:34:52,504 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 03:32:06 UTC)" executed successfully
+2026-03-06 04:40:09,019 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 05:32:06 UTC)" was missed by 0:08:02.920484
+2026-03-06 05:45:47,949 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 06:32:06 UTC)" was missed by 0:13:41.850538
+2026-03-06 07:23:09,441 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 07:32:06 UTC)" was missed by 0:51:03.342261
+2026-03-06 07:33:19,387 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 08:32:06 UTC)" (scheduled at 2026-03-06 07:32:06.099267+00:00)
+2026-03-06 07:33:19,389 | INFO | Starting scraper: python main.py
+2026-03-06 07:33:25,302 | INFO | Scraper finished with code=1
+2026-03-06 07:33:25,303 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 08:32:06 UTC)" executed successfully
+2026-03-06 08:35:26,621 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 09:32:06 UTC)" (scheduled at 2026-03-06 08:32:06.099267+00:00)
+2026-03-06 08:35:26,622 | INFO | Starting scraper: python main.py
+2026-03-06 08:35:31,476 | INFO | Scraper finished with code=1
+2026-03-06 08:35:31,477 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 09:32:06 UTC)" executed successfully
+2026-03-06 12:36:27,272 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 13:32:06 UTC)" (scheduled at 2026-03-06 12:32:06.099267+00:00)
+2026-03-06 12:55:12,579 | INFO | Starting scraper: python main.py
+2026-03-06 12:55:18,255 | INFO | Scraper finished with code=1
+2026-03-06 12:55:18,256 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-06 13:32:06 UTC)" executed successfully
+2026-03-08 11:54:29,654 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-08 11:54:29,655 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-08 11:54:29,658 | INFO | Added job "run_scraper" to job store "default"
+2026-03-08 11:54:29,659 | INFO | Scheduler started
+2026-03-08 11:54:29,661 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 12:54:29 UTC)" (scheduled at 2026-03-08 11:54:29.652251+00:00)
+2026-03-08 11:54:29,662 | INFO | Starting scraper: python main.py
+2026-03-08 11:54:35,091 | INFO | Scraper finished with code=1
+2026-03-08 11:54:35,091 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 12:54:29 UTC)" executed successfully
+2026-03-08 13:20:31,312 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 13:54:29 UTC)" was missed by 0:26:01.659920
+2026-03-08 14:29:12,612 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 14:54:29 UTC)" was missed by 0:34:42.960087
+2026-03-08 15:00:21,792 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 15:54:29 UTC)" was missed by 0:05:52.140177
+2026-03-08 15:57:44,580 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 16:54:29 UTC)" (scheduled at 2026-03-08 15:54:29.652251+00:00)
+2026-03-08 15:57:44,581 | INFO | Starting scraper: python main.py
+2026-03-08 15:57:49,196 | INFO | Scraper finished with code=1
+2026-03-08 15:57:49,197 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 16:54:29 UTC)" executed successfully
+2026-03-08 16:57:55,898 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 17:54:29 UTC)" (scheduled at 2026-03-08 16:54:29.652251+00:00)
+2026-03-08 16:57:55,899 | INFO | Starting scraper: python main.py
+2026-03-08 16:58:00,274 | INFO | Scraper finished with code=1
+2026-03-08 16:58:00,275 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 17:54:29 UTC)" executed successfully
+2026-03-08 17:57:45,703 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 18:54:29 UTC)" (scheduled at 2026-03-08 17:54:29.652251+00:00)
+2026-03-08 17:57:45,704 | INFO | Starting scraper: python main.py
+2026-03-08 17:57:50,224 | INFO | Scraper finished with code=1
+2026-03-08 17:57:50,224 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 18:54:29 UTC)" executed successfully
+2026-03-08 18:57:52,967 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 19:54:29 UTC)" (scheduled at 2026-03-08 18:54:29.652251+00:00)
+2026-03-08 18:57:52,968 | INFO | Starting scraper: python main.py
+2026-03-08 18:58:00,066 | INFO | Scraper finished with code=1
+2026-03-08 18:58:00,066 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 19:54:29 UTC)" executed successfully
+2026-03-08 19:57:29,894 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 20:54:29 UTC)" (scheduled at 2026-03-08 19:54:29.652251+00:00)
+2026-03-08 19:57:29,895 | INFO | Starting scraper: python main.py
+2026-03-08 19:57:34,275 | INFO | Scraper finished with code=1
+2026-03-08 19:57:34,280 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 20:54:29 UTC)" executed successfully
+2026-03-08 20:57:45,346 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 21:54:29 UTC)" (scheduled at 2026-03-08 20:54:29.652251+00:00)
+2026-03-08 20:57:45,347 | INFO | Starting scraper: python main.py
+2026-03-08 20:57:50,004 | INFO | Scraper finished with code=1
+2026-03-08 20:57:50,005 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 21:54:29 UTC)" executed successfully
+2026-03-08 21:57:39,434 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 22:54:29 UTC)" (scheduled at 2026-03-08 21:54:29.652251+00:00)
+2026-03-08 21:57:39,435 | INFO | Starting scraper: python main.py
+2026-03-08 21:57:43,804 | INFO | Scraper finished with code=1
+2026-03-08 21:57:43,805 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 22:54:29 UTC)" executed successfully
+2026-03-08 22:57:48,645 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 23:54:29 UTC)" (scheduled at 2026-03-08 22:54:29.652251+00:00)
+2026-03-08 22:57:48,646 | INFO | Starting scraper: python main.py
+2026-03-08 22:57:53,058 | INFO | Scraper finished with code=1
+2026-03-08 22:57:53,059 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-08 23:54:29 UTC)" executed successfully
+2026-03-08 23:58:02,044 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 00:54:29 UTC)" (scheduled at 2026-03-08 23:54:29.652251+00:00)
+2026-03-08 23:58:02,045 | INFO | Starting scraper: python main.py
+2026-03-08 23:58:06,847 | INFO | Scraper finished with code=1
+2026-03-08 23:58:06,847 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 00:54:29 UTC)" executed successfully
+2026-03-09 00:58:11,183 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 01:54:29 UTC)" (scheduled at 2026-03-09 00:54:29.652251+00:00)
+2026-03-09 00:58:11,184 | INFO | Starting scraper: python main.py
+2026-03-09 00:58:15,633 | INFO | Scraper finished with code=1
+2026-03-09 00:58:15,633 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 01:54:29 UTC)" executed successfully
+2026-03-09 01:58:07,687 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 02:54:29 UTC)" (scheduled at 2026-03-09 01:54:29.652251+00:00)
+2026-03-09 01:58:07,689 | INFO | Starting scraper: python main.py
+2026-03-09 01:58:12,154 | INFO | Scraper finished with code=1
+2026-03-09 01:58:12,155 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 02:54:29 UTC)" executed successfully
+2026-03-09 07:25:00,260 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 07:54:29 UTC)" was missed by 0:30:30.607959
+2026-03-09 11:36:10,972 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 11:54:29 UTC)" was missed by 0:41:41.320402
+2026-03-09 11:55:24,187 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 12:54:29 UTC)" (scheduled at 2026-03-09 11:54:29.652251+00:00)
+2026-03-09 11:55:24,188 | INFO | Starting scraper: python main.py
+2026-03-09 11:55:29,079 | INFO | Scraper finished with code=1
+2026-03-09 11:55:29,079 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 12:54:29 UTC)" executed successfully
+2026-03-09 12:54:29,732 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 13:54:29 UTC)" (scheduled at 2026-03-09 12:54:29.652251+00:00)
+2026-03-09 12:54:29,733 | INFO | Starting scraper: python main.py
+2026-03-09 12:54:34,466 | INFO | Scraper finished with code=1
+2026-03-09 12:54:34,466 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 13:54:29 UTC)" executed successfully
+2026-03-09 13:54:29,694 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 14:54:29 UTC)" (scheduled at 2026-03-09 13:54:29.652251+00:00)
+2026-03-09 13:54:29,695 | INFO | Starting scraper: python main.py
+2026-03-09 13:54:34,454 | INFO | Scraper finished with code=1
+2026-03-09 13:54:34,454 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 14:54:29 UTC)" executed successfully
+2026-03-09 15:12:48,665 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 15:54:29 UTC)" was missed by 0:18:19.013490
+2026-03-09 15:56:32,977 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 16:54:29 UTC)" (scheduled at 2026-03-09 15:54:29.652251+00:00)
+2026-03-09 15:56:32,980 | INFO | Starting scraper: python main.py
+2026-03-09 15:56:38,045 | INFO | Scraper finished with code=1
+2026-03-09 15:56:38,066 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 16:54:29 UTC)" executed successfully
+2026-03-09 17:16:37,435 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 17:54:29 UTC)" was missed by 0:22:07.783084
+2026-03-09 17:59:33,370 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 18:54:29 UTC)" was missed by 0:05:03.718612
+2026-03-09 18:58:02,135 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 19:54:29 UTC)" (scheduled at 2026-03-09 18:54:29.652251+00:00)
+2026-03-09 18:58:02,136 | INFO | Starting scraper: python main.py
+2026-03-09 18:58:06,877 | INFO | Scraper finished with code=1
+2026-03-09 18:58:06,877 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 19:54:29 UTC)" executed successfully
+2026-03-09 19:57:17,077 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 20:54:29 UTC)" (scheduled at 2026-03-09 19:54:29.652251+00:00)
+2026-03-09 19:57:17,078 | INFO | Starting scraper: python main.py
+2026-03-09 19:57:21,962 | INFO | Scraper finished with code=1
+2026-03-09 19:57:21,964 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 20:54:29 UTC)" executed successfully
+2026-03-09 20:57:58,229 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 21:54:29 UTC)" (scheduled at 2026-03-09 20:54:29.652251+00:00)
+2026-03-09 20:57:58,272 | INFO | Starting scraper: python main.py
+2026-03-09 20:58:03,160 | INFO | Scraper finished with code=1
+2026-03-09 20:58:03,161 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 21:54:29 UTC)" executed successfully
+2026-03-09 21:58:03,002 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 22:54:29 UTC)" (scheduled at 2026-03-09 21:54:29.652251+00:00)
+2026-03-09 21:58:03,003 | INFO | Starting scraper: python main.py
+2026-03-09 21:58:07,403 | INFO | Scraper finished with code=1
+2026-03-09 21:58:07,404 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 22:54:29 UTC)" executed successfully
+2026-03-09 22:57:57,465 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 23:54:29 UTC)" (scheduled at 2026-03-09 22:54:29.652251+00:00)
+2026-03-09 22:57:57,466 | INFO | Starting scraper: python main.py
+2026-03-09 22:58:02,088 | INFO | Scraper finished with code=1
+2026-03-09 22:58:02,088 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-09 23:54:29 UTC)" executed successfully
+2026-03-09 23:58:04,019 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 00:54:29 UTC)" (scheduled at 2026-03-09 23:54:29.652251+00:00)
+2026-03-09 23:58:04,020 | INFO | Starting scraper: python main.py
+2026-03-09 23:58:08,977 | INFO | Scraper finished with code=1
+2026-03-09 23:58:08,978 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 00:54:29 UTC)" executed successfully
+2026-03-10 08:11:27,075 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 08:54:29 UTC)" was missed by 0:16:57.422903
+2026-03-10 09:37:38,874 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 09:54:29 UTC)" was missed by 0:43:09.221952
+2026-03-10 09:55:17,460 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 10:54:29 UTC)" (scheduled at 2026-03-10 09:54:29.652251+00:00)
+2026-03-10 09:55:17,461 | INFO | Starting scraper: python main.py
+2026-03-10 09:55:23,313 | INFO | Scraper finished with code=1
+2026-03-10 09:55:23,315 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 10:54:29 UTC)" executed successfully
+2026-03-10 11:26:29,641 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 11:54:29 UTC)" was missed by 0:31:59.988719
+2026-03-10 12:03:36,360 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 12:54:29 UTC)" was missed by 0:09:06.708591
+2026-03-10 12:57:41,589 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 13:54:29 UTC)" (scheduled at 2026-03-10 12:54:29.652251+00:00)
+2026-03-10 12:57:41,590 | INFO | Starting scraper: python main.py
+2026-03-10 12:57:46,261 | INFO | Scraper finished with code=1
+2026-03-10 12:57:46,261 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 13:54:29 UTC)" executed successfully
+2026-03-10 13:57:59,758 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 14:54:29 UTC)" (scheduled at 2026-03-10 13:54:29.652251+00:00)
+2026-03-10 13:57:59,761 | INFO | Starting scraper: python main.py
+2026-03-10 13:58:05,558 | INFO | Scraper finished with code=1
+2026-03-10 13:58:05,559 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 14:54:29 UTC)" executed successfully
+2026-03-10 15:56:37,970 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 15:54:29 UTC)" was missed by 1:02:08.317970
+2026-03-10 16:01:43,827 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 16:54:29 UTC)" was missed by 0:07:14.174773
+2026-03-10 16:57:56,327 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 17:54:29 UTC)" (scheduled at 2026-03-10 16:54:29.652251+00:00)
+2026-03-10 16:57:56,328 | INFO | Starting scraper: python main.py
+2026-03-10 16:58:01,051 | INFO | Scraper finished with code=1
+2026-03-10 16:58:01,052 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-10 17:54:29 UTC)" executed successfully
+2026-03-11 12:58:24,152 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 13:54:29 UTC)" (scheduled at 2026-03-11 12:54:29.652251+00:00)
+2026-03-11 12:58:24,247 | INFO | Starting scraper: python main.py
+2026-03-11 12:57:34,165 | INFO | Scraper finished with code=1
+2026-03-11 12:57:34,166 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 13:54:29 UTC)" executed successfully
+2026-03-11 14:02:50,565 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-11 14:02:50,568 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-11 14:02:50,574 | INFO | Added job "run_scraper" to job store "default"
+2026-03-11 14:02:50,578 | INFO | Scheduler started
+2026-03-11 14:02:50,584 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 15:02:50 UTC)" (scheduled at 2026-03-11 14:02:50.561393+00:00)
+2026-03-11 14:02:50,588 | INFO | Starting scraper: python main.py
+2026-03-11 14:02:56,184 | INFO | Scraper finished with code=1
+2026-03-11 14:02:56,185 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 15:02:50 UTC)" executed successfully
+2026-03-11 15:06:54,732 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 16:02:50 UTC)" (scheduled at 2026-03-11 15:02:50.561393+00:00)
+2026-03-11 15:06:54,733 | INFO | Starting scraper: python main.py
+2026-03-11 15:06:59,506 | INFO | Scraper finished with code=1
+2026-03-11 15:06:59,507 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 16:02:50 UTC)" executed successfully
+2026-03-11 16:06:38,038 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 17:02:50 UTC)" (scheduled at 2026-03-11 16:02:50.561393+00:00)
+2026-03-11 16:06:38,039 | INFO | Starting scraper: python main.py
+2026-03-11 16:06:42,765 | INFO | Scraper finished with code=1
+2026-03-11 16:06:42,766 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 17:02:50 UTC)" executed successfully
+2026-03-11 17:06:36,407 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 18:02:50 UTC)" (scheduled at 2026-03-11 17:02:50.561393+00:00)
+2026-03-11 17:06:36,409 | INFO | Starting scraper: python main.py
+2026-03-11 17:06:42,051 | INFO | Scraper finished with code=1
+2026-03-11 17:06:42,052 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 18:02:50 UTC)" executed successfully
+2026-03-11 18:05:30,205 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 19:02:50 UTC)" (scheduled at 2026-03-11 18:02:50.561393+00:00)
+2026-03-11 18:05:30,227 | INFO | Starting scraper: python main.py
+2026-03-11 18:05:36,470 | INFO | Scraper finished with code=1
+2026-03-11 18:05:36,471 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 19:02:50 UTC)" executed successfully
+2026-03-11 19:06:12,247 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 20:02:50 UTC)" (scheduled at 2026-03-11 19:02:50.561393+00:00)
+2026-03-11 19:06:12,249 | INFO | Starting scraper: python main.py
+2026-03-11 19:06:17,023 | INFO | Scraper finished with code=1
+2026-03-11 19:06:17,024 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 20:02:50 UTC)" executed successfully
+2026-03-11 20:06:46,473 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 21:02:50 UTC)" (scheduled at 2026-03-11 20:02:50.561393+00:00)
+2026-03-11 20:06:46,474 | INFO | Starting scraper: python main.py
+2026-03-11 20:06:51,109 | INFO | Scraper finished with code=1
+2026-03-11 20:06:51,110 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 21:02:50 UTC)" executed successfully
+2026-03-11 21:06:21,702 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 22:02:50 UTC)" (scheduled at 2026-03-11 21:02:50.561393+00:00)
+2026-03-11 21:06:21,703 | INFO | Starting scraper: python main.py
+2026-03-11 21:06:26,120 | INFO | Scraper finished with code=1
+2026-03-11 21:06:26,120 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-11 22:02:50 UTC)" executed successfully
+2026-03-12 10:23:29,011 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 10:02:50 UTC)" was missed by 1:20:38.449916
+2026-03-12 11:05:49,550 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 12:02:50 UTC)" (scheduled at 2026-03-12 11:02:50.561393+00:00)
+2026-03-12 11:05:49,558 | INFO | Starting scraper: python main.py
+2026-03-12 11:05:55,233 | INFO | Scraper finished with code=1
+2026-03-12 11:05:55,234 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 12:02:50 UTC)" executed successfully
+2026-03-12 12:02:50,583 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 13:02:50 UTC)" (scheduled at 2026-03-12 12:02:50.561393+00:00)
+2026-03-12 12:02:50,584 | INFO | Starting scraper: python main.py
+2026-03-12 12:02:55,265 | INFO | Scraper finished with code=1
+2026-03-12 12:02:55,266 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 13:02:50 UTC)" executed successfully
+2026-03-12 13:08:32,306 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 14:02:50 UTC)" was missed by 0:05:41.744833
+2026-03-12 14:02:50,571 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 15:02:50 UTC)" (scheduled at 2026-03-12 14:02:50.561393+00:00)
+2026-03-12 14:02:50,573 | INFO | Starting scraper: python main.py
+2026-03-12 14:02:55,882 | INFO | Scraper finished with code=1
+2026-03-12 14:02:55,884 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 15:02:50 UTC)" executed successfully
+2026-03-12 15:02:50,678 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 16:02:50 UTC)" (scheduled at 2026-03-12 15:02:50.561393+00:00)
+2026-03-12 15:02:50,679 | INFO | Starting scraper: python main.py
+2026-03-12 15:02:55,513 | INFO | Scraper finished with code=1
+2026-03-12 15:02:55,514 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 16:02:50 UTC)" executed successfully
+2026-03-12 16:02:50,615 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 17:02:50 UTC)" (scheduled at 2026-03-12 16:02:50.561393+00:00)
+2026-03-12 16:02:50,616 | INFO | Starting scraper: python main.py
+2026-03-12 16:02:55,329 | INFO | Scraper finished with code=1
+2026-03-12 16:02:55,330 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 17:02:50 UTC)" executed successfully
+2026-03-12 17:57:52,494 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 18:02:50 UTC)" was missed by 0:55:01.932633
+2026-03-12 18:03:47,127 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 19:02:50 UTC)" (scheduled at 2026-03-12 18:02:50.561393+00:00)
+2026-03-12 18:03:47,131 | INFO | Starting scraper: python main.py
+2026-03-12 18:03:53,041 | INFO | Scraper finished with code=1
+2026-03-12 18:03:53,043 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 19:02:50 UTC)" executed successfully
+2026-03-12 19:02:50,658 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 20:02:50 UTC)" (scheduled at 2026-03-12 19:02:50.561393+00:00)
+2026-03-12 19:02:50,661 | INFO | Starting scraper: python main.py
+2026-03-12 19:02:56,391 | INFO | Scraper finished with code=1
+2026-03-12 19:02:56,392 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 20:02:50 UTC)" executed successfully
+2026-03-12 20:02:50,608 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 21:02:50 UTC)" (scheduled at 2026-03-12 20:02:50.561393+00:00)
+2026-03-12 20:02:50,609 | INFO | Starting scraper: python main.py
+2026-03-12 20:02:56,084 | INFO | Scraper finished with code=1
+2026-03-12 20:02:56,085 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 21:02:50 UTC)" executed successfully
+2026-03-12 21:20:20,505 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 22:02:50 UTC)" was missed by 0:17:29.943692
+2026-03-12 22:02:59,160 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 23:02:50 UTC)" (scheduled at 2026-03-12 22:02:50.561393+00:00)
+2026-03-12 22:02:59,161 | INFO | Starting scraper: python main.py
+2026-03-12 22:03:03,956 | INFO | Scraper finished with code=1
+2026-03-12 22:03:03,957 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-12 23:02:50 UTC)" executed successfully
+2026-03-12 23:06:27,863 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-13 00:02:50 UTC)" (scheduled at 2026-03-12 23:02:50.561393+00:00)
+2026-03-12 23:06:27,864 | INFO | Starting scraper: python main.py
+2026-03-12 23:06:32,262 | INFO | Scraper finished with code=1
+2026-03-12 23:06:32,262 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-13 00:02:50 UTC)" executed successfully
+2026-03-13 00:05:48,044 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-13 01:02:50 UTC)" (scheduled at 2026-03-13 00:02:50.561393+00:00)
+2026-03-13 00:05:48,045 | INFO | Starting scraper: python main.py
+2026-03-13 00:05:52,435 | INFO | Scraper finished with code=1
+2026-03-13 00:05:52,435 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-13 01:02:50 UTC)" executed successfully
+2026-03-13 01:05:24,472 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-13 02:02:50 UTC)" (scheduled at 2026-03-13 01:02:50.561393+00:00)
+2026-03-13 01:05:24,473 | INFO | Starting scraper: python main.py
+2026-03-13 01:05:31,636 | INFO | Scraper finished with code=1
+2026-03-13 01:05:31,637 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-13 02:02:50 UTC)" executed successfully
+2026-03-14 09:54:33,004 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-14 10:02:50 UTC)" was missed by 0:51:42.443067
+2026-03-14 10:03:15,061 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-14 11:02:50 UTC)" (scheduled at 2026-03-14 10:02:50.561393+00:00)
+2026-03-14 10:03:15,062 | INFO | Starting scraper: python main.py
+2026-03-14 10:03:19,478 | INFO | Scraper finished with code=1
+2026-03-14 10:03:19,478 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-14 11:02:50 UTC)" executed successfully
+2026-03-14 11:06:04,081 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-14 12:02:50 UTC)" (scheduled at 2026-03-14 11:02:50.561393+00:00)
+2026-03-14 11:06:04,081 | INFO | Starting scraper: python main.py
+2026-03-14 11:06:07,971 | INFO | Scraper finished with code=1
+2026-03-14 11:06:07,972 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-14 12:02:50 UTC)" executed successfully
+2026-03-14 13:13:56,348 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-14 14:02:50 UTC)" was missed by 0:11:05.786990
+2026-03-15 09:22:32,801 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 10:02:50 UTC)" was missed by 0:19:42.236814
+2026-03-15 10:05:51,110 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 11:02:50 UTC)" (scheduled at 2026-03-15 10:02:50.561393+00:00)
+2026-03-15 10:05:51,111 | INFO | Starting scraper: python main.py
+2026-03-15 10:05:55,801 | INFO | Scraper finished with code=1
+2026-03-15 10:05:55,801 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 11:02:50 UTC)" executed successfully
+2026-03-15 11:05:55,128 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 12:02:50 UTC)" (scheduled at 2026-03-15 11:02:50.561393+00:00)
+2026-03-15 11:05:55,129 | INFO | Starting scraper: python main.py
+2026-03-15 11:05:59,035 | INFO | Scraper finished with code=1
+2026-03-15 11:05:59,035 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 12:02:50 UTC)" executed successfully
+2026-03-15 12:05:32,086 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 13:02:50 UTC)" (scheduled at 2026-03-15 12:02:50.561393+00:00)
+2026-03-15 12:05:32,088 | INFO | Starting scraper: python main.py
+2026-03-15 12:05:35,993 | INFO | Scraper finished with code=1
+2026-03-15 12:05:35,994 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 13:02:50 UTC)" executed successfully
+2026-03-15 13:05:38,632 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 14:02:50 UTC)" (scheduled at 2026-03-15 13:02:50.561393+00:00)
+2026-03-15 13:05:38,639 | INFO | Starting scraper: python main.py
+2026-03-15 13:05:43,618 | INFO | Scraper finished with code=1
+2026-03-15 13:05:43,619 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 14:02:50 UTC)" executed successfully
+2026-03-15 14:05:32,130 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 15:02:50 UTC)" (scheduled at 2026-03-15 14:02:50.561393+00:00)
+2026-03-15 14:05:32,130 | INFO | Starting scraper: python main.py
+2026-03-15 14:05:36,134 | INFO | Scraper finished with code=1
+2026-03-15 14:05:36,135 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 15:02:50 UTC)" executed successfully
+2026-03-15 15:05:36,727 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 16:02:50 UTC)" (scheduled at 2026-03-15 15:02:50.561393+00:00)
+2026-03-15 15:05:36,728 | INFO | Starting scraper: python main.py
+2026-03-15 15:05:43,330 | INFO | Scraper finished with code=1
+2026-03-15 15:05:43,331 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 16:02:50 UTC)" executed successfully
+2026-03-15 16:05:42,928 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 17:02:50 UTC)" (scheduled at 2026-03-15 16:02:50.561393+00:00)
+2026-03-15 16:05:42,929 | INFO | Starting scraper: python main.py
+2026-03-15 16:05:46,846 | INFO | Scraper finished with code=1
+2026-03-15 16:05:46,847 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 17:02:50 UTC)" executed successfully
+2026-03-15 17:05:30,688 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 18:02:50 UTC)" (scheduled at 2026-03-15 17:02:50.561393+00:00)
+2026-03-15 17:05:30,689 | INFO | Starting scraper: python main.py
+2026-03-15 17:05:34,572 | INFO | Scraper finished with code=1
+2026-03-15 17:05:34,573 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 18:02:50 UTC)" executed successfully
+2026-03-15 18:13:02,883 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-15 19:02:50 UTC)" was missed by 0:10:12.321649
+2026-03-15 23:31:06,869 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 00:02:50 UTC)" was missed by 0:28:16.307756
+2026-03-16 02:25:37,394 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 03:02:50 UTC)" was missed by 0:22:46.833354
+2026-03-16 06:37:40,192 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 07:02:50 UTC)" was missed by 0:34:49.631456
+2026-03-16 08:45:24,489 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 09:02:50 UTC)" was missed by 0:42:33.927567
+2026-03-16 10:12:18,753 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 11:02:50 UTC)" was missed by 0:09:28.192303
+2026-03-16 11:05:41,610 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 12:02:50 UTC)" (scheduled at 2026-03-16 11:02:50.561393+00:00)
+2026-03-16 11:05:41,611 | INFO | Starting scraper: python main.py
+2026-03-16 11:05:45,788 | INFO | Scraper finished with code=1
+2026-03-16 11:05:45,788 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 12:02:50 UTC)" executed successfully
+2026-03-16 12:06:30,524 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 13:02:50 UTC)" (scheduled at 2026-03-16 12:02:50.561393+00:00)
+2026-03-16 12:06:30,525 | INFO | Starting scraper: python main.py
+2026-03-16 12:06:34,388 | INFO | Scraper finished with code=1
+2026-03-16 12:06:34,388 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 13:02:50 UTC)" executed successfully
+2026-03-16 13:06:31,262 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 14:02:50 UTC)" (scheduled at 2026-03-16 13:02:50.561393+00:00)
+2026-03-16 13:06:31,262 | INFO | Starting scraper: python main.py
+2026-03-16 13:06:35,135 | INFO | Scraper finished with code=1
+2026-03-16 13:06:35,135 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 14:02:50 UTC)" executed successfully
+2026-03-16 20:21:33,818 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 21:02:50 UTC)" was missed by 0:18:43.256747
+2026-03-16 21:37:39,131 | WARNING | Run time of job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 22:02:50 UTC)" was missed by 0:34:48.570536
+2026-03-16 22:00:56,809 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:00:56,809 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:00:56,812 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:00:56,812 | INFO | Scheduler started
+2026-03-16 22:00:56,813 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:00:56 UTC)" (scheduled at 2026-03-16 22:00:56.807940+00:00)
+2026-03-16 22:00:56,814 | INFO | Starting scraper: python main.py
+2026-03-16 22:00:58,172 | INFO | Scraper finished with code=0
+2026-03-16 22:00:58,173 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:00:56 UTC)" executed successfully
+2026-03-16 22:03:32,194 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:03:32,195 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:03:32,198 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:03:32,198 | INFO | Scheduler started
+2026-03-16 22:03:32,200 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 22:03:32 UTC)" (scheduled at 2026-03-16 22:03:32.194062+00:00)
+2026-03-16 22:03:32,200 | INFO | Starting scraper: python main.py
+2026-03-16 22:03:33,151 | INFO | Scraper finished with code=0
+2026-03-16 22:03:33,151 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:03:32 UTC)" executed successfully
+2026-03-16 22:04:02,999 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:04:03,000 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:04:03,003 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:04:03,003 | INFO | Scheduler started
+2026-03-16 22:04:03,004 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:04:02 UTC)" (scheduled at 2026-03-16 22:04:02.999377+00:00)
+2026-03-16 22:04:03,005 | INFO | Starting scraper: python main.py
+2026-03-16 22:04:03,919 | INFO | Scraper finished with code=0
+2026-03-16 22:04:03,920 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:04:02 UTC)" executed successfully
+2026-03-16 22:05:06,707 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:05:06,708 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:05:06,711 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:05:06,711 | INFO | Scheduler started
+2026-03-16 22:05:06,712 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 22:05:06 UTC)" (scheduled at 2026-03-16 22:05:06.707140+00:00)
+2026-03-16 22:05:06,712 | INFO | Starting scraper: python main.py
+2026-03-16 22:05:07,644 | INFO | Scraper finished with code=0
+2026-03-16 22:05:07,645 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:05:06 UTC)" executed successfully
+2026-03-16 22:06:18,263 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:06:18,264 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:06:18,266 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:06:18,267 | INFO | Scheduler started
+2026-03-16 22:06:18,268 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:06:18 UTC)" (scheduled at 2026-03-16 22:06:18.263219+00:00)
+2026-03-16 22:06:18,268 | INFO | Starting scraper: python main.py
+2026-03-16 22:06:19,309 | INFO | Scraper finished with code=0
+2026-03-16 22:06:19,309 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:06:18 UTC)" executed successfully
+2026-03-16 22:11:02,152 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:11:02,152 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:11:02,155 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:11:02,155 | INFO | Scheduler started
+2026-03-16 22:11:02,156 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:11:02 UTC)" (scheduled at 2026-03-16 22:11:02.151455+00:00)
+2026-03-16 22:11:02,157 | INFO | Starting scraper: python main.py
+2026-03-16 22:11:03,103 | INFO | Scraper finished with code=0
+2026-03-16 22:11:03,104 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:11:02 UTC)" executed successfully
+2026-03-16 22:21:56,626 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:21:56,627 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:21:56,629 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:21:56,630 | INFO | Scheduler started
+2026-03-16 22:21:56,631 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:21:56 UTC)" (scheduled at 2026-03-16 22:21:56.626009+00:00)
+2026-03-16 22:21:56,632 | INFO | Starting scraper: python main.py
+2026-03-16 22:21:57,609 | INFO | Scraper finished with code=0
+2026-03-16 22:21:57,609 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:21:56 UTC)" executed successfully
+2026-03-16 22:23:23,286 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:23:23,286 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:23:23,289 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:23:23,289 | INFO | Scheduler started
+2026-03-16 22:23:23,290 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:23:23 UTC)" (scheduled at 2026-03-16 22:23:23.285648+00:00)
+2026-03-16 22:23:23,291 | INFO | Starting scraper: python main.py
+2026-03-16 22:23:24,275 | INFO | Scraper finished with code=0
+2026-03-16 22:23:24,276 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:23:23 UTC)" executed successfully
+2026-03-16 22:24:12,326 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-16 22:24:12,327 | INFO | Scheduler started. Interval = 60 minutes
+2026-03-16 22:24:12,329 | INFO | Added job "run_scraper" to job store "default"
+2026-03-16 22:24:12,330 | INFO | Scheduler started
+2026-03-16 22:24:12,331 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:24:12 UTC)" (scheduled at 2026-03-16 22:24:12.325980+00:00)
+2026-03-16 22:24:12,332 | INFO | Starting scraper: python main.py
+2026-03-16 22:24:13,234 | INFO | Scraper finished with code=0
+2026-03-16 22:24:13,234 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-16 23:24:12 UTC)" executed successfully
+2026-03-16 23:24:12,350 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-17 00:24:12 UTC)" (scheduled at 2026-03-16 23:24:12.325980+00:00)
+2026-03-16 23:24:12,353 | INFO | Starting scraper: python main.py
+2026-03-16 23:24:13,311 | INFO | Scraper finished with code=0
+2026-03-16 23:24:13,312 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-17 00:24:12 UTC)" executed successfully
