@@ -75,6 +75,7 @@ services:
       MONGO_URI: "mongodb://mongo:27017"
       CLICKHOUSE_HOST: "clickhouse"
       CLICKHOUSE_HTTP_PORT: "8123"
+      UN_API_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiZWxlbHZzZXJAZ21haWwuY29tIiwiZW1haWwiOiJiZWxlbHZzZXJAZ21haWwuY29tIiwidW5pcXVlX25hbWUiOiJiZWxlbHZzZXJAZ21haWwuY29tIiwibmJmIjoxNzczNjk4MTE5LCJleHAiOjE4MDUyMzQxMTksImlhdCI6MTc3MzY5ODExOSwiaXNzIjoiZG90bmV0LXVzZXItand0cyIsImF1ZCI6ImRhdGEtcG9ydGFsLWFwaSJ9.KiQmyRHYmQvY0afAaKIo_d236vQhCYFXIes9sDWcRlM"
 
       # Postgres (добавили)
       POSTGRES_HOST: "postgres"

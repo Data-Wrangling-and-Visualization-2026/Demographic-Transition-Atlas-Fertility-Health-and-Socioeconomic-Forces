@@ -1,25 +1,32 @@
+import os
 import requests
 import pandas as pd
 
 BASE_URL = "https://population.un.org/dataportalapi/api/v1"
 
 def _get(endpoint, params=None):
-    """Возвращает объединённый DataFrame со всех страниц API."""
     if params is None:
         params = {}
+
+    token = os.getenv("UN_API_TOKEN")  # <-- добавили
+    headers = {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
     all_data = []
     url = f"{BASE_URL}/{endpoint}"
-    
+
     while url:
-        r = requests.get(url, params=params, timeout=30)
+        r = requests.get(url, params=params, headers=headers, timeout=60)  # <-- headers
         r.raise_for_status()
         resp = r.json()
-        
+
         if "data" in resp:
             all_data.extend(resp["data"])
+
         url = resp.get("nextPage", None)
-        params = None  
-    
+        params = None
+
     return pd.DataFrame(all_data)
 
 def get_indicators(codes=None):
