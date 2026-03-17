@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from sqlalchemy import text
 from pipeline.db import get_engine
