@@ -67,3 +67,44 @@ def list_indicators() -> list[str]:
         return combined
     except Exception as exc:  # pragma: no cover
         raise HTTPException(status_code=503, detail="db not available") from exc
+
+
+@app.get("/timeseries")
+def timeseries(
+    country_iso3: str = Query(..., min_length=3, max_length=3),
+    indicator: str = Query(..., min_length=1),
+    source: str = Query(..., min_length=1),
+) -> dict:
+    """
+    Return time-series points for one country + indicator from fact_indicator_value.
+    If no data -> points=[] (no errors).
+    """
+    stmt = text(
+        """
+        SELECT year, value
+        FROM fact_indicator_value
+        WHERE country_iso3 = :iso3
+          AND source = :source
+          AND indicator_code = :indicator
+        ORDER BY year
+        """
+    )
+
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(
+                stmt,
+                {"iso3": country_iso3.upper(), "source": source, "indicator": indicator},
+            ).mappings().all()
+
+        points = [{"year": int(r["year"]), "value": r["value"]} for r in rows]
+
+        return {
+            "country_iso3": country_iso3.upper(),
+            "source": source,
+            "indicator": indicator,
+            "points": points,
+        }
+    except Exception as exc:  # pragma: no cover
+        # Важно: не падать 500 на пустых данных; 500 только если реально DB сломалась
+        raise HTTPException(status_code=503, detail="db not available") from exc

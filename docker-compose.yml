@@ -60,6 +60,22 @@ services:
       timeout: 5s
       retries: 10
 
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: "postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "dwv"
+      POSTGRES_USER: "dwv"
+      POSTGRES_PASSWORD: "dwv"
+    ports:
+      - "8000:8000"
+
   scraper_scheduler:
     build:
       context: ./scraper
