@@ -71,21 +71,35 @@ source=worldbank, code=SP.DYN.TFRT.IN, name=Fertility rate, total (births per wo
 Пример строки:
 country_iso3=RUS, year=2010, source=worldbank, indicator_code=SP.DYN.TFRT.IN, value=1.56
 
----
 
-## Таблица: fact_event (появится в спринте 3)
-**Зачем:** объясняющие события/новости по стране (из GDELT)
+## Таблица: fact_event
+**Зачем:** объясняющие события/новости по стране
 **Ключ:** id
 
 Поля:
-- id (BIGSERIAL, PK)
-- country_iso3 (TEXT)
-- date (DATE) или year (INT)
-- category (TEXT) — например 'family_policy', 'healthcare'
-- summary (TEXT) — короткое описание
-- tags (JSONB) — список тегов/ключевых слов
-- url (TEXT) — ссылка на статью/источник
-- source (TEXT) — 'gdelt'
 
-Пример:
-country_iso3=FRA, date=2015-06-01, category=family_policy, summary="...", url="..."
+source:
+
+un_wpp
+irpd
+
+event_category:
+
+family_planning
+contraception
+abortion
+reproductive_health
+maternal_care
+assisted_reproduction
+parental_leave
+childcare_support
+population_policy
+
+policy_direction:
+
+expansive
+restrictive
+pro_natal
+anti_natal
+neutral
+unknown
