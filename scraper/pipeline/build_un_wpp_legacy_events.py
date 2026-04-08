@@ -73,7 +73,7 @@ def infer_policy_direction(feature_name: str, old_value: str | None, new_value: 
         return "unknown"
 
     new_lower = new_value.lower()
-    old_lower = (old_value or "").lower()
+
 
     if feature_name == "family_planning_support":
         rank = {
