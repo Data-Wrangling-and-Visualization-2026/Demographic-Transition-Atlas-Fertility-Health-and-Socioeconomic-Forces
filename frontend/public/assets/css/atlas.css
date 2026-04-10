@@ -900,3 +900,7 @@ code {
 #map-panel:not(.loading) .map-loading {
   display: none;
 }
+
+#map-panel:not(.loading) .map-empty {
+  display: none !important;
+}
