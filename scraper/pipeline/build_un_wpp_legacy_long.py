@@ -4,9 +4,8 @@ import re
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.append(str(PROJECT_ROOT))
-
-from scraper.pipeline.sources.un_wpp_legacy_long import load_legacy_file_to_long
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 DATA_DIR = Path("scraper/data/un_wpp")
 OUT_DIR = Path("scraper/data/processed")
@@ -24,6 +23,8 @@ def is_legacy_file(name: str) -> bool:
 
 
 def main():
+    from scraper.pipeline.sources.un_wpp_legacy_long import load_legacy_file_to_long
+
     frames = []
 
     for path in sorted(DATA_DIR.glob("*.xls")):

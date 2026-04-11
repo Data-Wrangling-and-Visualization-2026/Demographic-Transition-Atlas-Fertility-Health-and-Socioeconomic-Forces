@@ -1,17 +1,17 @@
 from pathlib import Path
 import sys
-import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.append(str(PROJECT_ROOT))
-
-from scraper.pipeline.sources.un_wpp_modern_long import load_modern_files_to_long
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 OUT_DIR = Path("scraper/data/processed")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def main():
+    from scraper.pipeline.sources.un_wpp_modern_long import load_modern_files_to_long
+
     file_map = {
         "2015": "scraper/data/un_wpp/undesa_pd_2015_population_policies_fertility_fp_rh_dataset.xls",
         "2017": "scraper/data/un_wpp/undesa_pd_2017_abortion_laws_policies_country_dataset.xlsx",
