@@ -826,3 +826,35 @@
 2026-03-16 23:24:12,353 | INFO | Starting scraper: python main.py
 2026-03-16 23:24:13,311 | INFO | Scraper finished with code=0
 2026-03-16 23:24:13,312 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-03-17 00:24:12 UTC)" executed successfully
+2026-04-11 10:30:53,728 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-11 10:30:53,728 | INFO | Scheduler started. Interval = 60 minutes
+2026-04-11 10:30:53,729 | INFO | Added job "run_scraper" to job store "default"
+2026-04-11 10:30:53,729 | INFO | Scheduler started
+2026-04-11 10:30:53,730 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 10:30:53 UTC)" (scheduled at 2026-04-11 10:30:53.728617+00:00)
+2026-04-11 10:30:53,730 | INFO | Starting scraper: python main.py
+2026-04-11 10:30:57,409 | INFO | Scraper finished with code=1
+2026-04-11 10:30:57,409 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 11:30:53 UTC)" executed successfully
+2026-04-11 10:32:02,897 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-11 10:32:02,897 | INFO | Scheduler started. Interval = 60 minutes
+2026-04-11 10:32:02,899 | INFO | Added job "run_scraper" to job store "default"
+2026-04-11 10:32:02,899 | INFO | Scheduler started
+2026-04-11 10:32:02,900 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 10:32:02 UTC)" (scheduled at 2026-04-11 10:32:02.897379+00:00)
+2026-04-11 10:32:02,900 | INFO | Starting scraper: python main.py
+2026-04-11 10:32:06,620 | INFO | Scraper finished with code=1
+2026-04-11 10:32:06,621 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 11:32:02 UTC)" executed successfully
+2026-04-11 10:44:36,863 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-11 10:44:36,863 | INFO | Scheduler started. Interval = 60 minutes
+2026-04-11 10:44:36,865 | INFO | Added job "run_scraper" to job store "default"
+2026-04-11 10:44:36,865 | INFO | Scheduler started
+2026-04-11 10:44:36,866 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 10:44:36 UTC)" (scheduled at 2026-04-11 10:44:36.863624+00:00)
+2026-04-11 10:44:36,866 | INFO | Starting scraper: python main.py
+2026-04-11 10:44:40,594 | INFO | Scraper finished with code=1
+2026-04-11 10:44:40,594 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 11:44:36 UTC)" executed successfully
+2026-04-11 11:06:43,602 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-11 11:06:43,602 | INFO | Scheduler started. Interval = 60 minutes
+2026-04-11 11:06:43,603 | INFO | Added job "run_scraper" to job store "default"
+2026-04-11 11:06:43,603 | INFO | Scheduler started
+2026-04-11 11:06:43,603 | INFO | Running job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 11:06:43 UTC)" (scheduled at 2026-04-11 11:06:43.601962+00:00)
+2026-04-11 11:06:43,603 | INFO | Starting scraper: python main.py
+2026-04-11 11:06:47,326 | INFO | Scraper finished with code=1
+2026-04-11 11:06:47,326 | INFO | Job "run_scraper (trigger: interval[1:00:00], next run at: 2026-04-11 12:06:43 UTC)" executed successfully

@@ -649,8 +649,21 @@ All connections OK
 MongoDB: OK
 ClickHouse: OK
 All connections OK
+<<<<<<< Updated upstream
+=======
 
 --- 2026-03-17T00:24:13.736379Z ---
 MongoDB: OK
 ClickHouse: OK
 All connections OK
+
+--- 2026-04-10T11:05:05.890662Z ---
+MongoDB: OK
+ClickHouse: OK
+All connections OK
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+--- 2026-04-11T11:06:47.326168Z ---
+Connection check failed: mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 3.0s, Topology Description: <TopologyDescription id: 69da2b431a39414cc5a829ab, topology_type: Unknown, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>

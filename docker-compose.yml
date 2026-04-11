@@ -61,8 +61,6 @@ services:
       retries: 10
 
   backend:
-    volumes:
-      - ./frontend/public:/app/frontend/public
     build:
       context: ./backend
     restart: unless-stopped
