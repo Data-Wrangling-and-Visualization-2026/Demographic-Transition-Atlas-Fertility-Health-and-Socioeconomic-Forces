@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demographic Transition Atlas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/css/atlas.css" />
+  </head>
+  <body class="is-booting">
+    <div class="mesh-gradient" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="glow-orbs" aria-hidden="true">
+      <span class="orb orb-a"></span>
+      <span class="orb orb-b"></span>
+      <span class="orb orb-c"></span>
+    </div>
+
+    <header class="site-header">
+      <div class="brand">
+        <div>
+          <h1 class="title">Global Fertility Atlas</h1>
+        </div>
+      </div>
+      <p class="tagline">
+        Explore how fertility changes across countries and years, and how those shifts relate to health and
+        socioeconomic indicators.
+      </p>
+    </header>
+
+    <section class="stats-strip" id="stats-strip" aria-label="Data snapshot" hidden>
+      <div class="stat-card" data-reveal-child>
+        <span class="stat-value" id="stat-countries" data-target="0">—</span>
+        <span class="stat-label">Countries</span>
+      </div>
+      <div class="stat-card" data-reveal-child>
+        <span class="stat-value" id="stat-facts" data-target="0">—</span>
+        <span class="stat-label">Indicator points</span>
+      </div>
+      <div class="stat-card" data-reveal-child>
+        <span class="stat-value" id="stat-events" data-target="0">—</span>
+        <span class="stat-label">Policy events</span>
+      </div>
+      <div class="stat-card" data-reveal-child>
+        <span class="stat-value" id="stat-years" data-target="0">—</span>
+        <span class="stat-label">Years covered</span>
+      </div>
+    </section>
+
+    <div class="wave-divider" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none" class="wave-svg">
+        <path
+          class="wave-path"
+          d="M0,24 Q360,0 720,24 T1440,24 L1440,48 L0,48 Z"
+          fill="url(#wave-grad)"
+          opacity="0.45"
+        />
+        <defs>
+          <linearGradient id="wave-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#7cf0d6" stop-opacity="0.3" />
+            <stop offset="50%" stop-color="#c9a6ff" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#5b8cff" stop-opacity="0.25" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <section class="story-block intro" data-reveal>
+      <h2>About This Site</h2>
+      <p>
+        This site is built for exploration. The globe shows the selected indicator for a specific year, and the right
+        panel opens a country profile with trend lines, context data, and events.
+      </p>
+    </section>
+
+    <main class="atlas-layout">
+      <div class="viz-column">
+        <div id="map-panel" class="map-panel">
+          <div class="map-panel__chrome">
+            <div class="map-panel__title">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span id="map-headline">Global snapshot</span>
+            </div>
+            <div class="map-toolbar" role="group" aria-label="Map controls">
+              <label class="field">
+                <span>Source</span>
+                <select id="source-select" class="control"></select>
+              </label>
+              <label class="field field-grow">
+                <span>Indicator</span>
+                <select id="indicator-select" class="control"></select>
+              </label>
+              <label class="field field-year">
+                <span>Year <strong id="year-label">—</strong></span>
+                <input type="range" id="year-slider" class="year-slider" min="1960" max="2023" value="2010" />
+              </label>
+              <button type="button" id="btn-reset" class="btn btn-ghost">Reset selection</button>
+            </div>
+          </div>
+          <div class="map-stage">
+            <canvas id="starfield" class="starfield-canvas" width="920" height="520" aria-hidden="true"></canvas>
+            <svg id="globe-svg" class="globe-svg" viewBox="0 0 920 520" role="img" aria-label="World globe">
+              <defs>
+                <radialGradient id="ocean-glow" cx="45%" cy="40%" r="65%">
+                  <stop offset="0%" stop-color="rgba(120, 210, 255, 0.35)" />
+                  <stop offset="55%" stop-color="rgba(30, 60, 120, 0.2)" />
+                  <stop offset="100%" stop-color="rgba(5, 8, 18, 0.95)" />
+                </radialGradient>
+                <linearGradient id="rim-light" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.55)" />
+                  <stop offset="40%" stop-color="rgba(255,255,255,0.08)" />
+                  <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+                </linearGradient>
+                <filter id="soft-glow" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <g id="globe-root"></g>
+            </svg>
+            <div id="map-tooltip" class="map-tooltip" hidden></div>
+            <div id="map-loading" class="map-loading" aria-live="polite">
+              <div class="spinner"></div>
+              <p>Loading data layer…</p>
+            </div>
+            <div id="map-empty" class="map-empty" hidden>
+              <p>No values for this year, indicator, and source.</p>
+              <p class="hint">Try another source or indicator.</p>
+            </div>
+          </div>
+        </div>
+
+        <section class="insights-panel card card--lift" id="insights-panel" data-reveal>
+          <div class="insights-head">
+            <h3>Indicator Insights</h3>
+            <p id="insights-subtitle" class="muted small">Based on current map selection</p>
+          </div>
+
+          <div class="insights-kpis">
+            <div class="insight-kpi">
+              <span class="insight-kpi__label">Countries with data</span>
+              <span class="insight-kpi__value" id="kpi-countries">—</span>
+            </div>
+            <div class="insight-kpi">
+              <span class="insight-kpi__label">Average</span>
+              <span class="insight-kpi__value" id="kpi-avg">—</span>
+            </div>
+            <div class="insight-kpi">
+              <span class="insight-kpi__label">Median</span>
+              <span class="insight-kpi__value" id="kpi-median">—</span>
+            </div>
+            <div class="insight-kpi">
+              <span class="insight-kpi__label">Min</span>
+              <span class="insight-kpi__value" id="kpi-min">—</span>
+            </div>
+            <div class="insight-kpi">
+              <span class="insight-kpi__label">Max</span>
+              <span class="insight-kpi__value" id="kpi-max">—</span>
+            </div>
+          </div>
+
+          <div class="insights-grid">
+            <article class="insight-card">
+              <h4>Top Countries</h4>
+              <table class="insight-table">
+                <thead>
+                  <tr><th>#</th><th>Country</th><th>Value</th></tr>
+                </thead>
+                <tbody id="insight-top-body"></tbody>
+              </table>
+            </article>
+
+            <article class="insight-card">
+              <h4>Lowest Countries</h4>
+              <table class="insight-table">
+                <thead>
+                  <tr><th>#</th><th>Country</th><th>Value</th></tr>
+                </thead>
+                <tbody id="insight-bottom-body"></tbody>
+              </table>
+            </article>
+
+            <article class="insight-card">
+              <h4>Year-over-Year Movers</h4>
+              <table class="insight-table">
+                <thead>
+                  <tr><th>Country</th><th>Current</th><th>Change</th></tr>
+                </thead>
+                <tbody id="insight-movers-body"></tbody>
+              </table>
+            </article>
+
+            <article class="insight-card">
+              <h4>Distribution</h4>
+              <svg id="dist-histogram-svg" class="distribution-svg" viewBox="0 0 520 130" preserveAspectRatio="none"></svg>
+              <p class="muted small" id="dist-note">Waiting for data...</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="viz-accent-row" aria-hidden="true">
+          <div class="pulse-ring"></div>
+          <div class="pulse-ring pulse-ring--delay"></div>
+          <div class="pulse-ring pulse-ring--delay2"></div>
+        </section>
+
+        <section class="story-block howto" data-reveal>
+          <h2>How To Use It</h2>
+          <ul class="story-list">
+            <li><strong>Source and indicator:</strong> choose what you want to compare across countries.</li>
+            <li><strong>Year slider:</strong> move through time to see how patterns shift.</li>
+            <li><strong>Country click:</strong> open country details with time series and context.</li>
+          </ul>
+        </section>
+      </div>
+
+      <aside class="detail-column" aria-label="Country detail">
+        <div class="sticky-stack">
+          <div class="country-picker card card--lift">
+            <label class="field">
+              <span>Country</span>
+              <select id="country-select" class="control">
+                <option value="">Pick on the globe or here</option>
+              </select>
+            </label>
+            <p id="country-hint" class="muted small">Clicking a country sets ISO3 and loads series.</p>
+          </div>
+
+          <div id="detail-empty" class="card detail-empty card--lift">
+            <h3>Nothing selected</h3>
+            <p class="muted">
+              Choose a country on the map or from the list—fertility over time, a context series, and policy events
+              will appear here.
+            </p>
+          </div>
+
+          <div id="detail-content" class="detail-content" hidden>
+            <div class="card country-head card--lift">
+              <h3 id="country-name">—</h3>
+              <p id="country-meta" class="muted small">—</p>
+            </div>
+
+            <div class="card chart-card card--lift">
+              <div class="chart-card__head">
+                <h4>Fertility over time</h4>
+                <span id="fertility-caption" class="muted small"></span>
+              </div>
+              <div id="chart-fertility-wrap" class="chart-wrap">
+                <svg id="chart-fertility" class="line-chart" viewBox="0 0 440 200"></svg>
+              </div>
+              <p id="chart-fertility-empty" class="muted small chart-empty" hidden>No series for this country.</p>
+            </div>
+
+            <div class="card chart-card chart-card--compact card--lift">
+              <div class="chart-card__head">
+                <h4>Context: GDP per capita</h4>
+                <span class="muted small">World Bank, current US$</span>
+              </div>
+              <div id="chart-gdp-wrap" class="chart-wrap chart-wrap--short">
+                <svg id="chart-gdp" class="line-chart" viewBox="0 0 440 120"></svg>
+              </div>
+              <p id="chart-gdp-empty" class="muted small chart-empty" hidden>No GDP series (common when UN layer only).</p>
+            </div>
+
+            <div class="card events-card card--lift">
+              <div class="chart-card__head">
+                <h4>Events &amp; policy</h4>
+                <span class="muted small">From <code>/events</code> · UN WPP and more</span>
+              </div>
+              <div id="events-loading" class="inline-loading" hidden>
+                <span class="spinner spinner--tiny"></span> Loading events…
+              </div>
+              <ul id="events-list" class="events-list"></ul>
+              <p id="events-empty" class="muted small" hidden>No event records for this country.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="info-sections" data-reveal>
+      <article class="info-card">
+        <h3>What The Atlas Shows</h3>
+        <p>
+          Country-level comparisons for fertility and related indicators such as health spending, urbanization,
+          education, and labor participation.
+        </p>
+      </article>
+      <article class="info-card">
+        <h3>Why This Matters</h3>
+        <p>
+          Demographic change shapes labor markets, healthcare systems, education planning, and long-term policy
+          decisions across regions.
+        </p>
+      </article>
+      <article class="info-card">
+        <h3>How To Read Results</h3>
+        <p>
+          Map color shows relative value for the selected year. Country charts add historical context so you can read
+          both the snapshot and the trend.
+        </p>
+      </article>
+    </section>
+
+    <section class="story-block footer-cta" data-reveal>
+      <h2>Data And Endpoints</h2>
+      <p class="muted small">
+        Data is served through: <code>/countries</code>, <code>/indicators</code>, <code>/timeseries</code>,
+        <code>/events</code>, <code>/map</code>, <code>/db/stats</code>. Keep frontend and backend running locally for
+        live interaction.
+      </p>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="/assets/js/atlas.js"></script>
+  </body>
+</html>
