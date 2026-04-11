@@ -141,8 +141,8 @@ def get_timeseries(
                 SELECT year, value
                 FROM fact_indicator_value
                 WHERE country_iso3 = :country_iso3
-                  AND indicator_code = : indicator
-                  AND source = : source
+                  AND indicator_code = :indicator
+                  AND source = :source
                 ORDER BY year
                 """)
 
@@ -152,11 +152,18 @@ def get_timeseries(
                 stmt,
                 {"country_iso3": country_iso3, "indicator": indicator, "source": source}
             ).mappings().all()
+            points = []
+            for row in rows:
+                if row["value"] is not None:
+                    try:
+                        points.append({"year": row["year"], "value": float(row["value"])})
+                    except (ValueError, TypeError):
+                        continue
         return {
             "country_iso3": country_iso3,
             "indicator": indicator,
             "source": source,
-            "points": [{"year": row["year"], "value": float(row["value"])} for row in rows]
+            "points": points
         }
     except Exception as exc:
         print(f"Error in /timeseries: {exc}")
