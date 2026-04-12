@@ -1,14 +1,15 @@
 import os
+import time
 import requests
 import pandas as pd
 
 BASE_URL = "https://population.un.org/dataportalapi/api/v1"
 
-def _get(endpoint, params=None):
+def _get(endpoint, params=None, max_retries=4, retry_sleep=5):
     if params is None:
         params = {}
 
-    token = os.getenv("UN_API_TOKEN")  # <-- добавили
+    token = os.getenv("UN_API_TOKEN")
     headers = {}
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -17,9 +18,28 @@ def _get(endpoint, params=None):
     url = f"{BASE_URL}/{endpoint}"
 
     while url:
-        r = requests.get(url, params=params, headers=headers, timeout=60)  # <-- headers
-        r.raise_for_status()
-        resp = r.json()
+        attempt = 0
+        while True:
+            try:
+                r = requests.get(url, params=params, headers=headers, timeout=60)
+                r.raise_for_status()
+                resp = r.json()
+                break
+            except requests.HTTPError as e:
+                status = e.response.status_code if e.response is not None else None
+                if status in (502, 503, 504) and attempt < max_retries:
+                    attempt += 1
+                    print(f"retry {attempt}/{max_retries} for {url} after HTTP {status}")
+                    time.sleep(retry_sleep * attempt)
+                    continue
+                raise
+            except requests.RequestException:
+                if attempt < max_retries:
+                    attempt += 1
+                    print(f"retry {attempt}/{max_retries} for {url} after request error")
+                    time.sleep(retry_sleep * attempt)
+                    continue
+                raise
 
         if "data" in resp:
             all_data.extend(resp["data"])
