@@ -111,6 +111,19 @@ def main():
         ORDER BY id;
     """)
 
+    create_raw_un_sql = text("""
+    CREATE TABLE IF NOT EXISTS raw_un_indicator_value (
+        country_iso3 TEXT NOT NULL,
+        year INT NOT NULL,
+        source TEXT NOT NULL,
+        indicator_id INT NOT NULL,
+        indicator_code TEXT NOT NULL,
+        indicator_name TEXT,
+        value NUMERIC,
+        PRIMARY KEY (country_iso3, year, indicator_id)
+    );
+    """)
+
     upsert = text("""
         INSERT INTO raw_un_indicator_value
             (country_iso3, year, source, indicator_id, indicator_code, indicator_name, value)
@@ -136,6 +149,7 @@ def main():
 
     with engine.begin() as conn:
         raws = conn.execute(sel).fetchall()
+        conn.execute(create_raw_un_sql)
 
         for raw_id, payload in raws:
             obj = payload if isinstance(payload, dict) else json.loads(payload)
