@@ -1,0 +1,18 @@
+source,code,name,project_label,theme_group,narrative_role
+worldbank,SP.DYN.TFRT.IN,"Fertility rate, total (births per woman)",Total fertility rate,fertility,core_outcome
+worldbank,SP.ADO.TFRT,"Adolescent fertility rate (births per 1,000 women ages 15-19)",Adolescent fertility,fertility,core_outcome
+worldbank,SH.STA.MMRT.NE,"Maternal mortality ratio (per 100,000 live births)",Maternal mortality,health,health_outcome
+worldbank,SL.TLF.CACT.FE.ZS,"Labor force participation rate, female (%)",Female labor force participation,labor_gender,gender_context
+worldbank,NY.GDP.PCAP.CD,GDP per capita (current US$),GDP per capita,economy,context
+worldbank,SP.URB.TOTL.IN.ZS,Urban population (% of total),Urban population (%),urbanization,context
+worldbank,SE.SEC.ENRR.FE,"School enrollment, secondary, female (%)",Female secondary enrollment,education,gender_context
+worldbank,SH.XPD.CHEX.GD.ZS,Current health expenditure (% of GDP),Health expenditure (% GDP),health_system,context
+un,UN_18,Mean age of childbearing (5-year),Mean age of childbearing,fertility_timing,context
+un,UN_67,Median age of population,Median age,population_structure,context
+un,UN_50,Population Change,Population change,population_dynamics,context
+un,UN_4,Unmet need for family planning: Any method (Percent),Unmet need for family planning,family_planning,core_context
+un,UN_2,Contraceptive prevalence: Any modern method (Percent),Modern contraceptive prevalence,family_planning,core_context
+un,UN_86,Total dependency ratio,Total dependency ratio,population_structure,context
+un,UN_83,Child dependency ratio,Child dependency ratio,population_structure,context
+un,UN_41,Female population of reproductive age (15-49 years),Female population 15-49,population_structure,context
+un,UN_66,Crude rate of net migration,Crude net migration rate,migration,context

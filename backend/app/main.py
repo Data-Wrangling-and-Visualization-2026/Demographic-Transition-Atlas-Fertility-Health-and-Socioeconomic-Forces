@@ -653,3 +653,47 @@ def map_legacy_alias(
         return rows[:limit]
     except SQLAlchemyError as exc:  # pragma: no cover
         raise HTTPException(status_code=503, detail="db not available") from exc
+
+
+@app.get("/timeseries")
+def timeseries_legacy_alias(
+    country_iso3: str = Query(..., min_length=3, max_length=3),
+    indicator: str = Query(..., min_length=1),
+    source: str | None = Query(None),
+) -> dict[str, Any]:
+    """
+    Legacy compatibility endpoint.
+    `source` is ignored because atlas_country_year_imputed is already harmonized.
+    """
+    _ = source
+    iso3 = country_iso3.upper()
+    _fail_invalid_indicator(indicator)
+
+    stmt = text(
+        f"""
+        SELECT year, {indicator} AS value
+        FROM atlas_country_year_imputed
+        WHERE country_iso3 = :iso3
+        ORDER BY year
+        """
+    )
+
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(stmt, {"iso3": iso3}).mappings().all()
+
+        points: list[dict[str, float | int]] = []
+        for row in rows:
+            value = _to_float_or_none(row["value"])
+            if value is None:
+                continue
+            points.append({"year": int(row["year"]), "value": value})
+
+        return {
+            "country_iso3": iso3,
+            "indicator": indicator,
+            "source": source,
+            "points": points,
+        }
+    except SQLAlchemyError as exc:  # pragma: no cover
+        raise HTTPException(status_code=503, detail="db not available") from exc
