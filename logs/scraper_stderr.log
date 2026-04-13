@@ -3189,3 +3189,65 @@ Traceback (most recent call last):
   File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 259, in _select_servers_loop
     raise ServerSelectionTimeoutError(
 pymongo.errors.ServerSelectionTimeoutError: mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 3.0s, Topology Description: <TopologyDescription id: 69da2b431a39414cc5a829ab, topology_type: Unknown, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+--- 2026-04-11T12:06:47.379568Z ---
+Traceback (most recent call last):
+  File "/app/main.py", line 23, in <module>
+    check_mongo()
+  File "/app/main.py", line 11, in check_mongo
+    client.admin.command("ping")
+  File "/usr/local/lib/python3.12/site-packages/pymongo/_csot.py", line 107, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/database.py", line 890, in command
+    with self.__client._conn_for_reads(read_preference, session) as (
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1346, in _conn_for_reads
+    server = self._select_server(read_preference, session)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1303, in _select_server
+    server = topology.select_server(server_selector)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 302, in select_server
+    server = self._select_server(selector, server_selection_timeout, address)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 286, in _select_server
+    servers = self.select_servers(selector, server_selection_timeout, address)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 237, in select_servers
+    server_descriptions = self._select_servers_loop(selector, server_timeout, address)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 259, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 3.0s, Topology Description: <TopologyDescription id: 69da3953774c543b61c237db, topology_type: Unknown, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+--- 2026-04-13T13:21:50.309262Z ---
+Traceback (most recent call last):
+  File "/app/main.py", line 23, in <module>
+    check_mongo()
+  File "/app/main.py", line 11, in check_mongo
+    client.admin.command("ping")
+  File "/usr/local/lib/python3.12/site-packages/pymongo/_csot.py", line 107, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/database.py", line 890, in command
+    with self.__client._conn_for_reads(read_preference, session) as (
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1346, in _conn_for_reads
+    server = self._select_server(read_preference, session)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1303, in _select_server
+    server = topology.select_server(server_selector)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 302, in select_server
+    server = self._select_server(selector, server_selection_timeout, address)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 286, in _select_server
+    servers = self.select_servers(selector, server_selection_timeout, address)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 237, in select_servers
+    server_descriptions = self._select_servers_loop(selector, server_timeout, address)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pymongo/topology.py", line 259, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 3.0s, Topology Description: <TopologyDescription id: 69dcedea48a7a83f516efd7b, topology_type: Unknown, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
