@@ -2,1253 +2,1309 @@
 (function () {
   "use strict";
 
-  const WB_FERTILITY = "SP.DYN.TFRT.IN";
-  const WB_GDP = "NY.GDP.PCAP.CD";
+  const API_BASE = window.ATLAS_API_BASE || "http://localhost:8000";
 
-  const MAP_EMPTY_DEFAULT = {
-    title: "No values for this year, indicator, and source.",
-    hint: "Try another source or indicator.",
+  const PANEL_INDICATORS = [
+    "tfr",
+    "adolescent_fertility",
+    "gdp_per_capita",
+    "female_secondary_enrollment",
+  ];
+
+  const PANEL_COLORS = {
+    tfr: "#176b55",
+    adolescent_fertility: "#2d8b6f",
+    gdp_per_capita: "#255e93",
+    female_secondary_enrollment: "#b87726",
   };
 
-  const INDICATOR_LABELS = {
-    [WB_FERTILITY]: "Fertility rate, total (births per woman)",
-    [WB_GDP]: "GDP per capita (current US$)",
-    "SP.ADO.TFRT": "Adolescent fertility (births per 1,000 women ages 15–19)",
-    "SH.STA.MMRT.NE": "Maternal mortality ratio (per 100,000 live births)",
-    "SL.TLF.CACT.FE.ZS": "Labor force participation, female (% of labor force)",
-    "SP.URB.TOTL.IN.ZS": "Urban population (% of total)",
-    "SE.SEC.ENRR.FE": "School enrollment, secondary, female (%)",
-    "SH.XPD.CHEX.GD.ZS": "Current health expenditure (% of GDP)",
+  const ID_TO_ISO3 = {
+    4: "AFG",
+    8: "ALB",
+    12: "DZA",
+    20: "AND",
+    24: "AGO",
+    28: "ATG",
+    32: "ARG",
+    51: "ARM",
+    36: "AUS",
+    40: "AUT",
+    31: "AZE",
+    44: "BHS",
+    48: "BHR",
+    50: "BGD",
+    52: "BRB",
+    112: "BLR",
+    56: "BEL",
+    84: "BLZ",
+    204: "BEN",
+    64: "BTN",
+    68: "BOL",
+    70: "BIH",
+    72: "BWA",
+    76: "BRA",
+    96: "BRN",
+    100: "BGR",
+    854: "BFA",
+    108: "BDI",
+    116: "KHM",
+    120: "CMR",
+    124: "CAN",
+    132: "CPV",
+    140: "CAF",
+    148: "TCD",
+    152: "CHL",
+    156: "CHN",
+    170: "COL",
+    174: "COM",
+    178: "COG",
+    180: "COD",
+    188: "CRI",
+    384: "CIV",
+    191: "HRV",
+    192: "CUB",
+    196: "CYP",
+    203: "CZE",
+    208: "DNK",
+    262: "DJI",
+    212: "DMA",
+    214: "DOM",
+    218: "ECU",
+    818: "EGY",
+    222: "SLV",
+    226: "GNQ",
+    232: "ERI",
+    233: "EST",
+    748: "SWZ",
+    231: "ETH",
+    242: "FJI",
+    246: "FIN",
+    250: "FRA",
+    266: "GAB",
+    270: "GMB",
+    268: "GEO",
+    276: "DEU",
+    288: "GHA",
+    300: "GRC",
+    308: "GRD",
+    320: "GTM",
+    324: "GIN",
+    624: "GNB",
+    328: "GUY",
+    332: "HTI",
+    340: "HND",
+    348: "HUN",
+    352: "ISL",
+    356: "IND",
+    360: "IDN",
+    364: "IRN",
+    368: "IRQ",
+    372: "IRL",
+    376: "ISR",
+    380: "ITA",
+    388: "JAM",
+    392: "JPN",
+    400: "JOR",
+    398: "KAZ",
+    404: "KEN",
+    296: "KIR",
+    408: "PRK",
+    410: "KOR",
+    414: "KWT",
+    417: "KGZ",
+    418: "LAO",
+    428: "LVA",
+    422: "LBN",
+    426: "LSO",
+    430: "LBR",
+    434: "LBY",
+    438: "LIE",
+    440: "LTU",
+    442: "LUX",
+    450: "MDG",
+    454: "MWI",
+    458: "MYS",
+    462: "MDV",
+    466: "MLI",
+    470: "MLT",
+    584: "MHL",
+    478: "MRT",
+    480: "MUS",
+    484: "MEX",
+    583: "FSM",
+    498: "MDA",
+    492: "MCO",
+    496: "MNG",
+    499: "MNE",
+    504: "MAR",
+    508: "MOZ",
+    104: "MMR",
+    516: "NAM",
+    520: "NRU",
+    524: "NPL",
+    528: "NLD",
+    554: "NZL",
+    558: "NIC",
+    562: "NER",
+    566: "NGA",
+    807: "MKD",
+    578: "NOR",
+    512: "OMN",
+    586: "PAK",
+    585: "PLW",
+    591: "PAN",
+    598: "PNG",
+    600: "PRY",
+    604: "PER",
+    608: "PHL",
+    616: "POL",
+    620: "PRT",
+    634: "QAT",
+    642: "ROU",
+    643: "RUS",
+    646: "RWA",
+    659: "KNA",
+    662: "LCA",
+    670: "VCT",
+    882: "WSM",
+    674: "SMR",
+    678: "STP",
+    682: "SAU",
+    686: "SEN",
+    688: "SRB",
+    690: "SYC",
+    694: "SLE",
+    702: "SGP",
+    703: "SVK",
+    705: "SVN",
+    90: "SLB",
+    706: "SOM",
+    710: "ZAF",
+    728: "SSD",
+    724: "ESP",
+    144: "LKA",
+    729: "SDN",
+    740: "SUR",
+    752: "SWE",
+    756: "CHE",
+    760: "SYR",
+    158: "TWN",
+    762: "TJK",
+    834: "TZA",
+    764: "THA",
+    626: "TLS",
+    768: "TGO",
+    776: "TON",
+    780: "TTO",
+    788: "TUN",
+    792: "TUR",
+    795: "TKM",
+    798: "TUV",
+    800: "UGA",
+    804: "UKR",
+    784: "ARE",
+    826: "GBR",
+    840: "USA",
+    858: "URY",
+    860: "UZB",
+    548: "VUT",
+    862: "VEN",
+    704: "VNM",
+    887: "YEM",
+    894: "ZMB",
+    716: "ZWE",
+  };
+
+  const state = {
+    meta: null,
+    indicators: [],
+    countries: [],
+    countriesByIso: new Map(),
+    worldFeatures: [],
+    mapRows: [],
+    regionSummaryRows: [],
+    selectedIso3: null,
+    selectedYear: 2024,
+    selectedIndicator: "tfr",
+    selectedRegion: "",
+    selectedIncome: "",
+    refreshToken: 0,
+    panelOpen: false,
+    playTimer: null,
+    compareSelectedCountries: [],
+    compareIndicator: "tfr",
+    compareHiddenCountries: new Set(),
+    mapProjection: null,
+    mapPath: null,
+    mapSvg: null,
+    mapLayer: null,
+    mapSphere: null,
+    mapGraticule: null,
+    mapAtmosphere: null,
+    mapGlow: null,
+    mapShadow: null,
+    mapDragSurface: null,
+    mapValueByIso: new Map(),
+    globeBaseScale: 236,
+    globeRotateTimer: null,
+    isDraggingGlobe: false,
+    isHoveringCountry: false,
   };
 
   const el = (id) => document.getElementById(id);
 
-  const state = {
-    year: 2010,
-    indicator: WB_FERTILITY,
-    source: "worldbank",
-    selectedIso3: "",
-    countries: [],
-    indicators: [],
-    mapRows: [],
-    prevMapRows: [],
-    worldFeatures: null,
-    λ: -24,
-    φ: -18,
-    path: null,
-    projection: null,
-    svg: null,
-    gLand: null,
-    gLines: null,
-    dimensions: { w: 920, h: 520 },
-    starfieldRaf: null,
-  };
-
-  function apiUrl(path) {
-    return `http://localhost:8000${path}`;
-  }
-
-  async function fetchJson(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    return res.json();
-  }
-
-  function initStarfield() {
-    const canvas = el("starfield");
-    if (!canvas || !canvas.getContext) return;
-    const stage = canvas.closest(".map-stage");
-    if (!stage) return;
-    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const n = reduceMotion ? 60 : 140;
-    const stars = Array.from({ length: n }, () => ({
-      x: Math.random(),
-      y: Math.random(),
-      r: Math.random() * 1.15 + 0.15,
-      p: Math.random() * Math.PI * 2,
-      s: 0.4 + Math.random() * 1.6,
-    }));
-
-    function resize() {
-      const rect = stage.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-    }
-
-    function drawStatic() {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const w = canvas.width;
-      const h = canvas.height;
-      const dpr = window.devicePixelRatio || 1;
-      stars.forEach((st) => {
-        ctx.fillStyle = "rgba(200, 230, 255, 0.1)";
-        ctx.beginPath();
-        ctx.arc(st.x * w, st.y * h, st.r * dpr, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    function tick(t) {
-      if (state.starfieldRaf === null) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const w = canvas.width;
-      const h = canvas.height;
-      const time = t * 0.001;
-      const dpr = window.devicePixelRatio || 1;
-      stars.forEach((st) => {
-        const tw = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(time * st.s + st.p));
-        ctx.fillStyle = `rgba(200, 230, 255, ${0.12 * tw})`;
-        ctx.beginPath();
-        ctx.arc(st.x * w, st.y * h, st.r * dpr, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      state.starfieldRaf = requestAnimationFrame(tick);
-    }
-
-    if (state.starfieldRaf) cancelAnimationFrame(state.starfieldRaf);
-    state.starfieldRaf = null;
-    resize();
-    window.addEventListener("resize", () => {
-      resize();
-      if (reduceMotion) drawStatic();
-    });
-    if (reduceMotion) {
-      requestAnimationFrame(() => drawStatic());
-      return;
-    }
-    state.starfieldRaf = requestAnimationFrame(tick);
-  }
-
-  function updateHistogram(rows) {
-    const svg = d3.select("#dist-histogram-svg");
-    const note = el("dist-note");
-    if (!svg.node()) return;
-    svg.selectAll("*").remove();
-    if (!rows || rows.length < 3) {
-      if (note) note.textContent = "Not enough data points to draw a distribution.";
-      return;
-    }
-    const values = rows.map((r) => Number(r.value)).filter((v) => Number.isFinite(v));
-    if (values.length < 3) {
-      if (note) note.textContent = "Not enough numeric values to draw a distribution.";
-      return;
-    }
-    const ext = d3.extent(values);
-    if (!ext[0] && ext[0] !== 0) {
-      if (note) note.textContent = "Distribution is unavailable for this selection.";
-      return;
-    }
-    if (ext[1] - ext[0] < 1e-9) {
-      if (note) note.textContent = "All values are currently identical.";
-      return;
-    }
-    const bins = d3.bin().domain(ext).thresholds(18)(values);
-    const w = 520;
-    const h = 130;
-    const pad = 10;
-    const maxc = d3.max(bins, (b) => b.length) || 1;
-    const bw = (w - pad * 2) / bins.length - 1;
-    bins.forEach((b, i) => {
-      const bh = ((b.length / maxc) * (h - pad * 2)) | 0;
-      const x = pad + i * (bw + 1);
-      const y = h - pad - bh;
-      svg
-        .append("rect")
-        .attr("x", x)
-        .attr("y", y)
-        .attr("width", Math.max(1, bw))
-        .attr("height", Math.max(0, bh))
-        .attr("rx", 3)
-        .attr("fill", "rgba(127, 213, 202, 0.72)")
-        .attr("stroke", "rgba(255,255,255,0.22)");
-    });
-    if (note) note.textContent = `Distribution across ${values.length} countries for ${state.year}.`;
-  }
-
-  function animateStat(elementId, rawTarget, duration = 1100) {
-    const node = el(elementId);
-    if (!node) return;
-    const end = Number(rawTarget);
-    if (!Number.isFinite(end) || end < 0) {
-      node.textContent = "—";
-      return;
-    }
-    const start = 0;
-    const t0 = performance.now();
-    function frame(now) {
-      const u = Math.min(1, (now - t0) / duration);
-      const eased = 1 - Math.pow(1 - u, 3);
-      node.textContent = Math.round(start + (end - start) * eased).toLocaleString("en-US");
-      if (u < 1) requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-  }
-
-  async function loadDbStats() {
-    const strip = el("stats-strip");
-    try {
-      const s = await fetchJson(apiUrl("/db/stats"));
-      strip.hidden = false;
-      animateStat("stat-countries", s.countries_count);
-      animateStat("stat-facts", s.fact_indicator_value_count);
-      animateStat("stat-events", s.fact_context_event_count);
-      animateStat("stat-years", s.indicator_years_count);
-    } catch {
-      strip.hidden = true;
-    }
-  }
-
-  async function loadAllCountries() {
-    const out = [];
-    let offset = 0;
-    const limit = 200;
-    for (;;) {
-      const chunk = await fetchJson(apiUrl(`/countries?limit=${limit}&offset=${offset}`));
-      if (!Array.isArray(chunk) || chunk.length === 0) break;
-      out.push(...chunk);
-      if (chunk.length < limit) break;
-      offset += limit;
-    }
-    return out.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-  }
-
-  function indicatorLabel(code) {
-    if (!code) return "—";
-    if (code.startsWith("UN_")) return `${code} (UN series in DB)`;
-    return INDICATOR_LABELS[code] || code;
-  }
-
-  function setMapEmptyMessage(title, hint) {
-    const paras = el("map-empty").querySelectorAll("p");
-    if (paras[0]) paras[0].textContent = title;
-    if (paras[1]) paras[1].textContent = hint;
-  }
-
-  function resetMapEmptyMessage() {
-    setMapEmptyMessage(MAP_EMPTY_DEFAULT.title, MAP_EMPTY_DEFAULT.hint);
-  }
-
-  async function loadIndicatorsForSource(src) {
-    try {
-      const q = `?source=${encodeURIComponent(src)}`;
-      state.indicators = await fetchJson(apiUrl(`/indicators${q}`));
-    } catch (e) {
-      console.error(e);
-      state.indicators = [];
-    }
-    populateIndicators();
-  }
-
-  function isoFromFeature(f) {
-    // Сначала пробуем стандартные поля
-    const p = f.properties || {};
+  function isoFromFeature(feature) {
+    const p = feature && feature.properties ? feature.properties : {};
     if (p.ISO_A3 && p.ISO_A3 !== "-99") return p.ISO_A3;
     if (p.ADM0_A3 && p.ADM0_A3 !== "-99") return p.ADM0_A3;
-
-    // Для world-atlas с числовыми id, создаем соответствие
-    // Это основные страны, можно добавить больше при необходимости
-    const idToIso = {
-        4: 'AFG',  // Afghanistan
-        8: 'ALB',  // Albania
-        12: 'DZA', // Algeria
-        20: 'AND', // Andorra
-        24: 'AGO', // Angola
-        28: 'ATG', // Antigua and Barbuda
-        32: 'ARG', // Argentina
-        51: 'ARM', // Armenia
-        36: 'AUS', // Australia
-        40: 'AUT', // Austria
-        31: 'AZE', // Azerbaijan
-        44: 'BHS', // Bahamas
-        48: 'BHR', // Bahrain
-        50: 'BGD', // Bangladesh
-        52: 'BRB', // Barbados
-        112: 'BLR', // Belarus
-        56: 'BEL', // Belgium
-        84: 'BLZ', // Belize
-        204: 'BEN', // Benin
-        64: 'BTN', // Bhutan
-        68: 'BOL', // Bolivia
-        70: 'BIH', // Bosnia and Herzegovina
-        72: 'BWA', // Botswana
-        76: 'BRA', // Brazil
-        96: 'BRN', // Brunei
-        100: 'BGR', // Bulgaria
-        854: 'BFA', // Burkina Faso
-        108: 'BDI', // Burundi
-        116: 'KHM', // Cambodia
-        120: 'CMR', // Cameroon
-        124: 'CAN', // Canada
-        132: 'CPV', // Cape Verde
-        140: 'CAF', // Central African Republic
-        148: 'TCD', // Chad
-        152: 'CHL', // Chile
-        156: 'CHN', // China
-        170: 'COL', // Colombia
-        174: 'COM', // Comoros
-        178: 'COG', // Congo
-        180: 'COD', // DR Congo
-        188: 'CRI', // Costa Rica
-        384: 'CIV', // Cote d'Ivoire
-        191: 'HRV', // Croatia
-        192: 'CUB', // Cuba
-        196: 'CYP', // Cyprus
-        203: 'CZE', // Czech Republic
-        208: 'DNK', // Denmark
-        262: 'DJI', // Djibouti
-        212: 'DMA', // Dominica
-        214: 'DOM', // Dominican Republic
-        218: 'ECU', // Ecuador
-        818: 'EGY', // Egypt
-        222: 'SLV', // El Salvador
-        226: 'GNQ', // Equatorial Guinea
-        232: 'ERI', // Eritrea
-        233: 'EST', // Estonia
-        748: 'SWZ', // Eswatini
-        231: 'ETH', // Ethiopia
-        242: 'FJI', // Fiji
-        246: 'FIN', // Finland
-        250: 'FRA', // France
-        266: 'GAB', // Gabon
-        270: 'GMB', // Gambia
-        268: 'GEO', // Georgia
-        276: 'DEU', // Germany
-        288: 'GHA', // Ghana
-        300: 'GRC', // Greece
-        308: 'GRD', // Grenada
-        320: 'GTM', // Guatemala
-        324: 'GIN', // Guinea
-        624: 'GNB', // Guinea-Bissau
-        328: 'GUY', // Guyana
-        332: 'HTI', // Haiti
-        340: 'HND', // Honduras
-        348: 'HUN', // Hungary
-        352: 'ISL', // Iceland
-        356: 'IND', // India
-        360: 'IDN', // Indonesia
-        364: 'IRN', // Iran
-        368: 'IRQ', // Iraq
-        372: 'IRL', // Ireland
-        376: 'ISR', // Israel
-        380: 'ITA', // Italy
-        388: 'JAM', // Jamaica
-        392: 'JPN', // Japan
-        400: 'JOR', // Jordan
-        398: 'KAZ', // Kazakhstan
-        404: 'KEN', // Kenya
-        296: 'KIR', // Kiribati
-        408: 'PRK', // North Korea
-        410: 'KOR', // South Korea
-        414: 'KWT', // Kuwait
-        417: 'KGZ', // Kyrgyzstan
-        418: 'LAO', // Laos
-        428: 'LVA', // Latvia
-        422: 'LBN', // Lebanon
-        426: 'LSO', // Lesotho
-        430: 'LBR', // Liberia
-        434: 'LBY', // Libya
-        438: 'LIE', // Liechtenstein
-        440: 'LTU', // Lithuania
-        442: 'LUX', // Luxembourg
-        450: 'MDG', // Madagascar
-        454: 'MWI', // Malawi
-        458: 'MYS', // Malaysia
-        462: 'MDV', // Maldives
-        466: 'MLI', // Mali
-        470: 'MLT', // Malta
-        584: 'MHL', // Marshall Islands
-        478: 'MRT', // Mauritania
-        480: 'MUS', // Mauritius
-        484: 'MEX', // Mexico
-        583: 'FSM', // Micronesia
-        498: 'MDA', // Moldova
-        492: 'MCO', // Monaco
-        496: 'MNG', // Mongolia
-        499: 'MNE', // Montenegro
-        504: 'MAR', // Morocco
-        508: 'MOZ', // Mozambique
-        104: 'MMR', // Myanmar
-        516: 'NAM', // Namibia
-        520: 'NRU', // Nauru
-        524: 'NPL', // Nepal
-        528: 'NLD', // Netherlands
-        554: 'NZL', // New Zealand
-        558: 'NIC', // Nicaragua
-        562: 'NER', // Niger
-        566: 'NGA', // Nigeria
-        807: 'MKD', // North Macedonia
-        578: 'NOR', // Norway
-        512: 'OMN', // Oman
-        586: 'PAK', // Pakistan
-        585: 'PLW', // Palau
-        591: 'PAN', // Panama
-        598: 'PNG', // Papua New Guinea
-        600: 'PRY', // Paraguay
-        604: 'PER', // Peru
-        608: 'PHL', // Philippines
-        616: 'POL', // Poland
-        620: 'PRT', // Portugal
-        634: 'QAT', // Qatar
-        642: 'ROU', // Romania
-        643: 'RUS', // Russia
-        646: 'RWA', // Rwanda
-        659: 'KNA', // Saint Kitts and Nevis
-        662: 'LCA', // Saint Lucia
-        670: 'VCT', // Saint Vincent and the Grenadines
-        882: 'WSM', // Samoa
-        674: 'SMR', // San Marino
-        678: 'STP', // Sao Tome and Principe
-        682: 'SAU', // Saudi Arabia
-        686: 'SEN', // Senegal
-        688: 'SRB', // Serbia
-        690: 'SYC', // Seychelles
-        694: 'SLE', // Sierra Leone
-        702: 'SGP', // Singapore
-        703: 'SVK', // Slovakia
-        705: 'SVN', // Slovenia
-        90: 'SLB', // Solomon Islands
-        706: 'SOM', // Somalia
-        710: 'ZAF', // South Africa
-        728: 'SSD', // South Sudan
-        724: 'ESP', // Spain
-        144: 'LKA', // Sri Lanka
-        729: 'SDN', // Sudan
-        740: 'SUR', // Suriname
-        752: 'SWE', // Sweden
-        756: 'CHE', // Switzerland
-        760: 'SYR', // Syria
-        158: 'TWN', // Taiwan
-        762: 'TJK', // Tajikistan
-        834: 'TZA', // Tanzania
-        764: 'THA', // Thailand
-        626: 'TLS', // Timor-Leste
-        768: 'TGO', // Togo
-        776: 'TON', // Tonga
-        780: 'TTO', // Trinidad and Tobago
-        788: 'TUN', // Tunisia
-        792: 'TUR', // Turkey
-        795: 'TKM', // Turkmenistan
-        798: 'TUV', // Tuvalu
-        800: 'UGA', // Uganda
-        804: 'UKR', // Ukraine
-        784: 'ARE', // United Arab Emirates
-        826: 'GBR', // United Kingdom
-        840: 'USA', // United States
-        858: 'URY', // Uruguay
-        860: 'UZB', // Uzbekistan
-        548: 'VUT', // Vanuatu
-        862: 'VEN', // Venezuela
-        704: 'VNM', // Vietnam
-        887: 'YEM', // Yemen
-        894: 'ZMB', // Zambia
-        716: 'ZWE', // Zimbabwe
-    };
-
-    // Пробуем найти по id
-    if (f.id && idToIso[f.id]) {
-        return idToIso[f.id];
-    }
-
+    if (feature && feature.id != null && ID_TO_ISO3[feature.id]) return ID_TO_ISO3[feature.id];
     return null;
-}
-
-  function setupReveal() {
-    const blocks = document.querySelectorAll("[data-reveal]");
-    if (!blocks.length || !("IntersectionObserver" in window)) {
-      blocks.forEach((b) => b.setAttribute("data-visible", "true"));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.setAttribute("data-visible", "true");
-        });
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.08 },
-    );
-    blocks.forEach((b) => io.observe(b));
   }
 
-  function setupControls() {
-    const sourceSelect = el("source-select");
-    sourceSelect.innerHTML = "";
-    [
-      { v: "worldbank", t: "World Bank" },
-      { v: "un", t: "United Nations" },
-    ].forEach((o) => {
-      const opt = document.createElement("option");
-      opt.value = o.v;
-      opt.textContent = o.t;
-      sourceSelect.appendChild(opt);
-    });
-    sourceSelect.value = state.source;
-    sourceSelect.addEventListener("change", async () => {
-      state.source = sourceSelect.value;
-      resetMapEmptyMessage();
-      await loadIndicatorsForSource(state.source);
-      void refreshMap();
-      void refreshDetailIfSelected();
-    });
-
-    el("indicator-select").addEventListener("change", (e) => {
-      state.indicator = e.target.value;
-      void refreshMap();
-    });
-
-    const yearSlider = el("year-slider");
-    const yearLabel = el("year-label");
-    yearLabel.textContent = String(yearSlider.value);
-    yearSlider.addEventListener("input", () => {
-      state.year = Number(yearSlider.value);
-      yearLabel.textContent = String(state.year);
-      void refreshMap();
-    });
-    state.year = Number(yearSlider.value);
-
-    el("btn-reset").addEventListener("click", () => {
-      state.selectedIso3 = "";
-      el("country-select").value = "";
-      toggleDetail(false);
-      redrawMapColors();
-    });
-
-    el("country-select").addEventListener("change", (e) => {
-      state.selectedIso3 = (e.target.value || "").toUpperCase();
-      if (state.selectedIso3) {
-        toggleDetail(true);
-        void loadCountryDetail();
-      } else {
-        toggleDetail(false);
-      }
-      redrawMapColors();
-    });
-  }
-
-  function toggleDetail(show) {
-    el("detail-empty").hidden = show;
-    el("detail-content").hidden = !show;
-  }
-
-  function populateCountrySelect() {
-    const sel = el("country-select");
-    const first = sel.querySelector("option[value='']");
-    sel.innerHTML = "";
-    if (first) sel.appendChild(first);
-    else {
-      const o = document.createElement("option");
-      o.value = "";
-      o.textContent = "Pick on the globe or here";
-      sel.appendChild(o);
-    }
-    state.countries.forEach((c) => {
-      const opt = document.createElement("option");
-      opt.value = c.iso3;
-      opt.textContent = `${c.name} (${c.iso3})`;
-      sel.appendChild(opt);
-    });
-  }
-
-  function populateIndicators() {
-    const sel = el("indicator-select");
-    sel.innerHTML = "";
-    if (!state.indicators.length) {
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent =
-        state.source === "un"
-          ? "No UN series in the database — run ingest or choose World Bank"
-          : "No indicators returned from the API";
-      sel.appendChild(opt);
-      state.indicator = "";
-      return;
-    }
-    state.indicators.forEach((code) => {
-      const opt = document.createElement("option");
-      opt.value = code;
-      opt.textContent = `${code} — ${indicatorLabel(code)}`;
-      sel.appendChild(opt);
-    });
-    if (state.indicators.includes(WB_FERTILITY)) sel.value = WB_FERTILITY;
-    else sel.value = state.indicators[0];
-    state.indicator = sel.value;
-  }
-
-  function buildScales(rows) {
-    const values = rows.map((r) => Number(r.value)).filter((v) => Number.isFinite(v));
-    if (!values.length) return { color: null, extent: [0, 1] };
-    const extent = d3.extent(values);
-    const color = d3.scaleSequential(d3.interpolateTurbo).domain([extent[0], extent[1]]);
-    return { color, extent };
-  }
-
-  function updateLegend(color, extent) {
-    const grad = el("legend-gradient");
-    const ticks = el("legend-ticks");
-    const hoverTip = el("legend-hover-tip");
-    const legendNote = el("legend-note");
-    if (!grad || !ticks) return;
-    if (!color || !Number.isFinite(extent[0])) {
-      grad.style.background = "rgba(255,255,255,0.08)";
-      ticks.innerHTML = "";
-      if (hoverTip) {
-        hoverTip.textContent =
-          "No scale is available for this selection yet. Usually this means there are no values for the chosen source, indicator, or year.";
-      }
-      if (legendNote) {
-        legendNote.textContent =
-          "No values available for this map selection yet. Try another source, indicator, or year.";
-      }
-      return;
-    }
-    const fmt = d3.format(".2f");
-    const span = extent[1] - extent[0];
-    if (Math.abs(span) < 1e-9) {
-      const solid = d3.interpolateTurbo(0.5);
-      grad.style.background = solid;
-      ticks.innerHTML = "";
-      const single = document.createElement("span");
-      single.style.margin = "0 auto";
-      single.textContent = fmt(extent[0]);
-      ticks.appendChild(single);
-      if (hoverTip) {
-        hoverTip.textContent =
-          `All currently available countries have the same value (${fmt(extent[0])}), so the scale is shown as one solid color.`;
-      }
-      if (legendNote) {
-        legendNote.textContent =
-          `Current value is ${fmt(extent[0])} for available map rows, so there is no visible range.`;
-      }
-      return;
-    }
-    if (hoverTip) {
-      hoverTip.textContent =
-        `Color scale: left = lower values, right = higher values. Current range is ${fmt(extent[0])} to ${fmt(extent[1])}.`;
-    }
-    if (legendNote) {
-      legendNote.textContent =
-        `Scale range for this selection: ${fmt(extent[0])} to ${fmt(extent[1])}.`;
-    }
-    const samples = d3.range(0, 1.01, 0.05).map((t) => d3.interpolateTurbo(t));
-    grad.style.background = `linear-gradient(90deg, ${samples.join(",")})`;
-    ticks.innerHTML = "";
-    [0, 0.25, 0.5, 0.75, 1].forEach((p) => {
-      const span = document.createElement("span");
-      span.textContent = fmt(extent[0] + p * (extent[1] - extent[0]));
-      ticks.appendChild(span);
-    });
-  }
-
-  function formatMetric(v) {
-    if (!Number.isFinite(v)) return "—";
+  function formatValue(value) {
+    if (value == null || !Number.isFinite(Number(value))) return "-";
+    const v = Number(value);
     const abs = Math.abs(v);
-    if (abs >= 1000000) return d3.format(".3s")(v);
-    if (abs >= 1000) return d3.format(",.0f")(v);
+    if (abs >= 1_000_000) return d3.format(".3s")(v);
+    if (abs >= 10_000) return d3.format(",.0f")(v);
+    if (abs >= 100) return d3.format(",.1f")(v);
     return d3.format(".2f")(v);
   }
 
-  function countryRowsOnly(rows) {
-    const valid = new Set(state.countries.map((c) => (c.iso3 || "").toUpperCase()));
-    return (rows || [])
-      .filter((r) => valid.has((r.iso3 || "").toUpperCase()))
-      .map((r) => ({ ...r, value: Number(r.value) }))
-      .filter((r) => Number.isFinite(r.value));
-  }
-
-  function setEmptyTable(tbody, text, colSpan) {
-    tbody.innerHTML = "";
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = colSpan;
-    td.textContent = text;
-    td.className = "muted small";
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-  }
-
-  function renderRankTable(tbodyId, rows) {
-    const tbody = el(tbodyId);
-    if (!tbody) return;
-    if (!rows.length) return setEmptyTable(tbody, "No data for this selection.", 3);
-    tbody.innerHTML = "";
-    rows.forEach((r, idx) => {
-      const tr = document.createElement("tr");
-      const tdRank = document.createElement("td");
-      tdRank.textContent = String(idx + 1);
-      const tdCountry = document.createElement("td");
-      tdCountry.textContent = r.name || r.iso3 || "—";
-      const tdValue = document.createElement("td");
-      tdValue.textContent = formatMetric(r.value);
-      tr.appendChild(tdRank);
-      tr.appendChild(tdCountry);
-      tr.appendChild(tdValue);
-      tbody.appendChild(tr);
-    });
-  }
-
-  function renderMoversTable(currentRows, prevRows) {
-    const tbody = el("insight-movers-body");
-    if (!tbody) return;
-    const prevMap = new Map((prevRows || []).map((r) => [r.iso3, Number(r.value)]));
-    const movers = currentRows
-      .map((r) => {
-        const prev = prevMap.get(r.iso3);
-        if (!Number.isFinite(prev)) return null;
-        return { ...r, delta: r.value - prev };
-      })
-      .filter(Boolean)
-      .filter((r) => Number.isFinite(r.delta))
-      .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
-      .slice(0, 8);
-
-    if (!movers.length) return setEmptyTable(tbody, "No previous-year data to compare.", 3);
-    tbody.innerHTML = "";
-    movers.forEach((r) => {
-      const tr = document.createElement("tr");
-      const tdCountry = document.createElement("td");
-      tdCountry.textContent = r.name || r.iso3 || "—";
-      const tdCurrent = document.createElement("td");
-      tdCurrent.textContent = formatMetric(r.value);
-      const tdDelta = document.createElement("td");
-      const sign = r.delta > 0 ? "+" : "";
-      tdDelta.textContent = `${sign}${formatMetric(r.delta)}`;
-      tdDelta.className = r.delta > 0 ? "delta-up" : r.delta < 0 ? "delta-down" : "";
-      tr.appendChild(tdCountry);
-      tr.appendChild(tdCurrent);
-      tr.appendChild(tdDelta);
-      tbody.appendChild(tr);
-    });
-  }
-
-  function renderInsights() {
-    const rows = countryRowsOnly(state.mapRows);
-    const subtitle = el("insights-subtitle");
-    if (subtitle) {
-      subtitle.textContent = `${indicatorLabel(state.indicator)} · ${state.source} · ${state.year}`;
+  function buildApiUrl(path, params) {
+    const url = new URL(path, API_BASE);
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === "") return;
+        url.searchParams.set(key, String(value));
+      });
     }
+    return url.toString();
+  }
 
-    const countriesEl = el("kpi-countries");
-    const avgEl = el("kpi-avg");
-    const medianEl = el("kpi-median");
-    const minEl = el("kpi-min");
-    const maxEl = el("kpi-max");
+  async function fetchJSON(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+      const payload = await response.text();
+      throw new Error(`${response.status} ${response.statusText} ${payload}`);
+    }
+    return response.json();
+  }
 
-    if (!rows.length) {
-      if (countriesEl) countriesEl.textContent = "0";
-      if (avgEl) avgEl.textContent = "—";
-      if (medianEl) medianEl.textContent = "—";
-      if (minEl) minEl.textContent = "—";
-      if (maxEl) maxEl.textContent = "—";
-      renderRankTable("insight-top-body", []);
-      renderRankTable("insight-bottom-body", []);
-      renderMoversTable([], []);
-      updateHistogram([]);
+  function indicatorMeta(code) {
+    return state.indicators.find((i) => i.code === code) || null;
+  }
+
+  function getCountryName(iso3) {
+    const row = state.countriesByIso.get(iso3);
+    return row ? row.name : iso3;
+  }
+
+  function updateYearLabel() {
+    el("year-value").textContent = String(state.selectedYear);
+  }
+
+  function setLoadingMessage(message) {
+    const box = el("map-empty");
+    box.textContent = message;
+    box.hidden = false;
+  }
+
+  function hideLoadingMessage() {
+    el("map-empty").hidden = true;
+  }
+
+  function setupReveal() {
+    const nodes = document.querySelectorAll("[data-reveal]");
+    if (!nodes.length) return;
+    if (!("IntersectionObserver" in window)) {
+      nodes.forEach((node) => node.setAttribute("data-visible", "true"));
       return;
     }
-
-    const values = rows.map((r) => r.value).sort((a, b) => a - b);
-    const avg = d3.mean(values);
-    const median = d3.median(values);
-    const min = values[0];
-    const max = values[values.length - 1];
-
-    if (countriesEl) countriesEl.textContent = String(rows.length);
-    if (avgEl) avgEl.textContent = formatMetric(avg);
-    if (medianEl) medianEl.textContent = formatMetric(median);
-    if (minEl) minEl.textContent = formatMetric(min);
-    if (maxEl) maxEl.textContent = formatMetric(max);
-
-    const sortedDesc = [...rows].sort((a, b) => b.value - a.value);
-    const sortedAsc = [...rows].sort((a, b) => a.value - b.value);
-    renderRankTable("insight-top-body", sortedDesc.slice(0, 8));
-    renderRankTable("insight-bottom-body", sortedAsc.slice(0, 8));
-    renderMoversTable(rows, countryRowsOnly(state.prevMapRows));
-    updateHistogram(rows);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.setAttribute("data-visible", "true");
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -8% 0px" },
+    );
+    nodes.forEach((node) => observer.observe(node));
   }
 
-  function initGlobe() {
-    const svg = d3.select("#globe-svg");
-    const root = svg.select("#globe-root");
-    root.selectAll("*").remove();
+  async function loadWorldFeatures() {
+    const world = await fetchJSON("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+    const features = topojson.feature(world, world.objects.countries).features;
+    features.forEach((feature) => {
+      feature._iso3 = isoFromFeature(feature);
+    });
+    return features;
+  }
 
-    const { w, h } = state.dimensions;
-    const projection = d3
-      .geoOrthographic()
-      .scale(260)
-      .center([0, 0])
-      .rotate([-state.λ, -state.φ])
-      .translate([w / 2, h / 2])
-      .clipAngle(90);
+  function populateIndicatorSelects() {
+    const indicatorSelect = el("indicator-select");
+    const compareSelect = el("compare-indicator-select");
 
-    const path = d3.geoPath(projection);
-    state.projection = projection;
-    state.path = path;
-    state.svg = svg;
+    indicatorSelect.innerHTML = "";
+    compareSelect.innerHTML = "";
 
-    const gRoot = root.append("g").attr("class", "globe-inner");
+    state.indicators.forEach((item) => {
+      const label = `${item.label} (${item.code})`;
 
-    svg
-      .select("defs")
-      .append("clipPath")
-      .attr("id", "sphere-clip")
-      .append("circle")
-      .attr("cx", w / 2)
-      .attr("cy", h / 2)
-      .attr("r", projection.scale());
+      const option1 = document.createElement("option");
+      option1.value = item.code;
+      option1.textContent = label;
+      indicatorSelect.appendChild(option1);
 
-    state.spherePath = gRoot
-      .append("path")
-      .datum({ type: "Sphere" })
-      .attr("class", "sphere-fill")
-      .attr("d", path)
-      .attr("fill", "url(#ocean-glow)")
-      .attr("filter", "url(#soft-glow)");
-
-    const graticule = d3.geoGraticule().step([18, 18]);
-    state.gLines = gRoot
-      .append("g")
-      .attr("clip-path", "url(#sphere-clip)")
-      .append("path")
-      .datum(graticule)
-      .attr("d", path)
-      .attr("fill", "none")
-      .attr("stroke", "rgba(255,255,255,0.07)")
-      .attr("stroke-width", 0.8)
-      .attr("pointer-events", "none");
-
-    const zoomSurface = gRoot
-      .append("circle")
-      .attr("clip-path", "url(#sphere-clip)")
-      .attr("cx", w / 2)
-      .attr("cy", h / 2)
-      .attr("r", projection.scale())
-      .attr("fill", "transparent")
-      .style("cursor", "grab");
-
-    state.gLand = gRoot.append("g").attr("clip-path", "url(#sphere-clip)");
-
-    state.rimCircle = gRoot
-      .append("circle")
-      .attr("cx", w / 2)
-      .attr("cy", h / 2)
-      .attr("r", projection.scale())
-      .attr("fill", "none")
-      .attr("stroke", "url(#rim-light)")
-      .attr("stroke-width", 1.4)
-      .attr("opacity", 0.85)
-      .attr("pointer-events", "none");
-
-    const drag = d3.drag().on("drag", (event) => {
-      const sens = 0.45;
-      state.λ += event.dx * sens;
-      state.φ -= event.dy * sens;
-      state.φ = Math.max(-60, Math.min(60, state.φ));
-      projection.rotate([-state.λ, -state.φ]);
-      refreshGlobeGeometry();
+      const option2 = document.createElement("option");
+      option2.value = item.code;
+      option2.textContent = label;
+      compareSelect.appendChild(option2);
     });
 
-    zoomSurface.call(drag);
-    state.zoomSurface = zoomSurface;
+    if (!state.indicators.some((i) => i.code === state.selectedIndicator) && state.indicators.length) {
+      state.selectedIndicator = state.indicators[0].code;
+    }
+    if (!state.indicators.some((i) => i.code === state.compareIndicator)) {
+      state.compareIndicator = state.selectedIndicator;
+    }
+
+    indicatorSelect.value = state.selectedIndicator;
+    compareSelect.value = state.compareIndicator;
   }
 
-  function refreshGlobeGeometry() {
-    if (!state.gLand || !state.path || !state.projection) return;
-    const { path, projection } = state;
-    if (state.spherePath) state.spherePath.attr("d", path);
-    state.gLines.attr("d", path);
-    state.gLand.selectAll("path.country").attr("d", path);
-    d3.select("#globe-svg").select("#sphere-clip circle").attr("r", projection.scale());
-    if (state.rimCircle) {
-      state.rimCircle
-        .attr("cx", state.dimensions.w / 2)
-        .attr("cy", state.dimensions.h / 2)
-        .attr("r", projection.scale());
-    }
-    if (state.zoomSurface) {
-      state.zoomSurface
-        .attr("cx", state.dimensions.w / 2)
-        .attr("cy", state.dimensions.h / 2)
-        .attr("r", projection.scale());
-    }
+  function populateFilterSelects() {
+    const regionSelect = el("region-select");
+    const incomeSelect = el("income-select");
+
+    regionSelect.innerHTML = "";
+    incomeSelect.innerHTML = "";
+
+    const allRegion = document.createElement("option");
+    allRegion.value = "";
+    allRegion.textContent = "All regions";
+    regionSelect.appendChild(allRegion);
+
+    (state.meta.regions || []).forEach((region) => {
+      const option = document.createElement("option");
+      option.value = region;
+      option.textContent = region;
+      regionSelect.appendChild(option);
+    });
+
+    const allIncome = document.createElement("option");
+    allIncome.value = "";
+    allIncome.textContent = "All income groups";
+    incomeSelect.appendChild(allIncome);
+
+    (state.meta.income_groups || []).forEach((incomeGroup) => {
+      const option = document.createElement("option");
+      option.value = incomeGroup;
+      option.textContent = incomeGroup;
+      incomeSelect.appendChild(option);
+    });
+
+    regionSelect.value = state.selectedRegion;
+    incomeSelect.value = state.selectedIncome;
   }
 
-  function redrawMapColors() {
-    if (!state.gLand) return;
-    const valueByIso = new Map(state.mapRows.map((r) => [r.iso3, r]));
-    const { color } = buildScales(state.mapRows);
-    const selected = state.selectedIso3;
+  function populateCompareCountries() {
+    const select = el("compare-countries");
+    select.innerHTML = "";
 
-    state.gLand
+    state.countries.forEach((country) => {
+      const option = document.createElement("option");
+      option.value = country.iso3;
+      option.textContent = `${country.name} (${country.iso3})`;
+      select.appendChild(option);
+    });
+  }
+
+  function initMap() {
+    const svg = d3.select("#world-map");
+    const width = 960;
+    const height = 520;
+
+    state.mapSvg = svg;
+    svg.selectAll("*").remove();
+
+    const defs = svg.append("defs");
+    const oceanGradient = defs
+      .append("radialGradient")
+      .attr("id", "globe-ocean-gradient")
+      .attr("cx", "35%")
+      .attr("cy", "28%")
+      .attr("r", "72%");
+    oceanGradient.append("stop").attr("offset", "0%").attr("stop-color", "#f4fbff");
+    oceanGradient.append("stop").attr("offset", "40%").attr("stop-color", "#9fd0df");
+    oceanGradient.append("stop").attr("offset", "100%").attr("stop-color", "#3d7986");
+
+    const atmosphereGradient = defs
+      .append("radialGradient")
+      .attr("id", "globe-atmosphere-gradient")
+      .attr("cx", "42%")
+      .attr("cy", "32%")
+      .attr("r", "70%");
+    atmosphereGradient.append("stop").attr("offset", "0%").attr("stop-color", "rgba(180,255,245,0.10)");
+    atmosphereGradient.append("stop").attr("offset", "72%").attr("stop-color", "rgba(106,193,174,0.14)");
+    atmosphereGradient.append("stop").attr("offset", "100%").attr("stop-color", "rgba(11,61,51,0.30)");
+
+    const glowFilter = defs
+      .append("filter")
+      .attr("id", "globe-glow-filter")
+      .attr("x", "-60%")
+      .attr("y", "-60%")
+      .attr("width", "220%")
+      .attr("height", "220%");
+    glowFilter.append("feGaussianBlur").attr("stdDeviation", 9).attr("result", "blur");
+    const merge = glowFilter.append("feMerge");
+    merge.append("feMergeNode").attr("in", "blur");
+    merge.append("feMergeNode").attr("in", "SourceGraphic");
+
+    state.mapProjection = d3
+      .geoOrthographic()
+      .scale(state.globeBaseScale)
+      .translate([width / 2, height / 2])
+      .rotate([-15, -18, 0])
+      .clipAngle(90);
+
+    state.mapPath = d3.geoPath(state.mapProjection);
+
+    const root = svg.append("g").attr("class", "globe-root");
+
+    state.mapShadow = root.append("ellipse").attr("class", "globe-shadow");
+    state.mapGlow = root.append("circle").attr("class", "globe-glow").attr("filter", "url(#globe-glow-filter)");
+    state.mapAtmosphere = root.append("circle").attr("class", "globe-atmosphere");
+    state.mapSphere = root.append("path").datum({ type: "Sphere" }).attr("class", "globe-sphere");
+    state.mapGraticule = root.append("path").datum(d3.geoGraticule10()).attr("class", "globe-graticule");
+    state.mapLayer = root.append("g").attr("class", "globe-countries");
+
+    state.mapLayer
       .selectAll("path.country")
-      .data(state.worldFeatures, (d) => isoFromFeature(d) || d.id)
+      .data(state.worldFeatures, (d) => d.id)
       .join("path")
-      .attr("class", "country")
-      .attr("d", state.path)
-      .attr("vector-effect", "non-scaling-stroke")
-      .attr("stroke", "rgba(255,255,255,0.18)")
-      .attr("stroke-width", 0.35)
-      .each(function (d) {
-        const iso = isoFromFeature(d);
-        const row = iso ? valueByIso.get(iso) : null;
-        const v = row && row.value != null ? Number(row.value) : null;
-        const fill =
-          v != null && color ? color(v) : iso && selected && iso === selected ? "rgba(124,240,214,0.35)" : "#1e2438";
-        d3.select(this).interrupt().transition().duration(420).ease(d3.easeCubicOut).attr("fill", fill);
+      .attr("class", "country no-data")
+      .attr("d", state.mapPath)
+      .on("mouseenter", handleCountryEnter)
+      .on("mousemove", handleCountryMove)
+      .on("mouseleave", handleCountryLeave)
+      .on("click", handleCountryClick);
+
+    const drag = d3
+      .drag()
+      .on("start", () => {
+        state.isDraggingGlobe = true;
       })
-      .on("mouseenter", (event, d) => showTooltip(event, d, valueByIso))
-      .on("mousemove", (event, d) => moveTooltip(event, d, valueByIso))
-      .on("mouseleave", hideTooltip)
-      .on("click", (_, d) => {
-        const iso = isoFromFeature(d);
-        if (!iso) return;
-        state.selectedIso3 = iso;
-        el("country-select").value = iso;
-        toggleDetail(true);
-        void loadCountryDetail();
-        redrawMapColors();
+      .on("drag", (event) => {
+        const rot = state.mapProjection.rotate();
+        const k = 0.35;
+        const nextLambda = rot[0] + event.dx * k;
+        const nextPhi = Math.max(-55, Math.min(55, rot[1] - event.dy * k));
+        state.mapProjection.rotate([nextLambda, nextPhi, rot[2] || 0]);
+        renderGlobeGeometry();
+      })
+      .on("end", () => {
+        state.isDraggingGlobe = false;
       });
+
+    svg.call(drag);
+
+    const zoom = d3
+      .zoom()
+      .scaleExtent([0.82, 1.72])
+      .filter((event) => event.type === "wheel")
+      .on("zoom", (event) => {
+        state.mapProjection.scale(state.globeBaseScale * event.transform.k);
+        renderGlobeGeometry();
+      });
+
+    svg.call(zoom).on("dblclick.zoom", null);
+
+    startGlobeAutoRotate();
+    renderGlobeGeometry();
   }
 
-  function showTooltip(event, d, valueByIso) {
-    const iso = isoFromFeature(d);
+  function renderGlobeGeometry() {
+    if (!state.mapProjection || !state.mapPath) return;
+
+    const [cx, cy] = state.mapProjection.translate();
+    const r = state.mapProjection.scale();
+
+    if (state.mapShadow) {
+      state.mapShadow
+        .attr("cx", cx)
+        .attr("cy", cy + r + 22)
+        .attr("rx", r * 0.88)
+        .attr("ry", 24);
+    }
+
+    if (state.mapGlow) {
+      state.mapGlow
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", r + 10);
+    }
+
+    if (state.mapAtmosphere) {
+      state.mapAtmosphere
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", r + 4);
+    }
+
+    if (state.mapSphere) state.mapSphere.attr("d", state.mapPath);
+    if (state.mapGraticule) state.mapGraticule.attr("d", state.mapPath);
+    if (state.mapLayer) state.mapLayer.selectAll("path.country").attr("d", state.mapPath);
+  }
+
+  function stopGlobeAutoRotate() {
+    if (state.globeRotateTimer) {
+      state.globeRotateTimer.stop();
+      state.globeRotateTimer = null;
+    }
+  }
+
+  function startGlobeAutoRotate() {
+    stopGlobeAutoRotate();
+    state.globeRotateTimer = d3.timer(() => {
+      if (!state.mapProjection || state.isDraggingGlobe || state.isHoveringCountry || document.hidden) return;
+      const r = state.mapProjection.rotate();
+      state.mapProjection.rotate([r[0] + 0.03, r[1], r[2] || 0]);
+      renderGlobeGeometry();
+    });
+  }
+
+  function handleCountryEnter(event, feature) {
+    state.isHoveringCountry = true;
+    const iso3 = feature._iso3;
+    const row = iso3 ? state.mapValueByIso.get(iso3) : null;
+    const countryName = row?.name || getCountryName(iso3) || feature.properties?.name || "Unknown";
+    const indicator = indicatorMeta(state.selectedIndicator);
+
     const tip = el("map-tooltip");
-    const row = iso ? valueByIso.get(iso) : null;
-    const name = row?.name || d.properties?.NAME || iso || "Unknown";
-    const v = row?.value;
-    const val =
-      v != null && Number.isFinite(Number(v)) ? d3.format(".2f")(Number(v)) : "no data";
-    tip.innerHTML = `<strong>${name}</strong><span>${state.indicator} · ${state.year}</span><br/><span class="muted">${val}</span>`;
+    tip.innerHTML = `
+      <strong>${countryName}</strong><br/>
+      <span>${indicator ? indicator.label : state.selectedIndicator} · ${state.selectedYear}</span><br/>
+      <span>${row ? formatValue(row.value) : "No data"}</span>
+    `;
     tip.hidden = false;
-    moveTooltip(event, d, valueByIso);
+    handleCountryMove(event);
   }
 
-  function moveTooltip(event) {
+  function handleCountryMove(event) {
     const tip = el("map-tooltip");
-    const stage = document.querySelector(".map-stage");
-    const rect = stage.getBoundingClientRect();
-    const x = event.clientX - rect.left + 12;
-    const y = event.clientY - rect.top + 12;
-    tip.style.left = `${Math.min(x, rect.width - 200)}px`;
-    tip.style.top = `${Math.min(y, rect.height - 80)}px`;
+    if (tip.hidden) return;
+    const parentRect = el("world-map").getBoundingClientRect();
+    const x = event.clientX - parentRect.left + 12;
+    const y = event.clientY - parentRect.top + 12;
+    tip.style.left = `${Math.min(x, parentRect.width - 220)}px`;
+    tip.style.top = `${Math.min(y, parentRect.height - 90)}px`;
   }
 
-  function hideTooltip() {
+  function handleCountryLeave() {
+    state.isHoveringCountry = false;
     el("map-tooltip").hidden = true;
   }
 
-  async function refreshMap() {
-    const panel = el("map-panel");
-    panel.classList.add("loading");
-    el("map-empty").hidden = true;
-    resetMapEmptyMessage();
-    updateHistogram([]);
-    try {
-      if (!state.indicator) {
-        state.mapRows = [];
-        state.prevMapRows = [];
-        el("map-headline").textContent = "Choose an indicator";
-        updateLegend(null, [0, 1]);
-        setMapEmptyMessage(
-          "No indicators available for this source.",
-          "The UN list is built from rows in the database after ingest. For a quick demo, switch to World Bank.",
-        );
-        el("map-empty").hidden = false;
-        redrawMapColors();
-        renderInsights();
-        return;
-      }
-      const params = new URLSearchParams({
-        year: String(state.year),
-        indicator: state.indicator,
-        source: state.source,
-        limit: "500",
+  function handleCountryClick(event, feature) {
+    if (event.defaultPrevented) return;
+    const iso3 = feature._iso3;
+    if (!iso3) return;
+    state.selectedIso3 = iso3;
+    renderMapColors();
+    openCountryPanel(iso3);
+  }
+
+  function renderMapColors() {
+    const values = state.mapRows.map((row) => Number(row.value)).filter(Number.isFinite);
+    const hasValues = values.length > 0;
+
+    const min = hasValues ? d3.min(values) : null;
+    const max = hasValues ? d3.max(values) : null;
+
+    const color = hasValues
+      ? d3.scaleSequential(d3.interpolateYlGnBu).domain(min === max ? [min - 1, max + 1] : [min, max])
+      : null;
+
+    state.mapValueByIso = new Map(state.mapRows.map((row) => [row.iso3, row]));
+
+    state.mapLayer
+      .selectAll("path.country")
+      .attr("class", (feature) => {
+        const iso3 = feature._iso3;
+        const hasValue = iso3 && state.mapValueByIso.has(iso3);
+        const selected = iso3 && iso3 === state.selectedIso3;
+        return `country ${hasValue ? "" : "no-data"} ${selected ? "selected" : ""}`.trim();
+      })
+      .transition()
+      .duration(200)
+      .attr("fill", (feature) => {
+        const iso3 = feature._iso3;
+        const row = iso3 ? state.mapValueByIso.get(iso3) : null;
+        if (!row || row.value == null || !color) return "#ced9d3";
+        return color(Number(row.value));
       });
-      const rows = await fetchJson(apiUrl(`/map?${params}`));
-      state.mapRows = Array.isArray(rows) ? rows : [];
 
-      if (state.year > 1960) {
-        const prevParams = new URLSearchParams({
-          year: String(state.year - 1),
-          indicator: state.indicator,
-          source: state.source,
-          limit: "500",
-        });
-        try {
-          const prevRows = await fetchJson(apiUrl(`/map?${prevParams}`));
-          state.prevMapRows = Array.isArray(prevRows) ? prevRows : [];
-        } catch {
-          state.prevMapRows = [];
-        }
-      } else {
-        state.prevMapRows = [];
-      }
+    renderGlobeGeometry();
 
-      el("map-headline").textContent = `${indicatorLabel(state.indicator)} · ${state.year}`;
-      const { color, extent } = buildScales(state.mapRows);
-      updateLegend(color, extent);
-      if (!state.mapRows.length) {
-        setMapEmptyMessage(
-          MAP_EMPTY_DEFAULT.title,
-          "Often means there are no rows yet for this source/indicator—load data or try World Bank with SP.DYN.TFRT.IN.",
-        );
-        el("map-empty").hidden = false;
-      }
-      redrawMapColors();
-      renderInsights();
-    } catch (e) {
-      console.error(e);
-      state.mapRows = [];
-      state.prevMapRows = [];
-      el("map-empty").hidden = false;
-      renderInsights();
-    } finally {
-      panel.classList.remove("loading");
+    updateLegend(min, max, indicatorMeta(state.selectedIndicator));
+
+    if (!hasValues) {
+      setLoadingMessage("No data for this year/indicator/filter combination");
+    } else {
+      hideLoadingMessage();
     }
   }
 
-  function drawLineChart(svgSel, points, opts) {
-    const margin = { top: 12, right: 10, bottom: 28, left: 44 };
-    const fullW = opts.width;
-    const fullH = opts.height;
-    const w = fullW - margin.left - margin.right;
-    const h = fullH - margin.top - margin.bottom;
-    svgSel.selectAll("*").remove();
-    if (!points.length) return;
+  function updateLegend(min, max, indicator) {
+    const legendIndicator = el("legend-indicator");
+    const legendUnit = el("legend-unit");
+    const gradient = el("legend-gradient");
+    const minEl = el("legend-min");
+    const maxEl = el("legend-max");
+
+    legendIndicator.textContent = indicator ? indicator.label : "Indicator scale";
+    legendUnit.textContent = indicator ? indicator.unit : "-";
+
+    if (min == null || max == null) {
+      gradient.style.background = "#d6e2dc";
+      minEl.textContent = "-";
+      maxEl.textContent = "-";
+      return;
+    }
+
+    const colors = d3.range(0, 1.01, 0.1).map((t) => d3.interpolateYlGnBu(t));
+    gradient.style.background = `linear-gradient(90deg, ${colors.join(",")})`;
+    minEl.textContent = formatValue(min);
+    maxEl.textContent = formatValue(max);
+  }
+
+  function updateSelectionNote(mapSummary) {
+    const note = el("selection-note");
+    if (!note) return;
+    const indicator = indicatorMeta(state.selectedIndicator);
+    const indicatorLabel = indicator ? indicator.label : state.selectedIndicator;
+    const unit = indicator && indicator.unit ? indicator.unit : "selected unit";
+    const _ = mapSummary;
+    note.innerHTML = `<strong>What this selection means:</strong> You are viewing <strong>${indicatorLabel}</strong> for <strong>${state.selectedYear}</strong> (${unit}).`;
+  }
+
+  function renderRegionCards() {
+    const host = el("region-cards");
+    host.innerHTML = "";
+
+    if (!state.regionSummaryRows.length) {
+      const empty = document.createElement("div");
+      empty.className = "region-item";
+      empty.textContent = "No regional aggregates for current filters";
+      host.appendChild(empty);
+      return;
+    }
+
+    state.regionSummaryRows.forEach((row) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `region-item ${state.selectedRegion === row.region ? "active" : ""}`;
+      button.innerHTML = `
+        <div class="region-name">${row.region}</div>
+        <div class="region-value">${formatValue(row.avg_value)}</div>
+        <div class="region-count">${row.countries_with_data} countries</div>
+      `;
+      button.addEventListener("click", () => {
+        state.selectedRegion = state.selectedRegion === row.region ? "" : row.region;
+        el("region-select").value = state.selectedRegion;
+        refreshAtlas();
+      });
+      host.appendChild(button);
+    });
+  }
+
+  function renderRegionChart() {
+    const svg = d3.select("#region-chart");
+    const width = 760;
+    const height = 240;
+    const margin = { top: 16, right: 16, bottom: 42, left: 70 };
+
+    svg.selectAll("*").remove();
+
+    const rows = state.regionSummaryRows.filter((row) => Number.isFinite(Number(row.avg_value)));
+    if (!rows.length) return;
+
+    const x = d3
+      .scaleBand()
+      .domain(rows.map((row) => row.region))
+      .range([margin.left, width - margin.right])
+      .padding(0.2);
+
+    const y = d3
+      .scaleLinear()
+      .domain([0, d3.max(rows, (row) => Number(row.avg_value)) || 1])
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    svg
+      .append("g")
+      .selectAll("rect")
+      .data(rows)
+      .join("rect")
+      .attr("x", (row) => x(row.region))
+      .attr("y", (row) => y(Number(row.avg_value)))
+      .attr("width", x.bandwidth())
+      .attr("height", (row) => y(0) - y(Number(row.avg_value)))
+      .attr("fill", (row) => (row.region === state.selectedRegion ? "#145f4a" : "#2f9c7f"))
+      .attr("opacity", 0.88)
+      .style("cursor", "pointer")
+      .on("click", (_, row) => {
+        state.selectedRegion = state.selectedRegion === row.region ? "" : row.region;
+        el("region-select").value = state.selectedRegion;
+        refreshAtlas();
+      });
+
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .attr("class", "axis")
+      .call(
+        d3
+          .axisBottom(x)
+          .tickFormat((value) => value.replace("Middle East, North Africa, Afghanistan & Pakistan", "MENA+AP")),
+      )
+      .selectAll("text")
+      .attr("transform", "rotate(-18)")
+      .style("text-anchor", "end");
+
+    svg.append("g").attr("transform", `translate(${margin.left},0)`).attr("class", "axis").call(d3.axisLeft(y).ticks(5));
+  }
+
+  async function refreshAtlas() {
+    const token = ++state.refreshToken;
+    setLoadingMessage("Loading data…");
+
+    try {
+      const mapParams = {
+        year: state.selectedYear,
+        indicator: state.selectedIndicator,
+        region: state.selectedRegion || null,
+        income_group: state.selectedIncome || null,
+      };
+
+      const regionsParams = {
+        year: state.selectedYear,
+        indicator: state.selectedIndicator,
+        income_group: state.selectedIncome || null,
+      };
+
+      const [mapData, regions] = await Promise.all([
+        fetchJSON(buildApiUrl("/map-data", mapParams)),
+        fetchJSON(buildApiUrl("/regions/summary", regionsParams)),
+      ]);
+
+      if (token !== state.refreshToken) return;
+
+      state.mapRows = mapData.rows || [];
+      state.regionSummaryRows = regions.rows || [];
+
+      renderMapColors();
+      updateSelectionNote(mapData.summary || null);
+      renderRegionCards();
+      renderRegionChart();
+
+      if (state.selectedIso3 && state.panelOpen) {
+        await refreshCountryProfileOnly(state.selectedIso3);
+      }
+
+      await refreshCompareChart();
+    } catch (error) {
+      console.error(error);
+      setLoadingMessage("Could not load map data. Check backend/API connection.");
+      updateSelectionNote(null);
+    }
+  }
+
+  function renderPanelKpis(profile) {
+    const container = el("panel-kpis");
+    container.innerHTML = "";
+
+    const rows = PANEL_INDICATORS.map((indicatorCode) => {
+      const meta = indicatorMeta(indicatorCode);
+      return {
+        code: indicatorCode,
+        label: meta ? meta.label : indicatorCode,
+        value: profile.values[indicatorCode],
+      };
+    });
+
+    rows.forEach((row) => {
+      const block = document.createElement("div");
+      block.className = "kpi-item";
+      block.innerHTML = `
+        <span class="kpi-label">${row.label}</span>
+        <span class="kpi-value">${formatValue(row.value)}</span>
+      `;
+      container.appendChild(block);
+    });
+  }
+
+  function drawMiniChart(svgId, points, color, unit) {
+    const svg = d3.select(svgId);
+    const width = 420;
+    const height = 160;
+    const margin = { top: 12, right: 12, bottom: 26, left: 48 };
+
+    svg.selectAll("*").remove();
+
+    if (!points || !points.length) {
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#708a80")
+        .attr("font-size", 12)
+        .text("No data");
+      return;
+    }
 
     const x = d3
       .scaleLinear()
       .domain(d3.extent(points, (d) => d.year))
-      .range([0, w]);
+      .range([margin.left, width - margin.right]);
+
     const y = d3
       .scaleLinear()
       .domain(d3.extent(points, (d) => d.value))
       .nice()
-      .range([h, 0]);
+      .range([height - margin.bottom, margin.top]);
 
     const line = d3
       .line()
-      .curve(d3.curveMonotoneX)
       .x((d) => x(d.year))
-      .y((d) => y(d.value));
+      .y((d) => y(d.value))
+      .curve(d3.curveMonotoneX);
 
-    const g = svgSel.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-    const gradId = `lg-${opts.id}`;
-    const defs = svgSel.append("defs");
-    const lg = defs
-      .append("linearGradient")
-      .attr("id", gradId)
-      .attr("x1", "0%")
-      .attr("y1", "0%")
-      .attr("x2", "0%")
-      .attr("y2", "100%");
-    lg.append("stop").attr("offset", "0%").attr("stop-color", opts.accent).attr("stop-opacity", 0.5);
-    lg.append("stop").attr("offset", "100%").attr("stop-color", opts.accent).attr("stop-opacity", 0);
-
-    const area = d3
-      .area()
-      .curve(d3.curveMonotoneX)
-      .x((d) => x(d.year))
-      .y0(h)
-      .y1((d) => y(d.value));
-
-    g.append("path").datum(points).attr("fill", `url(#${gradId})`).attr("d", area);
-
-    g.append("path")
+    svg
+      .append("path")
       .datum(points)
       .attr("fill", "none")
-      .attr("stroke", opts.accent)
+      .attr("stroke", color)
       .attr("stroke-width", 2.2)
       .attr("d", line);
 
-    g.selectAll("circle.pt")
-      .data(points.filter((_, i) => i % Math.ceil(points.length / 12 || 1) === 0))
-      .join("circle")
-      .attr("class", "pt")
-      .attr("cx", (d) => x(d.year))
-      .attr("cy", (d) => y(d.value))
-      .attr("r", 2.4)
-      .attr("fill", "#fff")
-      .attr("opacity", 0.85);
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format("d")));
 
-    const xAxis = d3.axisBottom(x).ticks(6).tickFormat(d3.format("d"));
-    const yAxis = d3.axisLeft(y).ticks(4);
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(4));
 
-    g.append("g").attr("transform", `translate(0,${h})`).call(xAxis).attr("color", "#8891b5").attr("font-size", 9);
+    const hoverLine = svg
+      .append("line")
+      .attr("class", "chart-hover-line")
+      .attr("y1", margin.top)
+      .attr("y2", height - margin.bottom)
+      .style("display", "none");
 
-    g.append("g").call(yAxis).attr("color", "#8891b5").attr("font-size", 9);
+    const hoverPoint = svg.append("circle").attr("class", "chart-hover-point").attr("r", 4).style("display", "none");
 
-    g.selectAll("text").attr("font-family", "Outfit, sans-serif");
+    const hoverLabel = svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top)
+      .attr("font-size", 11)
+      .attr("fill", "#2e4b40")
+      .attr("font-weight", 700)
+      .text("");
+
+    const bisect = d3.bisector((d) => d.year).left;
+
+    svg
+      .append("rect")
+      .attr("x", margin.left)
+      .attr("y", margin.top)
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("fill", "transparent")
+      .on("mousemove", (event) => {
+        const mouseX = d3.pointer(event)[0];
+        const year = x.invert(mouseX);
+        const idx = Math.max(0, Math.min(points.length - 1, bisect(points, year)));
+        const candidate = points[idx];
+        if (!candidate) return;
+
+        hoverLine
+          .style("display", null)
+          .attr("x1", x(candidate.year))
+          .attr("x2", x(candidate.year));
+
+        hoverPoint
+          .style("display", null)
+          .attr("cx", x(candidate.year))
+          .attr("cy", y(candidate.value));
+
+        hoverLabel.text(`${candidate.year}: ${formatValue(candidate.value)} ${unit || ""}`);
+      })
+      .on("mouseleave", () => {
+        hoverLine.style("display", "none");
+        hoverPoint.style("display", "none");
+        hoverLabel.text("");
+      });
   }
 
-  async function loadCountryDetail() {
-    const iso = state.selectedIso3;
-    if (!iso) return;
-    const country = state.countries.find((c) => c.iso3 === iso);
-    el("country-name").textContent = country?.name || iso;
-    el("country-meta").textContent = country
-      ? `${country.region || "—"} · ${country.income_group || "—"}`
-      : "";
-
-    el("fertility-caption").textContent = `${WB_FERTILITY} · worldbank`;
-
-    let fertPts = [];
+  async function refreshCountryProfileOnly(iso3) {
     try {
-      const ts = await fetchJson(
-        apiUrl(`/timeseries?country_iso3=${iso}&indicator=${WB_FERTILITY}&source=worldbank`),
-      );
-      fertPts = (ts.points || [])
-        .map((p) => ({ year: p.year, value: Number(p.value) }))
-        .filter((p) => Number.isFinite(p.value));
-    } catch (e) {
-      console.error(e);
-    }
-    const fertEmpty = el("chart-fertility-empty");
-    if (!fertPts.length) {
-      fertEmpty.hidden = false;
-      d3.select("#chart-fertility").selectAll("*").remove();
-    } else {
-      fertEmpty.hidden = true;
-      drawLineChart(d3.select("#chart-fertility"), fertPts, {
-        id: "fert",
-        width: 440,
-        height: 200,
-        accent: "#7cf0d6",
-      });
-    }
-
-    let gdpPts = [];
-    try {
-      const tsG = await fetchJson(apiUrl(`/timeseries?country_iso3=${iso}&indicator=${WB_GDP}&source=worldbank`));
-      gdpPts = (tsG.points || [])
-        .map((p) => ({ year: p.year, value: Number(p.value) }))
-        .filter((p) => Number.isFinite(p.value));
-    } catch (e) {
-      console.error(e);
-    }
-    const gdpEmpty = el("chart-gdp-empty");
-    if (!gdpPts.length) {
-      gdpEmpty.hidden = false;
-      d3.select("#chart-gdp").selectAll("*").remove();
-    } else {
-      gdpEmpty.hidden = true;
-      drawLineChart(d3.select("#chart-gdp"), gdpPts, {
-        id: "gdp",
-        width: 440,
-        height: 120,
-        accent: "#c9a6ff",
-      });
-    }
-
-    el("events-loading").hidden = false;
-    el("events-list").innerHTML = "";
-    el("events-empty").hidden = true;
-    try {
-      const evs = await fetchJson(apiUrl(`/events?country_iso3=${iso}&limit=100`));
-      el("events-loading").hidden = true;
-      renderEvents(Array.isArray(evs) ? evs : []);
-    } catch (e) {
-      console.error(e);
-      el("events-loading").hidden = true;
-      renderEvents([]);
+      const profile = await fetchJSON(buildApiUrl(`/country/${iso3}/profile`, { year: state.selectedYear }));
+      renderPanelKpis(profile);
+    } catch {
+      // If selected year not available for this country, keep old profile KPIs.
     }
   }
 
-  function renderEvents(items) {
-    const ul = el("events-list");
-    ul.innerHTML = "";
-    if (!items.length) {
-      el("events-empty").hidden = false;
+  async function openCountryPanel(iso3) {
+    state.panelOpen = true;
+    state.selectedIso3 = iso3;
+
+    const panel = el("country-panel");
+    panel.classList.add("open");
+
+    try {
+      const [profile, timeseries] = await Promise.all([
+        fetchJSON(buildApiUrl(`/country/${iso3}/profile`, { year: state.selectedYear })),
+        fetchJSON(buildApiUrl(`/country/${iso3}/timeseries`, { indicators: PANEL_INDICATORS.join(",") })),
+      ]);
+
+      el("panel-country-name").textContent = profile.name || iso3;
+      el("panel-country-meta").textContent = `${profile.region || "Unknown region"} · ${profile.income_group || "Unknown income group"} · Year ${profile.selected_year}`;
+
+      renderPanelKpis(profile);
+
+      PANEL_INDICATORS.forEach((code) => {
+        const series = (timeseries.series && timeseries.series[code]) || [];
+        drawMiniChart(`#chart-${code}`, series, PANEL_COLORS[code] || "#1f8a70", (indicatorMeta(code) || {}).unit || "");
+      });
+    } catch (error) {
+      console.error(error);
+      el("panel-country-name").textContent = iso3;
+      el("panel-country-meta").textContent = "Could not load country profile";
+      PANEL_INDICATORS.forEach((code) => drawMiniChart(`#chart-${code}`, [], "#9fbab0", ""));
+    }
+  }
+
+  function closeCountryPanel() {
+    state.panelOpen = false;
+    el("country-panel").classList.remove("open");
+  }
+
+  function getCompareSelectedCountries() {
+    const select = el("compare-countries");
+    const values = Array.from(select.selectedOptions).map((option) => option.value);
+    return values.slice(0, 5);
+  }
+
+  function renderCompareLegend(rows) {
+    const host = el("compare-legend");
+    host.innerHTML = "";
+
+    if (!rows.length) return;
+
+    const color = d3.scaleOrdinal(d3.schemeTableau10).domain(rows.map((row) => row.iso3));
+
+    rows.forEach((row) => {
+      const item = document.createElement("button");
+      const inactive = state.compareHiddenCountries.has(row.iso3);
+      item.type = "button";
+      item.className = `compare-item ${inactive ? "inactive" : ""}`;
+      item.innerHTML = `
+        <span class="compare-dot" style="background:${color(row.iso3)}"></span>
+        <span>${row.name}</span>
+      `;
+      item.addEventListener("click", () => {
+        if (state.compareHiddenCountries.has(row.iso3)) state.compareHiddenCountries.delete(row.iso3);
+        else state.compareHiddenCountries.add(row.iso3);
+        drawCompareChart(rows);
+        renderCompareLegend(rows);
+      });
+      host.appendChild(item);
+    });
+  }
+
+  function drawCompareChart(rows) {
+    const svg = d3.select("#compare-chart");
+    const width = 980;
+    const height = 300;
+    const margin = { top: 20, right: 24, bottom: 36, left: 58 };
+
+    svg.selectAll("*").remove();
+
+    const activeRows = rows.filter((row) => !state.compareHiddenCountries.has(row.iso3));
+    const points = activeRows.flatMap((row) => row.points);
+
+    if (!activeRows.length || !points.length) {
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#7a9288")
+        .text("Select countries to compare");
       return;
     }
-    el("events-empty").hidden = true;
-    items
-      .slice()
-      .sort((a, b) => (a.year || 0) - (b.year || 0))
-      .forEach((ev) => {
-        const li = document.createElement("li");
-        li.className = "event-card";
-        const src = (ev.source || "").toLowerCase();
-        const srcClass =
-          src === "un_wpp" ? "pill-source-un_wpp" : src === "worldbank" ? "pill-source-worldbank" : "pill-source-other";
-        const cat = ev.event_category || "—";
-        const title = ev.title || "Untitled";
-        const summary = ev.summary || "";
-        li.innerHTML = `
-          <div class="event-card__top">
-            <span class="pill pill-year">${ev.year ?? "—"}</span>
-            <span class="pill ${srcClass}">${ev.source || "source"}</span>
-            <span class="pill pill-cat">${cat}</span>
-          </div>
-          <p class="event-card__title"></p>
-          <p class="event-card__summary"></p>
-        `;
-        li.querySelector(".event-card__title").textContent = title;
-        li.querySelector(".event-card__summary").textContent = summary;
-        ul.appendChild(li);
+
+    const x = d3
+      .scaleLinear()
+      .domain(d3.extent(points, (d) => d.year))
+      .range([margin.left, width - margin.right]);
+
+    const y = d3
+      .scaleLinear()
+      .domain(d3.extent(points, (d) => d.value))
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    const color = d3.scaleOrdinal(d3.schemeTableau10).domain(activeRows.map((row) => row.iso3));
+
+    const line = d3
+      .line()
+      .x((d) => x(d.year))
+      .y((d) => y(d.value))
+      .curve(d3.curveMonotoneX);
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(7).tickFormat(d3.format("d")));
+
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5));
+
+    const linesGroup = svg.append("g");
+
+    linesGroup
+      .selectAll("path.compare-line")
+      .data(activeRows)
+      .join("path")
+      .attr("class", "compare-line")
+      .attr("fill", "none")
+      .attr("stroke", (row) => color(row.iso3))
+      .attr("stroke-width", 2.4)
+      .attr("d", (row) => line(row.points));
+
+    const hoverLine = svg
+      .append("line")
+      .attr("class", "chart-hover-line")
+      .attr("y1", margin.top)
+      .attr("y2", height - margin.bottom)
+      .style("display", "none");
+
+    const focusGroup = svg.append("g");
+    const bisect = d3.bisector((d) => d.year).left;
+
+    svg
+      .append("rect")
+      .attr("x", margin.left)
+      .attr("y", margin.top)
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("fill", "transparent")
+      .on("mousemove", (event) => {
+        const mouseX = d3.pointer(event)[0];
+        const year = x.invert(mouseX);
+
+        hoverLine.style("display", null).attr("x1", mouseX).attr("x2", mouseX);
+        focusGroup.selectAll("*").remove();
+
+        activeRows.forEach((row) => {
+          const idx = Math.max(0, Math.min(row.points.length - 1, bisect(row.points, year)));
+          const point = row.points[idx];
+          if (!point) return;
+
+          focusGroup
+            .append("circle")
+            .attr("cx", x(point.year))
+            .attr("cy", y(point.value))
+            .attr("r", 3.4)
+            .attr("fill", "#fff")
+            .attr("stroke", color(row.iso3))
+            .attr("stroke-width", 2);
+        });
+      })
+      .on("mouseleave", () => {
+        hoverLine.style("display", "none");
+        focusGroup.selectAll("*").remove();
       });
   }
 
-  async function refreshDetailIfSelected() {
-    if (state.selectedIso3) await loadCountryDetail();
+  async function refreshCompareChart() {
+    const selectedCountries = getCompareSelectedCountries();
+    state.compareSelectedCountries = selectedCountries;
+
+    if (!selectedCountries.length) {
+      renderCompareLegend([]);
+      drawCompareChart([]);
+      return;
+    }
+
+    const indicator = state.compareIndicator;
+
+    try {
+      const rows = await Promise.all(
+        selectedCountries.map(async (iso3) => {
+          const response = await fetchJSON(buildApiUrl(`/country/${iso3}/timeseries`, { indicators: indicator }));
+          return {
+            iso3,
+            name: response.name || iso3,
+            points: (response.series[indicator] || []).map((point) => ({ year: Number(point.year), value: Number(point.value) })),
+          };
+        }),
+      );
+
+      renderCompareLegend(rows);
+      drawCompareChart(rows);
+    } catch (error) {
+      console.error(error);
+      renderCompareLegend([]);
+      drawCompareChart([]);
+    }
+  }
+
+  function stopPlay() {
+    if (state.playTimer) {
+      clearInterval(state.playTimer);
+      state.playTimer = null;
+    }
+    el("play-btn").textContent = "Play";
+  }
+
+  function startPlay() {
+    if (state.playTimer) return;
+    el("play-btn").textContent = "Pause";
+
+    state.playTimer = window.setInterval(async () => {
+      const maxYear = Number(state.meta.max_year || 2024);
+      const minYear = Number(state.meta.min_year || 1970);
+
+      state.selectedYear = state.selectedYear >= maxYear ? minYear : state.selectedYear + 1;
+      el("year-slider").value = String(state.selectedYear);
+      updateYearLabel();
+      await refreshAtlas();
+    }, 850);
+  }
+
+  function bindEvents() {
+    el("indicator-select").addEventListener("change", async (event) => {
+      state.selectedIndicator = event.target.value;
+      if (!state.compareIndicator) {
+        state.compareIndicator = state.selectedIndicator;
+        el("compare-indicator-select").value = state.compareIndicator;
+      }
+      await refreshAtlas();
+    });
+
+    el("compare-indicator-select").addEventListener("change", async (event) => {
+      state.compareIndicator = event.target.value;
+      await refreshCompareChart();
+    });
+
+    el("region-select").addEventListener("change", async (event) => {
+      state.selectedRegion = event.target.value;
+      await refreshAtlas();
+    });
+
+    el("income-select").addEventListener("change", async (event) => {
+      state.selectedIncome = event.target.value;
+      await refreshAtlas();
+    });
+
+    el("year-slider").addEventListener("input", async (event) => {
+      state.selectedYear = Number(event.target.value);
+      updateYearLabel();
+      await refreshAtlas();
+    });
+
+    el("play-btn").addEventListener("click", () => {
+      if (state.playTimer) stopPlay();
+      else startPlay();
+    });
+
+    el("reset-filters-btn").addEventListener("click", async () => {
+      state.selectedRegion = "";
+      state.selectedIncome = "";
+      el("region-select").value = "";
+      el("income-select").value = "";
+      await refreshAtlas();
+    });
+
+    el("compare-countries").addEventListener("change", async () => {
+      state.compareHiddenCountries.clear();
+      await refreshCompareChart();
+    });
+
+    el("close-panel").addEventListener("click", () => {
+      state.selectedIso3 = null;
+      renderMapColors();
+      closeCountryPanel();
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (!state.panelOpen) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("#country-panel")) return;
+      if (target.closest(".country")) return;
+      state.selectedIso3 = null;
+      renderMapColors();
+      closeCountryPanel();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.panelOpen) {
+        state.selectedIso3 = null;
+        renderMapColors();
+        closeCountryPanel();
+      }
+    });
   }
 
   async function bootstrap() {
-    setupReveal();
-    setupControls();
-    void loadDbStats();
-
     try {
-      const [countries, world] = await Promise.all([
-        loadAllCountries(),
-        fetchJson("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
+      setupReveal();
+      const [meta, indicators, countries, worldFeatures] = await Promise.all([
+        fetchJSON(buildApiUrl("/atlas/meta")),
+        fetchJSON(buildApiUrl("/indicators")),
+        fetchJSON(buildApiUrl("/countries", { limit: 2000, offset: 0 })),
+        loadWorldFeatures(),
       ]);
-      state.countries = countries;
-      populateCountrySelect();
-      await loadIndicatorsForSource(state.source);
 
-      state.worldFeatures = topojson.feature(world, world.objects.countries).features;
-      initGlobe();
-      initStarfield();
-      await refreshMap();
-      redrawMapColors();
-      renderInsights();
-    } catch (e) {
-      console.error(e);
-      const box = el("map-empty");
-      const paras = box.querySelectorAll("p");
-      let title = "Could not load initial data.";
-      let hint =
-        "Open this page via the backend (e.g. http://localhost:8000/), not as a file. Postgres and uvicorn must be running.";
-      const msg = e && e.message ? String(e.message) : "";
-      if (msg === "Failed to fetch" || msg.includes("NetworkError") || msg.includes("Load failed")) {
-        title = "Cannot reach the API (server not running or wrong port).";
-        hint =
-          "Start Postgres, then from the backend folder run: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000. Reload this page.";
-      } else if (msg.includes("503")) {
-        title = "API is up but the database is unavailable (503).";
-        hint = "Start PostgreSQL and check POSTGRES_* environment variables.";
-      } else if (msg) {
-        hint = `${hint} (${msg})`;
-      }
-      if (paras[0]) paras[0].textContent = title;
-      if (paras[1]) paras[1].textContent = hint;
-      box.hidden = false;
-      el("map-loading").style.display = "none";
-    } finally {
-      document.body.classList.remove("is-booting");
+      state.meta = meta;
+      state.indicators = indicators;
+      state.countries = countries;
+      state.worldFeatures = worldFeatures;
+
+      state.countriesByIso = new Map(countries.map((country) => [country.iso3, country]));
+
+      state.selectedYear = Number(meta.max_year || 2024);
+      state.selectedIndicator = indicators.some((item) => item.code === "tfr") ? "tfr" : indicators[0].code;
+      state.compareIndicator = state.selectedIndicator;
+
+      const slider = el("year-slider");
+      slider.min = String(meta.min_year || 1970);
+      slider.max = String(meta.max_year || 2024);
+      slider.value = String(state.selectedYear);
+      updateYearLabel();
+
+      populateIndicatorSelects();
+      populateFilterSelects();
+      populateCompareCountries();
+      initMap();
+      bindEvents();
+
+      await refreshAtlas();
+      await refreshCompareChart();
+    } catch (error) {
+      console.error(error);
+      setLoadingMessage("Failed to bootstrap atlas. Ensure backend is running on http://localhost:8000");
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", bootstrap);
-  } else {
-    void bootstrap();
-  }
+  bootstrap();
 })();
