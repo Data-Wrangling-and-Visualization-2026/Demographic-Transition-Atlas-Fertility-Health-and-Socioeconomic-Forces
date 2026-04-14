@@ -21,53 +21,157 @@
     </div>
 
     <header class="hero">
-      <p class="hero-kicker">Interactive Demographic Intelligence</p>
+      <p class="hero-kicker">Demographic Transition Atlas</p>
       <h1>
-        <span class="hero-line">Global Demographic</span>
-        <span class="hero-line hero-line--accent">Transition Atlas</span>
+        <span class="hero-line">Global Patterns</span>
+        <span class="hero-line hero-line--accent">of Fertility and Development</span>
       </h1>
       <p class="hero-subtitle">
-        Explore fertility dynamics across countries from <strong>1970 to 2024</strong>, compare regional patterns, and
-        investigate country-level trajectories through rich interactive visuals.
+        This is more than a map. We provide a full analytical overview across <strong>217 countries</strong> for
+        <strong>1970-2024</strong>: how fertility changed, where high fertility persists, and how these trends relate
+        to income and education.
       </p>
       <div class="hero-chips" aria-label="Atlas highlights">
-        <span class="hero-chip">Global 3D Globe View</span>
-        <span class="hero-chip">Time Animation & Filters</span>
-        <span class="hero-chip">Country & Region Analytics</span>
+        <span class="hero-chip">55 years of trend data</span>
+        <span class="hero-chip">Regional and income profiles</span>
+        <span class="hero-chip">GDP and education correlations</span>
+        <span class="hero-chip">Interactive globe and country profiles</span>
       </div>
     </header>
 
     <main class="layout">
       <section class="story-intro" data-reveal>
         <article class="story-card">
-          <h3>Why This Matters</h3>
+          <h3>What This Research Covers</h3>
           <p>
-            Demographic transition shapes labor markets, healthcare planning, education demand, and long-term economic
-            resilience. This atlas makes those shifts visible across both time and geography.
+            We analyze how demographic transition unfolds across regions and where it slows down. The goal is to
+            provide ready-to-read conclusions, not force users to click every country manually.
           </p>
         </article>
 
         <article class="story-card">
-          <h3>What You Get</h3>
+          <h3>Key Questions</h3>
           <p>
-            A single exploration space for country, region, and income-group analysis: interactive globe, temporal
-            playback, dynamic filtering, country profiles, and comparative time-series charts.
+            How fast is fertility falling globally? Why does Sub-Saharan Africa remain above other regions? How are
+            fertility, GDP per capita, and female secondary enrollment connected?
           </p>
         </article>
 
         <article class="story-card">
-          <h3>How To Use It</h3>
+          <h3>How To Read This Page</h3>
           <ol>
-            <li>Select an indicator and target year.</li>
-            <li>Filter by region and income group for focused analysis.</li>
-            <li>Press <strong>Play</strong> to animate trends over time.</li>
-            <li>Click a country to open a detailed side profile.</li>
-            <li>Use comparison mode to benchmark multiple countries.</li>
+            <li>Start with the key findings below.</li>
+            <li>Move from global trends to region and country-level views.</li>
+            <li>Use the interactive globe at the end for detailed checks.</li>
+            <li>All charts and tooltips include measurement units.</li>
           </ol>
         </article>
       </section>
 
+      <section class="card findings-card" data-reveal>
+        <div class="section-head">
+          <h2>Key Findings</h2>
+          <p>Automatically computed from the latest available data.</p>
+        </div>
+        <div class="findings-grid">
+          <article class="finding-item">
+            <span class="finding-label">Global trend</span>
+            <p id="finding-global-delta" class="finding-value">Loading...</p>
+          </article>
+          <article class="finding-item">
+            <span class="finding-label">Sub-Saharan Africa</span>
+            <p id="finding-africa-level" class="finding-value">Loading...</p>
+          </article>
+          <article class="finding-item">
+            <span class="finding-label">High income vs Low income</span>
+            <p id="finding-income-gap" class="finding-value">Loading...</p>
+          </article>
+          <article class="finding-item">
+            <span class="finding-label">TFR and GDP per capita</span>
+            <p id="finding-gdp-link" class="finding-value">Loading...</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>1) Global trend: fertility is steadily declining worldwide</h2>
+          <p id="story-global-summary">
+            The line shows the country-average Total fertility rate for each year. Unit: births per woman.
+          </p>
+        </div>
+        <svg id="story-global-chart" viewBox="0 0 980 320" class="story-chart"></svg>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>2) Regional divergence: Sub-Saharan Africa remains the highest</h2>
+          <p id="story-region-summary">
+            Regions follow the same broad direction (decline), but at very different speeds and levels.
+          </p>
+        </div>
+        <div id="story-region-legend" class="story-legend"></div>
+        <svg id="story-region-chart" viewBox="0 0 980 340" class="story-chart"></svg>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>3) Income profiles: higher income, lower TFR</h2>
+          <p id="story-income-summary">
+            Comparison of average values across income groups. Unit: births per woman.
+          </p>
+        </div>
+        <div id="story-income-legend" class="story-legend"></div>
+        <svg id="story-income-chart" viewBox="0 0 980 340" class="story-chart"></svg>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>4) GDP per capita and fertility</h2>
+          <p id="story-gdp-scatter-summary">
+            Points represent countries in the latest year. X-axis: GDP per capita (current US$), Y-axis: TFR (births
+            per woman).
+          </p>
+        </div>
+        <svg id="story-gdp-scatter" viewBox="0 0 980 360" class="story-chart"></svg>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>5) Education and adolescent fertility</h2>
+          <p id="story-education-scatter-summary">
+            X-axis: female secondary enrollment (% gross), Y-axis: adolescent fertility (births per 1,000 women ages
+            15-19).
+          </p>
+        </div>
+        <svg id="story-education-scatter" viewBox="0 0 980 360" class="story-chart"></svg>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>6) Where fertility declined the fastest</h2>
+          <p id="story-decline-summary">
+            Country comparison between the first and last year in the sample. Change unit: births per woman.
+          </p>
+        </div>
+        <div class="decline-layout">
+          <svg id="story-decline-chart" viewBox="0 0 700 360" class="story-chart story-chart--compact"></svg>
+          <div class="decline-list-wrap">
+            <h3>Top 10 countries by TFR decline</h3>
+            <ol id="story-decline-list" class="decline-list"></ol>
+          </div>
+        </div>
+      </section>
+
       <section class="card map-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>Interactive module for detailed hypothesis checks</h2>
+          <p>
+            This section is for deeper exploration: selecting countries, checking specific cases, and comparing time
+            series. The main conclusions are already presented above.
+          </p>
+        </div>
+
         <div class="controls" aria-label="Atlas controls">
           <label class="field">
             <span>Indicator</span>
@@ -142,6 +246,34 @@
         </div>
         <div id="compare-legend" class="compare-legend"></div>
         <svg id="compare-chart" viewBox="0 0 980 300" class="compare-chart"></svg>
+      </section>
+
+      <section class="card methodology-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>How to interpret indicators</h2>
+          <p>
+            Measurement units are always shown near each metric, in tooltips, and in chart labels. This helps avoid
+            confusion between levels and rates of change.
+          </p>
+        </div>
+        <div class="method-grid">
+          <article>
+            <h3>TFR</h3>
+            <p><strong>births per woman</strong> - average number of births per woman.</p>
+          </article>
+          <article>
+            <h3>Adolescent fertility</h3>
+            <p><strong>births per 1,000 women ages 15-19</strong> - fertility among adolescent girls.</p>
+          </article>
+          <article>
+            <h3>GDP per capita</h3>
+            <p><strong>current US$</strong> - GDP per person in current U.S. dollars.</p>
+          </article>
+          <article>
+            <h3>Female secondary enrollment</h3>
+            <p><strong>% gross</strong> - female participation in secondary education (gross enrollment ratio).</p>
+          </article>
+        </div>
       </section>
     </main>
 
