@@ -3,7 +3,7 @@
   "use strict";
 
   const API_BASE = window.ATLAS_API_BASE || "http://localhost:8000";
-const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.fixed.json";
+const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
   const PANEL_PRIORITY = [
     "tfr",
@@ -243,6 +243,8 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.fixed.json";
     mapPath: null,
     mapSvg: null,
     mapLayer: null,
+    mapSupplementLayer: null,
+    mapSupplementOrbit: null,
     mapSphere: null,
     mapGraticule: null,
     mapAtmosphere: null,
@@ -250,6 +252,8 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.fixed.json";
     mapShadow: null,
     mapDragSurface: null,
     mapValueByIso: new Map(),
+    mapRenderableIsos: new Set(),
+    mapColorScale: null,
     globeBaseScale: 236,
     globeRotateTimer: null,
     isDraggingGlobe: false,
@@ -258,13 +262,19 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.fixed.json";
 
   const el = (id) => document.getElementById(id);
 
-function isoFromFeature(feature) {
+  function isoFromFeature(feature) {
   const p = feature && feature.properties ? feature.properties : {};
+
   if (p.ISO_A3 && p.ISO_A3 !== "-99") return p.ISO_A3;
   if (p.ADM0_A3 && p.ADM0_A3 !== "-99") return p.ADM0_A3;
-  const rawId = feature && feature.id != null ? String(feature.id) : null;
-  const normalizedId = rawId && /^\d+$/.test(rawId) ? String(Number(rawId)) : rawId;
-  if (normalizedId && ID_TO_ISO3[normalizedId]) return ID_TO_ISO3[normalizedId];
+
+  if (feature && feature.id != null) {
+    const numericId = Number(feature.id);
+    if (!Number.isNaN(numericId) && ID_TO_ISO3[numericId]) {
+      return ID_TO_ISO3[numericId];
+    }
+  }
+
   return null;
 }
 
@@ -315,6 +325,10 @@ function isoFromFeature(feature) {
     return PANEL_COLORS[code] || d3.schemeTableau10[index % d3.schemeTableau10.length];
   }
 
+  function canRenderIsoOnMap(iso3) {
+    return Boolean(iso3 && state.mapRenderableIsos.has(iso3));
+  }
+
   function getCountryName(iso3) {
     const row = state.countriesByIso.get(iso3);
     return row ? row.name : iso3;
@@ -355,9 +369,12 @@ function isoFromFeature(feature) {
   async function loadWorldFeatures() {
     const world = await fetchJSON(WORLD_TOPOJSON_PATH);
     const features = topojson.feature(world, world.objects.countries).features;
+    const renderableIsos = new Set();
     features.forEach((feature) => {
       feature._iso3 = isoFromFeature(feature);
+      if (feature._iso3) renderableIsos.add(feature._iso3);
     });
+    state.mapRenderableIsos = renderableIsos;
     return features;
   }
 
@@ -594,11 +611,14 @@ function isoFromFeature(feature) {
     });
   }
 
-  function showMapTooltip(event, row, fallbackName) {
+  function handleCountryEnter(event, feature) {
+    state.isHoveringCountry = true;
+    const iso3 = feature._iso3;
+    const row = iso3 ? state.mapValueByIso.get(iso3) : null;
+    const countryName = row?.name || getCountryName(iso3) || feature.properties?.name || "Unknown";
     const indicator = indicatorMeta(state.selectedIndicator);
-    const countryName = row?.name || fallbackName || row?.iso3 || "Unknown";
-    const tip = el("map-tooltip");
 
+    const tip = el("map-tooltip");
     tip.innerHTML = `
       <strong>${countryName}</strong><br/>
       <span>${indicator ? indicator.label : state.selectedIndicator} · ${state.selectedYear}</span><br/>
@@ -606,14 +626,6 @@ function isoFromFeature(feature) {
     `;
     tip.hidden = false;
     handleCountryMove(event);
-  }
-
-  function handleCountryEnter(event, feature) {
-    state.isHoveringCountry = true;
-    const iso3 = feature._iso3;
-    const row = iso3 ? state.mapValueByIso.get(iso3) : null;
-    const countryName = row?.name || getCountryName(iso3) || feature.properties?.name || "Unknown";
-    showMapTooltip(event, row, countryName);
   }
 
   function handleCountryMove(event) {
@@ -712,6 +724,65 @@ function isoFromFeature(feature) {
     const unit = indicator && indicator.unit ? indicator.unit : "selected unit";
     const _ = mapSummary;
     note.innerHTML = `<strong>What this selection means:</strong> You are viewing <strong>${indicatorLabel}</strong> for <strong>${state.selectedYear}</strong> (${unit}).`;
+  }
+
+  function renderSelectionDataTable() {
+    const body = el("selection-data-rows");
+    const note = el("data-table-note");
+    if (!body || !note) return;
+
+    body.innerHTML = "";
+
+    if (!state.mapRows.length) {
+      note.textContent = "No country rows for the current year, indicator, and filters.";
+      const emptyRow = document.createElement("tr");
+      emptyRow.innerHTML = '<td class="table-empty" colspan="6">No data for this selection.</td>';
+      body.appendChild(emptyRow);
+      return;
+    }
+
+    const unmappedCount = state.mapRows.filter((row) => !canRenderIsoOnMap(row.iso3)).length;
+    note.textContent = unmappedCount
+      ? `${state.mapRows.length} country rows loaded. ${unmappedCount} appear in the table only because the globe geometry has no matching shape for them.`
+      : `${state.mapRows.length} country rows loaded. All of them are available on the globe and in the table.`;
+
+    state.mapRows.forEach((row) => {
+      const tr = document.createElement("tr");
+      const visibleOnMap = canRenderIsoOnMap(row.iso3);
+      const countryTd = document.createElement("td");
+      const countryBtn = document.createElement("button");
+
+      countryBtn.type = "button";
+      countryBtn.className = "data-country-btn";
+      countryBtn.textContent = row.name || row.iso3 || "Unknown";
+      countryBtn.addEventListener("click", () => {
+        openCountryPanel(row.iso3);
+        renderMapColors();
+      });
+
+      countryTd.appendChild(countryBtn);
+      tr.appendChild(countryTd);
+
+      [
+        row.iso3 || "-",
+        row.region || "-",
+        row.income_group || "-",
+        formatValue(row.value),
+      ].forEach((value) => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+
+      const coverageTd = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = `coverage-badge ${visibleOnMap ? "coverage-badge--map" : "coverage-badge--table"}`;
+      badge.textContent = visibleOnMap ? "Map + table" : "Table only";
+      coverageTd.appendChild(badge);
+      tr.appendChild(coverageTd);
+
+      body.appendChild(tr);
+    });
   }
 
   function renderRegionCards() {
@@ -831,6 +902,7 @@ function isoFromFeature(feature) {
 
       renderMapColors();
       updateSelectionNote(mapData.summary || null);
+      renderSelectionDataTable();
       renderRegionCards();
       renderRegionChart();
 
@@ -844,6 +916,7 @@ function isoFromFeature(feature) {
       state.mapRows = [];
       state.regionSummaryRows = [];
       renderMapColors();
+      renderSelectionDataTable();
       renderRegionCards();
       renderRegionChart();
       setLoadingMessage("Could not load map data. Check backend/API connection.");
