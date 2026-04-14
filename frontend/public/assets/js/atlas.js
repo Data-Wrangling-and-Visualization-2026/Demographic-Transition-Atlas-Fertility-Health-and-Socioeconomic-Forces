@@ -249,6 +249,22 @@
     globeRotateTimer: null,
     isDraggingGlobe: false,
     isHoveringCountry: false,
+    story: {
+      ready: false,
+      yearSeries: [],
+      tfrByYear: [],
+      tfrRowsByYear: new Map(),
+      latestYear: null,
+      firstYear: null,
+      latestTfrRows: [],
+      latestGdpRows: [],
+      latestEnrollmentRows: [],
+      latestAdolescentRows: [],
+      correlations: {
+        gdpVsTfr: null,
+        enrollmentVsAdolescent: null,
+      },
+    },
   };
 
   const el = (id) => document.getElementById(id);
@@ -269,6 +285,81 @@
     if (abs >= 10_000) return d3.format(",.0f")(v);
     if (abs >= 100) return d3.format(",.1f")(v);
     return d3.format(".2f")(v);
+  }
+
+  function formatValueWithUnit(value, unit) {
+    const base = formatValue(value);
+    if (base === "-" || !unit) return base;
+    return `${base} ${unit}`;
+  }
+
+  function toNumberOrNull(value) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : null;
+  }
+
+  function mean(values) {
+    const filtered = values.filter(Number.isFinite);
+    if (!filtered.length) return null;
+    return d3.mean(filtered);
+  }
+
+  function createYearRange(minYear, maxYear) {
+    const years = [];
+    for (let year = minYear; year <= maxYear; year += 1) years.push(year);
+    return years;
+  }
+
+  function pearsonCorrelation(rows, xAccessor, yAccessor) {
+    const prepared = rows
+      .map((row) => ({ x: toNumberOrNull(xAccessor(row)), y: toNumberOrNull(yAccessor(row)) }))
+      .filter((row) => row.x != null && row.y != null);
+
+    if (prepared.length < 3) return null;
+
+    const meanX = d3.mean(prepared, (d) => d.x);
+    const meanY = d3.mean(prepared, (d) => d.y);
+
+    let numerator = 0;
+    let sumX = 0;
+    let sumY = 0;
+
+    prepared.forEach((point) => {
+      const dx = point.x - meanX;
+      const dy = point.y - meanY;
+      numerator += dx * dy;
+      sumX += dx * dx;
+      sumY += dy * dy;
+    });
+
+    const denominator = Math.sqrt(sumX * sumY);
+    if (!denominator) return null;
+    return numerator / denominator;
+  }
+
+  function regressionLine(rows, xAccessor, yAccessor) {
+    const prepared = rows
+      .map((row) => ({ x: toNumberOrNull(xAccessor(row)), y: toNumberOrNull(yAccessor(row)) }))
+      .filter((row) => row.x != null && row.y != null);
+
+    if (prepared.length < 3) return null;
+
+    const meanX = d3.mean(prepared, (d) => d.x);
+    const meanY = d3.mean(prepared, (d) => d.y);
+
+    let numerator = 0;
+    let denominator = 0;
+    prepared.forEach((point) => {
+      const dx = point.x - meanX;
+      numerator += dx * (point.y - meanY);
+      denominator += dx * dx;
+    });
+
+    if (!denominator) return null;
+
+    const slope = numerator / denominator;
+    const intercept = meanY - slope * meanX;
+    return { slope, intercept };
   }
 
   function buildApiUrl(path, params) {
@@ -582,10 +673,11 @@
     const indicator = indicatorMeta(state.selectedIndicator);
 
     const tip = el("map-tooltip");
+    const unit = indicator && indicator.unit ? indicator.unit : "";
     tip.innerHTML = `
       <strong>${countryName}</strong><br/>
       <span>${indicator ? indicator.label : state.selectedIndicator} · ${state.selectedYear}</span><br/>
-      <span>${row ? formatValue(row.value) : "No data"}</span>
+      <span>${row ? formatValueWithUnit(row.value, unit) : "No data"}</span>
     `;
     tip.hidden = false;
     handleCountryMove(event);
@@ -675,8 +767,9 @@
 
     const colors = d3.range(0, 1.01, 0.1).map((t) => d3.interpolateYlGnBu(t));
     gradient.style.background = `linear-gradient(90deg, ${colors.join(",")})`;
-    minEl.textContent = formatValue(min);
-    maxEl.textContent = formatValue(max);
+    const unit = indicator && indicator.unit ? indicator.unit : "";
+    minEl.textContent = formatValueWithUnit(min, unit);
+    maxEl.textContent = formatValueWithUnit(max, unit);
   }
 
   function updateSelectionNote(mapSummary) {
@@ -701,13 +794,16 @@
       return;
     }
 
+    const activeIndicator = indicatorMeta(state.selectedIndicator);
+    const unit = activeIndicator && activeIndicator.unit ? activeIndicator.unit : "";
+
     state.regionSummaryRows.forEach((row) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = `region-item ${state.selectedRegion === row.region ? "active" : ""}`;
       button.innerHTML = `
         <div class="region-name">${row.region}</div>
-        <div class="region-value">${formatValue(row.avg_value)}</div>
+        <div class="region-value">${formatValueWithUnit(row.avg_value, unit)}</div>
         <div class="region-count">${row.countries_with_data} countries</div>
       `;
       button.addEventListener("click", () => {
@@ -774,6 +870,14 @@
       .style("text-anchor", "end");
 
     svg.append("g").attr("transform", `translate(${margin.left},0)`).attr("class", "axis").call(d3.axisLeft(y).ticks(5));
+
+    const unit = (indicatorMeta(state.selectedIndicator) || {}).unit || "";
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 6)
+      .attr("class", "story-note")
+      .text(unit ? `Unit: ${unit}` : "");
   }
 
   async function refreshAtlas() {
@@ -831,6 +935,7 @@
         code: indicatorCode,
         label: meta ? meta.label : indicatorCode,
         value: profile.values[indicatorCode],
+        unit: meta && meta.unit ? meta.unit : "",
       };
     });
 
@@ -840,6 +945,7 @@
       block.innerHTML = `
         <span class="kpi-label">${row.label}</span>
         <span class="kpi-value">${formatValue(row.value)}</span>
+        <span class="kpi-unit">${row.unit || "-"}</span>
       `;
       container.appendChild(block);
     });
@@ -1060,6 +1166,7 @@
       .domain(d3.extent(points, (d) => d.value))
       .nice()
       .range([height - margin.bottom, margin.top]);
+    const unit = (indicatorMeta(state.compareIndicator) || {}).unit || "";
 
     const color = d3.scaleOrdinal(d3.schemeTableau10).domain(activeRows.map((row) => row.iso3));
 
@@ -1076,6 +1183,13 @@
       .call(d3.axisBottom(x).ticks(7).tickFormat(d3.format("d")));
 
     svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5));
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 6)
+      .attr("class", "story-note")
+      .text(unit ? `Unit: ${unit}` : "");
 
     const linesGroup = svg.append("g");
 
@@ -1164,6 +1278,726 @@
       console.error(error);
       renderCompareLegend([]);
       drawCompareChart([]);
+    }
+  }
+
+  function averageBy(rows, key) {
+    const grouped = d3.group(
+      rows.filter((row) => Number.isFinite(Number(row.value))),
+      (row) => row[key] || "Unknown",
+    );
+    const result = new Map();
+    grouped.forEach((groupRows, groupKey) => {
+      result.set(groupKey, d3.mean(groupRows, (row) => Number(row.value)));
+    });
+    return result;
+  }
+
+  function renderStoryLegend(containerId, items) {
+    const container = el(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    items.forEach((item) => {
+      const node = document.createElement("span");
+      node.className = "story-legend-item";
+      node.innerHTML = `<span class="story-legend-dot" style="background:${item.color}"></span>${item.label}`;
+      container.appendChild(node);
+    });
+  }
+
+  function setText(id, value) {
+    const node = el(id);
+    if (!node) return;
+    node.textContent = value;
+  }
+
+  async function fetchMapSeries(indicator, years, concurrency) {
+    const out = new Array(years.length);
+    let cursor = 0;
+    const workerCount = Math.min(concurrency, years.length);
+
+    async function worker() {
+      while (cursor < years.length) {
+        const index = cursor;
+        cursor += 1;
+        const year = years[index];
+        out[index] = await fetchJSON(buildApiUrl("/map-data", { year, indicator }));
+      }
+    }
+
+    await Promise.all(d3.range(workerCount).map(() => worker()));
+    return out;
+  }
+
+  function drawStoryGlobalChart() {
+    const svg = d3.select("#story-global-chart");
+    const width = 980;
+    const height = 320;
+    const margin = { top: 20, right: 20, bottom: 42, left: 70 };
+    const series = state.story.tfrByYear.filter((row) => Number.isFinite(row.globalAvg));
+
+    svg.selectAll("*").remove();
+    if (!series.length) return;
+
+    const x = d3
+      .scaleLinear()
+      .domain(d3.extent(series, (d) => d.year))
+      .range([margin.left, width - margin.right]);
+    const y = d3
+      .scaleLinear()
+      .domain(d3.extent(series, (d) => d.globalAvg))
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(5).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove());
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format("d")));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5));
+
+    const area = d3
+      .area()
+      .x((d) => x(d.year))
+      .y0(height - margin.bottom)
+      .y1((d) => y(d.globalAvg))
+      .curve(d3.curveMonotoneX);
+    const line = d3
+      .line()
+      .x((d) => x(d.year))
+      .y((d) => y(d.globalAvg))
+      .curve(d3.curveMonotoneX);
+
+    svg
+      .append("path")
+      .datum(series)
+      .attr("fill", "rgba(28, 124, 95, 0.18)")
+      .attr("d", area);
+    svg
+      .append("path")
+      .datum(series)
+      .attr("fill", "none")
+      .attr("stroke", "#156e56")
+      .attr("stroke-width", 2.8)
+      .attr("d", line);
+
+    const first = series[0];
+    const last = series[series.length - 1];
+    [first, last].forEach((point, index) => {
+      svg
+        .append("circle")
+        .attr("cx", x(point.year))
+        .attr("cy", y(point.globalAvg))
+        .attr("r", 4)
+        .attr("fill", "#156e56");
+
+      svg
+        .append("text")
+        .attr("x", x(point.year) + (index ? -4 : 8))
+        .attr("y", y(point.globalAvg) - 8)
+        .attr("text-anchor", index ? "end" : "start")
+        .attr("class", "story-note")
+        .text(`${point.year}: ${formatValueWithUnit(point.globalAvg, "births per woman")}`);
+    });
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 6)
+      .attr("class", "story-axis-label")
+      .text("TFR (births per woman)");
+  }
+
+  function drawStoryRegionChart() {
+    const svg = d3.select("#story-region-chart");
+    const width = 980;
+    const height = 340;
+    const margin = { top: 24, right: 20, bottom: 44, left: 76 };
+    const regions = state.meta.regions || [];
+
+    svg.selectAll("*").remove();
+    if (!regions.length || !state.story.tfrByYear.length) return;
+
+    const series = regions.map((region) => ({
+      region,
+      points: state.story.tfrByYear
+        .map((row) => ({ year: row.year, value: row.byRegion.get(region) }))
+        .filter((row) => Number.isFinite(row.value)),
+    }));
+
+    const allPoints = series.flatMap((row) => row.points);
+    if (!allPoints.length) return;
+
+    const x = d3
+      .scaleLinear()
+      .domain(d3.extent(allPoints, (d) => d.year))
+      .range([margin.left, width - margin.right]);
+    const y = d3
+      .scaleLinear()
+      .domain(d3.extent(allPoints, (d) => d.value))
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+    const color = d3.scaleOrdinal(d3.schemeTableau10).domain(regions);
+    const line = d3
+      .line()
+      .x((d) => x(d.year))
+      .y((d) => y(d.value))
+      .curve(d3.curveMonotoneX);
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(6).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove());
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format("d")));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(6));
+
+    svg
+      .append("g")
+      .selectAll("path")
+      .data(series)
+      .join("path")
+      .attr("fill", "none")
+      .attr("stroke", (row) => color(row.region))
+      .attr("stroke-width", 2)
+      .attr("opacity", 0.95)
+      .attr("d", (row) => line(row.points));
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 8)
+      .attr("class", "story-axis-label")
+      .text("TFR by region (births per woman)");
+
+    renderStoryLegend(
+      "story-region-legend",
+      regions.map((region) => ({
+        label: region,
+        color: color(region),
+      })),
+    );
+  }
+
+  function drawStoryIncomeChart() {
+    const svg = d3.select("#story-income-chart");
+    const width = 980;
+    const height = 340;
+    const margin = { top: 24, right: 20, bottom: 44, left: 76 };
+    const incomes = (state.meta.income_groups || []).filter((group) => group && group !== "Not classified");
+
+    svg.selectAll("*").remove();
+    if (!incomes.length || !state.story.tfrByYear.length) return;
+
+    const series = incomes.map((income) => ({
+      income,
+      points: state.story.tfrByYear
+        .map((row) => ({ year: row.year, value: row.byIncome.get(income) }))
+        .filter((row) => Number.isFinite(row.value)),
+    }));
+    const allPoints = series.flatMap((row) => row.points);
+    if (!allPoints.length) return;
+
+    const x = d3
+      .scaleLinear()
+      .domain(d3.extent(allPoints, (d) => d.year))
+      .range([margin.left, width - margin.right]);
+    const y = d3
+      .scaleLinear()
+      .domain(d3.extent(allPoints, (d) => d.value))
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    const colorMap = {
+      "High income": "#145f4a",
+      "Upper middle income": "#2f7c64",
+      "Lower middle income": "#4e9f84",
+      "Low income": "#7ab79b",
+    };
+    const color = d3.scaleOrdinal().domain(incomes).range(incomes.map((income) => colorMap[income] || "#4a8b75"));
+    const line = d3
+      .line()
+      .x((d) => x(d.year))
+      .y((d) => y(d.value))
+      .curve(d3.curveMonotoneX);
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(6).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove());
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format("d")));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(6));
+
+    svg
+      .append("g")
+      .selectAll("path")
+      .data(series)
+      .join("path")
+      .attr("fill", "none")
+      .attr("stroke", (row) => color(row.income))
+      .attr("stroke-width", 2.4)
+      .attr("d", (row) => line(row.points));
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 8)
+      .attr("class", "story-axis-label")
+      .text("TFR by income group (births per woman)");
+
+    renderStoryLegend(
+      "story-income-legend",
+      incomes.map((income) => ({
+        label: income,
+        color: color(income),
+      })),
+    );
+  }
+
+  function drawStoryScatter(svgId, config) {
+    const svg = d3.select(svgId);
+    const width = 980;
+    const height = 360;
+    const margin = { top: 24, right: 20, bottom: 52, left: 78 };
+    svg.selectAll("*").remove();
+
+    const rows = config.rows
+      .map((row) => ({
+        ...row,
+        x: toNumberOrNull(config.xAccessor(row)),
+        y: toNumberOrNull(config.yAccessor(row)),
+      }))
+      .filter((row) => row.x != null && row.y != null);
+
+    if (!rows.length) return;
+
+    const x = config.useLogX
+      ? d3.scaleLog().domain(d3.extent(rows, (d) => d.x)).nice().range([margin.left, width - margin.right])
+      : d3.scaleLinear().domain(d3.extent(rows, (d) => d.x)).nice().range([margin.left, width - margin.right]);
+    const y = d3
+      .scaleLinear()
+      .domain(d3.extent(rows, (d) => d.y))
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    const groups = Array.from(new Set(rows.map((row) => config.colorAccessor(row))));
+    const color = d3.scaleOrdinal(d3.schemeTableau10).domain(groups);
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(6).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove());
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(config.useLogX ? d3.axisBottom(x).ticks(7, "~s") : d3.axisBottom(x).ticks(7));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(6));
+
+    const dots = svg.append("g").attr("class", "story-tooltip-layer");
+    dots
+      .selectAll("circle")
+      .data(rows)
+      .join("circle")
+      .attr("cx", (d) => x(d.x))
+      .attr("cy", (d) => y(d.y))
+      .attr("r", 3.3)
+      .attr("fill", (d) => color(config.colorAccessor(d)))
+      .attr("opacity", 0.72)
+      .append("title")
+      .text(
+        (d) =>
+          `${d.name || d.iso3}\n${config.xLabel}: ${formatValueWithUnit(d.x, config.xUnit)}\n${config.yLabel}: ${formatValueWithUnit(
+            d.y,
+            config.yUnit,
+          )}`,
+      );
+
+    const regressionRows = rows.map((row) => ({
+      x: config.useLogX ? Math.log10(row.x) : row.x,
+      y: row.y,
+    }));
+    const regression = regressionLine(
+      regressionRows,
+      (row) => row.x,
+      (row) => row.y,
+    );
+
+    if (regression) {
+      const xDomain = d3.extent(rows, (d) => d.x);
+      const x1 = xDomain[0];
+      const x2 = xDomain[1];
+      const rx1 = config.useLogX ? Math.log10(x1) : x1;
+      const rx2 = config.useLogX ? Math.log10(x2) : x2;
+      const y1 = regression.slope * rx1 + regression.intercept;
+      const y2 = regression.slope * rx2 + regression.intercept;
+
+      svg
+        .append("line")
+        .attr("x1", x(x1))
+        .attr("y1", y(y1))
+        .attr("x2", x(x2))
+        .attr("y2", y(y2))
+        .attr("stroke", "#2f3f5f")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", "5 4")
+        .attr("opacity", 0.9);
+    }
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 8)
+      .attr("class", "story-axis-label")
+      .text(config.yLabel);
+    svg
+      .append("text")
+      .attr("x", width - margin.right)
+      .attr("y", height - 10)
+      .attr("text-anchor", "end")
+      .attr("class", "story-axis-label")
+      .text(config.xLabel);
+  }
+
+  function drawStoryDeclineChart() {
+    const svg = d3.select("#story-decline-chart");
+    const width = 700;
+    const height = 360;
+    const margin = { top: 20, right: 18, bottom: 28, left: 210 };
+    svg.selectAll("*").remove();
+
+    const firstRows = state.story.tfrRowsByYear.get(state.story.firstYear) || [];
+    const latestRows = state.story.latestTfrRows || [];
+    const latestByIso = new Map(latestRows.map((row) => [row.iso3, row]));
+
+    const declines = firstRows
+      .map((row) => {
+        const latest = latestByIso.get(row.iso3);
+        const firstValue = toNumberOrNull(row.value);
+        const latestValue = latest ? toNumberOrNull(latest.value) : null;
+        if (firstValue == null || latestValue == null) return null;
+        return {
+          iso3: row.iso3,
+          name: row.name || getCountryName(row.iso3) || row.iso3,
+          firstValue,
+          latestValue,
+          drop: firstValue - latestValue,
+        };
+      })
+      .filter((row) => row && row.drop > 0)
+      .sort((a, b) => d3.descending(a.drop, b.drop))
+      .slice(0, 10);
+
+    if (!declines.length) return;
+
+    const x = d3
+      .scaleLinear()
+      .domain([0, d3.max(declines, (d) => d.drop) || 1])
+      .nice()
+      .range([margin.left, width - margin.right]);
+    const y = d3
+      .scaleBand()
+      .domain(declines.map((d) => d.name))
+      .range([margin.top, height - margin.bottom])
+      .padding(0.2);
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(5));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
+
+    svg
+      .append("g")
+      .selectAll("rect")
+      .data(declines)
+      .join("rect")
+      .attr("x", margin.left)
+      .attr("y", (d) => y(d.name))
+      .attr("width", (d) => x(d.drop) - margin.left)
+      .attr("height", y.bandwidth())
+      .attr("fill", "#2f8d71")
+      .attr("opacity", 0.88);
+
+    svg
+      .append("g")
+      .selectAll("text.value")
+      .data(declines)
+      .join("text")
+      .attr("x", (d) => x(d.drop) + 6)
+      .attr("y", (d) => y(d.name) + y.bandwidth() / 2 + 4)
+      .attr("class", "story-note")
+      .text((d) => `-${formatValue(d.drop)}`);
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 8)
+      .attr("class", "story-axis-label")
+      .text("TFR decline from first to latest year (births per woman)");
+
+    const list = el("story-decline-list");
+    if (list) {
+      list.innerHTML = "";
+      declines.forEach((row) => {
+        const item = document.createElement("li");
+        item.textContent = `${row.name}: ${formatValue(row.firstValue)} -> ${formatValue(row.latestValue)} (-${formatValue(
+          row.drop,
+        )} births per woman)`;
+        list.appendChild(item);
+      });
+    }
+  }
+
+  function renderStoryFindings() {
+    if (!state.story.ready) return;
+
+    const first = state.story.tfrByYear[0];
+    const last = state.story.tfrByYear[state.story.tfrByYear.length - 1];
+    const delta = first && last ? last.globalAvg - first.globalAvg : null;
+    const africa = last ? last.byRegion.get("Sub-Saharan Africa") : null;
+    const highIncome = last ? last.byIncome.get("High income") : null;
+    const lowIncome = last ? last.byIncome.get("Low income") : null;
+
+    setText(
+      "finding-global-delta",
+      delta == null
+        ? "Insufficient data"
+        : `Average TFR changed from ${formatValue(first.globalAvg)} to ${formatValue(last.globalAvg)} (${formatValue(delta)} births per woman).`,
+    );
+    setText(
+      "finding-africa-level",
+      africa == null
+        ? "Insufficient data"
+        : `In ${state.story.latestYear}, the regional average TFR is ${formatValueWithUnit(africa, "births per woman")}.`,
+    );
+    setText(
+      "finding-income-gap",
+      highIncome == null || lowIncome == null
+        ? "Insufficient data"
+        : `${state.story.latestYear}: High income ${formatValue(highIncome)} vs Low income ${formatValue(lowIncome)} births per woman.`,
+    );
+
+    const corr = state.story.correlations.gdpVsTfr;
+    const corrText =
+      corr == null
+        ? "Correlation unavailable"
+        : corr < -0.35
+          ? `Strong inverse relationship (r=${formatValue(corr)}): as GDP per capita rises, TFR is usually lower.`
+          : `Inverse relationship is present (r=${formatValue(corr)}).`;
+    setText("finding-gdp-link", corrText);
+
+    if (first && last) {
+      setText(
+        "story-global-summary",
+        `From ${first.year} to ${last.year}, global average TFR declined from ${formatValue(first.globalAvg)} to ${formatValue(
+          last.globalAvg,
+        )} births per woman.`,
+      );
+    }
+
+    if (last) {
+      const topRegion = Array.from(last.byRegion.entries()).sort((a, b) => d3.descending(a[1], b[1]))[0];
+      if (topRegion) {
+        setText(
+          "story-region-summary",
+          `In the latest year (${state.story.latestYear}), the highest regional average TFR is in ${topRegion[0]}: ${formatValueWithUnit(
+            topRegion[1],
+            "births per woman",
+          )}.`,
+        );
+      }
+    }
+
+    if (highIncome != null && lowIncome != null) {
+      setText(
+        "story-income-summary",
+        `The gap between Low income and High income in ${state.story.latestYear} is ${formatValue(
+          lowIncome - highIncome,
+        )} births per woman.`,
+      );
+    }
+
+    const corrEdu = state.story.correlations.enrollmentVsAdolescent;
+    if (corrEdu != null) {
+      setText(
+        "story-education-scatter-summary",
+        `At country level, there is an inverse relationship between female secondary enrollment and adolescent fertility (r=${formatValue(
+          corrEdu,
+        )}).`,
+      );
+    }
+  }
+
+  function drawStoryScatters() {
+    const latestTfrByIso = new Map(state.story.latestTfrRows.map((row) => [row.iso3, row]));
+    const gdpRows = state.story.latestGdpRows
+      .map((row) => {
+        const tfr = latestTfrByIso.get(row.iso3);
+        if (!tfr) return null;
+        return {
+          iso3: row.iso3,
+          name: row.name,
+          region: row.region || "Unknown",
+          gdp: toNumberOrNull(row.value),
+          tfr: toNumberOrNull(tfr.value),
+        };
+      })
+      .filter((row) => row && row.gdp != null && row.gdp > 0 && row.tfr != null);
+
+    drawStoryScatter("#story-gdp-scatter", {
+      rows: gdpRows,
+      xAccessor: (row) => row.gdp,
+      yAccessor: (row) => row.tfr,
+      colorAccessor: (row) => row.region,
+      xLabel: "GDP per capita (current US$)",
+      yLabel: "TFR (births per woman)",
+      xUnit: "current US$",
+      yUnit: "births per woman",
+      useLogX: true,
+    });
+
+    const enrollmentByIso = new Map(state.story.latestEnrollmentRows.map((row) => [row.iso3, row]));
+    const educationRows = state.story.latestAdolescentRows
+      .map((row) => {
+        const enrollment = enrollmentByIso.get(row.iso3);
+        if (!enrollment) return null;
+        return {
+          iso3: row.iso3,
+          name: row.name,
+          income: row.income_group || "Unknown",
+          adolescent: toNumberOrNull(row.value),
+          enrollment: toNumberOrNull(enrollment.value),
+        };
+      })
+      .filter((row) => row && row.adolescent != null && row.enrollment != null);
+
+    drawStoryScatter("#story-education-scatter", {
+      rows: educationRows,
+      xAccessor: (row) => row.enrollment,
+      yAccessor: (row) => row.adolescent,
+      colorAccessor: (row) => row.income,
+      xLabel: "Female secondary enrollment (% gross)",
+      yLabel: "Adolescent fertility (births per 1,000 women ages 15-19)",
+      xUnit: "% gross",
+      yUnit: "births per 1,000 women ages 15-19",
+      useLogX: false,
+    });
+  }
+
+  async function loadStoryAnalytics() {
+    if (state.story.ready || !state.meta) return;
+
+    try {
+      const minYear = Number(state.meta.min_year || 1970);
+      const maxYear = Number(state.meta.max_year || 2024);
+      const years = createYearRange(minYear, maxYear);
+
+      const tfrSeriesRaw = await fetchMapSeries("tfr", years, 8);
+
+      const tfrByYear = tfrSeriesRaw.map((response, index) => {
+        const year = years[index];
+        const rows = response.rows || [];
+        return {
+          year,
+          globalAvg: mean(rows.map((row) => Number(row.value))),
+          byRegion: averageBy(rows, "region"),
+          byIncome: averageBy(rows, "income_group"),
+        };
+      });
+
+      state.story.yearSeries = years;
+      state.story.tfrByYear = tfrByYear;
+      state.story.tfrRowsByYear = new Map(tfrSeriesRaw.map((response, index) => [years[index], response.rows || []]));
+      state.story.firstYear = years[0];
+      state.story.latestYear = years[years.length - 1];
+      state.story.latestTfrRows = state.story.tfrRowsByYear.get(state.story.latestYear) || [];
+
+      const [gdpLatest, enrollmentLatest, adolescentLatest] = await Promise.all([
+        fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: "gdp_per_capita" })),
+        fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: "female_secondary_enrollment" })),
+        fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: "adolescent_fertility" })),
+      ]);
+
+      state.story.latestGdpRows = gdpLatest.rows || [];
+      state.story.latestEnrollmentRows = enrollmentLatest.rows || [];
+      state.story.latestAdolescentRows = adolescentLatest.rows || [];
+
+      const latestTfrByIso = new Map(state.story.latestTfrRows.map((row) => [row.iso3, row]));
+      const corrRowsGdp = state.story.latestGdpRows
+        .map((row) => {
+          const tfr = latestTfrByIso.get(row.iso3);
+          if (!tfr) return null;
+          return {
+            gdp: toNumberOrNull(row.value),
+            tfr: toNumberOrNull(tfr.value),
+          };
+        })
+        .filter((row) => row && row.gdp != null && row.gdp > 0 && row.tfr != null)
+        .map((row) => ({ ...row, logGdp: Math.log10(row.gdp) }));
+
+      state.story.correlations.gdpVsTfr = pearsonCorrelation(
+        corrRowsGdp,
+        (row) => row.logGdp,
+        (row) => row.tfr,
+      );
+
+      const enrollmentByIso = new Map(state.story.latestEnrollmentRows.map((row) => [row.iso3, row]));
+      const corrRowsEducation = state.story.latestAdolescentRows
+        .map((row) => {
+          const enrollment = enrollmentByIso.get(row.iso3);
+          if (!enrollment) return null;
+          return {
+            enrollment: toNumberOrNull(enrollment.value),
+            adolescent: toNumberOrNull(row.value),
+          };
+        })
+        .filter((row) => row && row.enrollment != null && row.adolescent != null);
+
+      state.story.correlations.enrollmentVsAdolescent = pearsonCorrelation(
+        corrRowsEducation,
+        (row) => row.enrollment,
+        (row) => row.adolescent,
+      );
+
+      state.story.ready = true;
+
+      drawStoryGlobalChart();
+      drawStoryRegionChart();
+      drawStoryIncomeChart();
+      drawStoryScatters();
+      drawStoryDeclineChart();
+      renderStoryFindings();
+    } catch (error) {
+      console.error(error);
+      setText("finding-global-delta", "Failed to load analytical findings");
+      setText("finding-africa-level", "Check backend/API connection");
+      setText("finding-income-gap", "Could not compute");
+      setText("finding-gdp-link", "Could not compute");
     }
   }
 
@@ -1300,6 +2134,7 @@
 
       await refreshAtlas();
       await refreshCompareChart();
+      loadStoryAnalytics();
     } catch (error) {
       console.error(error);
       setLoadingMessage("Failed to bootstrap atlas. Ensure backend is running on http://localhost:8000");
