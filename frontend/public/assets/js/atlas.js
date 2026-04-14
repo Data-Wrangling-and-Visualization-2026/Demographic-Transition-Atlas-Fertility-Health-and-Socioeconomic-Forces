@@ -3,8 +3,9 @@
   "use strict";
 
   const API_BASE = window.ATLAS_API_BASE || "http://localhost:8000";
+const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
-  const PANEL_INDICATORS = [
+  const PANEL_PRIORITY = [
     "tfr",
     "adolescent_fertility",
     "gdp_per_capita",
@@ -83,13 +84,16 @@
     266: "GAB",
     270: "GMB",
     268: "GEO",
+    275: "PSE",
     276: "DEU",
     288: "GHA",
     300: "GRC",
+    304: "GRL",
     308: "GRD",
     320: "GTM",
     324: "GIN",
     624: "GNB",
+    630: "PRI",
     328: "GUY",
     332: "HTI",
     340: "HND",
@@ -143,6 +147,7 @@
     520: "NRU",
     524: "NPL",
     528: "NLD",
+    540: "NCL",
     554: "NZL",
     558: "NIC",
     562: "NER",
@@ -238,6 +243,8 @@
     mapPath: null,
     mapSvg: null,
     mapLayer: null,
+    mapSupplementLayer: null,
+    mapSupplementOrbit: null,
     mapSphere: null,
     mapGraticule: null,
     mapAtmosphere: null,
@@ -245,6 +252,8 @@
     mapShadow: null,
     mapDragSurface: null,
     mapValueByIso: new Map(),
+    mapRenderableIsos: new Set(),
+    mapColorScale: null,
     globeBaseScale: 236,
     globeRotateTimer: null,
     isDraggingGlobe: false,
@@ -254,12 +263,20 @@
   const el = (id) => document.getElementById(id);
 
   function isoFromFeature(feature) {
-    const p = feature && feature.properties ? feature.properties : {};
-    if (p.ISO_A3 && p.ISO_A3 !== "-99") return p.ISO_A3;
-    if (p.ADM0_A3 && p.ADM0_A3 !== "-99") return p.ADM0_A3;
-    if (feature && feature.id != null && ID_TO_ISO3[feature.id]) return ID_TO_ISO3[feature.id];
-    return null;
+  const p = feature && feature.properties ? feature.properties : {};
+
+  if (p.ISO_A3 && p.ISO_A3 !== "-99") return p.ISO_A3;
+  if (p.ADM0_A3 && p.ADM0_A3 !== "-99") return p.ADM0_A3;
+
+  if (feature && feature.id != null) {
+    const numericId = Number(feature.id);
+    if (!Number.isNaN(numericId) && ID_TO_ISO3[numericId]) {
+      return ID_TO_ISO3[numericId];
+    }
   }
+
+  return null;
+}
 
   function formatValue(value) {
     if (value == null || !Number.isFinite(Number(value))) return "-";
@@ -293,6 +310,23 @@
 
   function indicatorMeta(code) {
     return state.indicators.find((i) => i.code === code) || null;
+  }
+
+  function panelIndicatorCodes() {
+    if (!state.indicators.length) return PANEL_PRIORITY.slice();
+
+    const allCodes = state.indicators.map((item) => item.code);
+    const prioritized = PANEL_PRIORITY.filter((code) => allCodes.includes(code));
+    const remaining = allCodes.filter((code) => !prioritized.includes(code));
+    return [...prioritized, ...remaining];
+  }
+
+  function panelChartColor(code, index) {
+    return PANEL_COLORS[code] || d3.schemeTableau10[index % d3.schemeTableau10.length];
+  }
+
+  function canRenderIsoOnMap(iso3) {
+    return Boolean(iso3 && state.mapRenderableIsos.has(iso3));
   }
 
   function getCountryName(iso3) {
@@ -333,11 +367,14 @@
   }
 
   async function loadWorldFeatures() {
-    const world = await fetchJSON("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+    const world = await fetchJSON(WORLD_TOPOJSON_PATH);
     const features = topojson.feature(world, world.objects.countries).features;
+    const renderableIsos = new Set();
     features.forEach((feature) => {
       feature._iso3 = isoFromFeature(feature);
+      if (feature._iso3) renderableIsos.add(feature._iso3);
     });
+    state.mapRenderableIsos = renderableIsos;
     return features;
   }
 
@@ -689,6 +726,65 @@
     note.innerHTML = `<strong>What this selection means:</strong> You are viewing <strong>${indicatorLabel}</strong> for <strong>${state.selectedYear}</strong> (${unit}).`;
   }
 
+  function renderSelectionDataTable() {
+    const body = el("selection-data-rows");
+    const note = el("data-table-note");
+    if (!body || !note) return;
+
+    body.innerHTML = "";
+
+    if (!state.mapRows.length) {
+      note.textContent = "No country rows for the current year, indicator, and filters.";
+      const emptyRow = document.createElement("tr");
+      emptyRow.innerHTML = '<td class="table-empty" colspan="6">No data for this selection.</td>';
+      body.appendChild(emptyRow);
+      return;
+    }
+
+    const unmappedCount = state.mapRows.filter((row) => !canRenderIsoOnMap(row.iso3)).length;
+    note.textContent = unmappedCount
+      ? `${state.mapRows.length} country rows loaded. ${unmappedCount} appear in the table only because the globe geometry has no matching shape for them.`
+      : `${state.mapRows.length} country rows loaded. All of them are available on the globe and in the table.`;
+
+    state.mapRows.forEach((row) => {
+      const tr = document.createElement("tr");
+      const visibleOnMap = canRenderIsoOnMap(row.iso3);
+      const countryTd = document.createElement("td");
+      const countryBtn = document.createElement("button");
+
+      countryBtn.type = "button";
+      countryBtn.className = "data-country-btn";
+      countryBtn.textContent = row.name || row.iso3 || "Unknown";
+      countryBtn.addEventListener("click", () => {
+        openCountryPanel(row.iso3);
+        renderMapColors();
+      });
+
+      countryTd.appendChild(countryBtn);
+      tr.appendChild(countryTd);
+
+      [
+        row.iso3 || "-",
+        row.region || "-",
+        row.income_group || "-",
+        formatValue(row.value),
+      ].forEach((value) => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+
+      const coverageTd = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = `coverage-badge ${visibleOnMap ? "coverage-badge--map" : "coverage-badge--table"}`;
+      badge.textContent = visibleOnMap ? "Map + table" : "Table only";
+      coverageTd.appendChild(badge);
+      tr.appendChild(coverageTd);
+
+      body.appendChild(tr);
+    });
+  }
+
   function renderRegionCards() {
     const host = el("region-cards");
     host.innerHTML = "";
@@ -806,6 +902,7 @@
 
       renderMapColors();
       updateSelectionNote(mapData.summary || null);
+      renderSelectionDataTable();
       renderRegionCards();
       renderRegionChart();
 
@@ -816,6 +913,12 @@
       await refreshCompareChart();
     } catch (error) {
       console.error(error);
+      state.mapRows = [];
+      state.regionSummaryRows = [];
+      renderMapColors();
+      renderSelectionDataTable();
+      renderRegionCards();
+      renderRegionChart();
       setLoadingMessage("Could not load map data. Check backend/API connection.");
       updateSelectionNote(null);
     }
@@ -825,7 +928,7 @@
     const container = el("panel-kpis");
     container.innerHTML = "";
 
-    const rows = PANEL_INDICATORS.map((indicatorCode) => {
+    const rows = panelIndicatorCodes().map((indicatorCode) => {
       const meta = indicatorMeta(indicatorCode);
       return {
         code: indicatorCode,
@@ -842,6 +945,31 @@
         <span class="kpi-value">${formatValue(row.value)}</span>
       `;
       container.appendChild(block);
+    });
+  }
+
+  function renderPanelCharts(timeseries) {
+    const grid = el("chart-grid");
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    panelIndicatorCodes().forEach((code, index) => {
+      const meta = indicatorMeta(code);
+      const svgId = `chart-${code}`;
+      const unit = meta && meta.unit ? meta.unit : "";
+      const series = (timeseries && timeseries.series && timeseries.series[code]) || [];
+      const card = document.createElement("article");
+
+      card.className = "chart-card";
+      card.innerHTML = `
+        <h4>${meta ? meta.label : code}</h4>
+        <p class="chart-unit">${unit || "No unit metadata"}</p>
+        <svg id="${svgId}" viewBox="0 0 420 160"></svg>
+      `;
+      grid.appendChild(card);
+
+      drawMiniChart(`#${svgId}`, series, panelChartColor(code, index), unit);
     });
   }
 
@@ -954,6 +1082,7 @@
   async function refreshCountryProfileOnly(iso3) {
     try {
       const profile = await fetchJSON(buildApiUrl(`/country/${iso3}/profile`, { year: state.selectedYear }));
+      el("panel-country-meta").textContent = `${profile.region || "Unknown region"} | ${profile.income_group || "Unknown income group"} | Year ${profile.selected_year}`;
       renderPanelKpis(profile);
     } catch {
       // If selected year not available for this country, keep old profile KPIs.
@@ -970,23 +1099,20 @@
     try {
       const [profile, timeseries] = await Promise.all([
         fetchJSON(buildApiUrl(`/country/${iso3}/profile`, { year: state.selectedYear })),
-        fetchJSON(buildApiUrl(`/country/${iso3}/timeseries`, { indicators: PANEL_INDICATORS.join(",") })),
+        fetchJSON(buildApiUrl(`/country/${iso3}/timeseries`, { indicators: panelIndicatorCodes().join(",") })),
       ]);
 
       el("panel-country-name").textContent = profile.name || iso3;
-      el("panel-country-meta").textContent = `${profile.region || "Unknown region"} · ${profile.income_group || "Unknown income group"} · Year ${profile.selected_year}`;
+      el("panel-country-meta").textContent = `${profile.region || "Unknown region"} | ${profile.income_group || "Unknown income group"} | Year ${profile.selected_year}`;
 
       renderPanelKpis(profile);
-
-      PANEL_INDICATORS.forEach((code) => {
-        const series = (timeseries.series && timeseries.series[code]) || [];
-        drawMiniChart(`#chart-${code}`, series, PANEL_COLORS[code] || "#1f8a70", (indicatorMeta(code) || {}).unit || "");
-      });
+      renderPanelCharts(timeseries);
     } catch (error) {
       console.error(error);
       el("panel-country-name").textContent = iso3;
       el("panel-country-meta").textContent = "Could not load country profile";
-      PANEL_INDICATORS.forEach((code) => drawMiniChart(`#chart-${code}`, [], "#9fbab0", ""));
+      renderPanelKpis({ values: {} });
+      renderPanelCharts(null);
     }
   }
 

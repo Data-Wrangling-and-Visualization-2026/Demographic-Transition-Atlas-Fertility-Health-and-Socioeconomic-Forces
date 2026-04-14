@@ -687,6 +687,12 @@ select {
   font-size: 0.9rem;
 }
 
+.chart-unit {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
 .chart-card svg {
   width: 100%;
   height: auto;
