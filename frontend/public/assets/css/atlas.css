@@ -508,8 +508,9 @@ select {
 
 .section-head p {
   margin: 0;
-  color: var(--muted);
+  color: #111;
   font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .region-card,
@@ -888,6 +889,17 @@ select {
   margin: 0.8rem auto 0;
 }
 
+.story-chart-scroll--correlation {
+  max-width: 680px;
+}
+
+.story-chart--correlation {
+  width: min(100%, 680px);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .story-chart--compact-grid {
   margin-top: 0;
 }
@@ -1014,7 +1026,7 @@ select {
 
 .story-context-intro {
   margin: 0.45rem 0 0;
-  color: #436257;
+  color: #111;
   font-size: 0.88rem;
   line-height: 1.58;
 }
@@ -1022,7 +1034,7 @@ select {
 .story-context-list {
   margin: 0.75rem 0 0;
   padding-left: 1.15rem;
-  color: #27493f;
+  color: #161f1b;
   font-size: 0.84rem;
   line-height: 1.65;
 }

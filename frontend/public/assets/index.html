@@ -161,8 +161,8 @@
             It is a compact view of how the features move together over time.
           </p>
         </div>
-        <div class="story-chart-scroll story-chart-scroll--compact">
-          <svg id="story-correlation-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow story-chart--compact-grid"></svg>
+        <div class="story-chart-scroll story-chart-scroll--compact story-chart-scroll--correlation">
+          <svg id="story-correlation-chart" viewBox="0 0 680 520" class="story-chart story-chart--correlation story-chart--compact-grid"></svg>
         </div>
         <div class="story-context-block">
           <h3>Why child dependency and fertility move together so strongly</h3>
@@ -176,18 +176,24 @@
             carry a high child dependency burden. If fertility falls, child dependency falls with it. In plain terms:
             the more children a population has, the more children it must support.
           </p>
+          <p class="story-context-intro">
+            *Child dependency ratio: number of children (ages 0-14) per 100 working-age people (ages 15-64).
+            <br />*Total dependency ratio: number of dependents (ages 0-14 and 65+) per 100 working-age people (ages
+            15-64).
+          </p>
         </div>
       </section>
 
       <section class="card analysis-card" data-reveal>
         <div class="section-head section-head--stack">
-          <h2>Radial impact chart for low fertility</h2>
+          <h2>Radial impact chart for fertility</h2>
           <p id="story-shap-summary">
-            The center shows low fertility. Surrounding factors show relative influence strength in the data.
+            The circle is 0%. Red bars inward indicate stronger fertility-suppressing effects, and green bars outward
+            indicate positive effects on fertility.
           </p>
         </div>
         <div class="story-chart-scroll story-chart-scroll--compact">
-          <svg id="story-shap-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow"></svg>
+          <svg id="story-shap-chart" viewBox="0 0 660 560" class="story-chart story-chart--narrow"></svg>
         </div>
       </section>
 
