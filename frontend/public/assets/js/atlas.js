@@ -85,14 +85,6 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
   const MENA_REGION = "Middle East, North Africa, Afghanistan & Pakistan";
   const STORY_WORLD_REGION_KEY = "__world__";
 
-  const SHAP_FEATURE_CONFIG = [
-    { code: "female_secondary_enrollment", label: "Girls' secondary" },
-    { code: "gdp_per_capita", label: "GDP pc" },
-    { code: "urban_population_pct", label: "Urban pop" },
-    { code: "median_age", label: "Median age" },
-    { code: "contraceptive_prevalence_modern", label: "Modern contraception" },
-  ];
-
   const TFR_THEME_GROUPS = [
     {
       key: "socio_economic",
@@ -2215,114 +2207,139 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
         .filter(([, value]) => value != null),
     );
 
-    return SHAP_FEATURE_CONFIG.map((feature) => {
-      const joined = (state.story.indicatorSeriesRows.get(feature.code) || [])
-        .map((row) => {
-          const x = normalizeCorrelationValue(feature.code, row.value);
-          const y = tfrByKey.get(`${row.iso3}-${row.year}`);
-          if (x == null || y == null) return null;
-          return { x, y };
-        })
-        .filter(Boolean);
+    const featureCodes = (state.indicators || [])
+      .map((item) => item.code)
+      .filter((code) => code && code !== "tfr" && state.story.indicatorSeriesRows.has(code));
 
-      if (joined.length < 8) return null;
-      const corr = pearsonCorrelation(
-        joined,
-        (row) => row.x,
-        (row) => row.y,
-      );
-      if (corr == null) return null;
+    return featureCodes
+      .map((code) => {
+        const joined = (state.story.indicatorSeriesRows.get(code) || [])
+          .map((row) => {
+            const x = normalizeCorrelationValue(code, row.value);
+            const y = tfrByKey.get(`${row.iso3}-${row.year}`);
+            if (x == null || y == null) return null;
+            return { x, y };
+          })
+          .filter(Boolean);
 
-      return {
-        ...feature,
-        corr,
-        impact: Math.abs(corr),
-        sampleSize: joined.length,
-      };
-    }).filter(Boolean);
+        const corr =
+          joined.length >= 3
+            ? pearsonCorrelation(
+                joined,
+                (row) => row.x,
+                (row) => row.y,
+              ) || 0
+            : 0;
+
+        const meta = indicatorMeta(code);
+        return {
+          code,
+          label: indicatorShortLabel(code),
+          fullLabel: meta ? cleanIndicatorLabel(meta.label) : code,
+          corr,
+          impact: Math.abs(corr),
+          sampleSize: joined.length,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => d3.descending(a.impact, b.impact));
   }
 
   function drawStoryShapChart() {
     const svg = d3.select("#story-shap-chart");
     const width = 660;
-    const height = 500;
+    const height = 560;
     const centerX = width / 2;
-    const centerY = height / 2 + 16;
-    const innerRadius = 86;
-    const maxOuterRadius = 224;
+    const centerY = height / 2 + 4;
+    const baseRadius = 160;
+    const maxBarLength = 76;
 
     svg.selectAll("*").remove();
 
     const rows = buildStoryRadialImpacts();
     if (!rows.length) return;
-    const totalImpact = d3.sum(rows, (row) => row.impact) || 1;
-    const rowsWithShare = rows.map((row) => ({
+
+    const maxAbsCorr = d3.max(rows, (row) => Math.abs(row.corr)) || 0.01;
+    const rowsWithSignedImpact = rows.map((row) => ({
       ...row,
-      sharePct: (row.impact / totalImpact) * 100,
+      signedPct: (row.corr / maxAbsCorr) * 100,
     }));
-    const maxShare = d3.max(rowsWithShare, (row) => row.sharePct) || 1;
 
     const angle = d3
       .scaleBand()
-      .domain(rowsWithShare.map((row) => row.code))
+      .domain(rowsWithSignedImpact.map((row) => row.code))
       .range([0, Math.PI * 2])
-      .paddingInner(0.18)
-      .paddingOuter(0.05);
-
-    const radius = d3.scaleLinear().domain([0, maxShare]).range([innerRadius + 18, maxOuterRadius]).clamp(true);
-    const color = d3
-      .scaleOrdinal()
-      .domain(rowsWithShare.map((row) => row.code))
-      .range(["#2d6a8a", "#52508c", "#4ba781", "#8cc253", "#2f8f8b"]);
+      .paddingInner(0.12)
+      .paddingOuter(0.04);
+    const lengthScale = d3.scaleLinear().domain([0, 100]).range([0, maxBarLength]).clamp(true);
 
     const layer = svg.append("g").attr("transform", `translate(${centerX},${centerY})`);
 
     layer
       .append("circle")
-      .attr("r", maxOuterRadius + 8)
+      .attr("r", baseRadius)
       .attr("fill", "none")
-      .attr("stroke", "#cfded7")
+      .attr("stroke", "#111")
       .attr("stroke-width", 1.4);
 
-    [5, 10, 15, 20, 25, 30].forEach((tick) => {
+    [25, 50, 75, 100].forEach((tick) => {
+      const len = lengthScale(tick);
       layer
         .append("circle")
-        .attr("r", radius(Math.min(tick, maxShare)))
+        .attr("r", baseRadius + len)
         .attr("fill", "none")
         .attr("stroke", "#e2ece7")
-        .attr("stroke-width", 1)
-        .attr("stroke-dasharray", "3 5");
+        .attr("stroke-width", 0.9)
+        .attr("stroke-dasharray", "2 4");
+      layer
+        .append("circle")
+        .attr("r", Math.max(24, baseRadius - len))
+        .attr("fill", "none")
+        .attr("stroke", "#ece4e4")
+        .attr("stroke-width", 0.9)
+        .attr("stroke-dasharray", "2 4");
     });
+
+    layer
+      .append("text")
+      .attr("x", 0)
+      .attr("y", -baseRadius - 10)
+      .attr("text-anchor", "middle")
+      .attr("class", "story-note")
+      .text("0%");
 
     const arc = d3
       .arc()
-      .innerRadius(innerRadius)
-      .outerRadius((row) => radius(row.sharePct))
+      .innerRadius((row) =>
+        row.signedPct < 0 ? Math.max(24, baseRadius - lengthScale(Math.abs(row.signedPct))) : baseRadius,
+      )
+      .outerRadius((row) => (row.signedPct < 0 ? baseRadius : baseRadius + lengthScale(Math.abs(row.signedPct))))
       .startAngle((row) => angle(row.code))
       .endAngle((row) => angle(row.code) + angle.bandwidth())
-      .padAngle(0.015)
-      .padRadius(innerRadius);
+      .padAngle(0.012)
+      .padRadius(baseRadius);
 
     const bars = layer
-      .selectAll("path")
-      .data(rowsWithShare)
+      .selectAll("path.story-impact-bar")
+      .data(rowsWithSignedImpact)
       .join("path")
+      .attr("class", "story-impact-bar")
       .attr("d", arc)
-      .attr("fill", (row) => color(row.code))
-      .attr("fill-opacity", 0.93)
-      .attr("stroke", "#ffffff")
-      .attr("stroke-width", 1.5)
+      .attr("fill", (row) => (row.signedPct < 0 ? "#d95050" : "#2f9c63"))
+      .attr("fill-opacity", 0.9)
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 1.2)
       .style("cursor", "pointer");
 
     bars
       .on("mouseenter", (event, row) => {
         showStoryTooltip(
           event,
-          `<strong>${row.label}</strong><br/><span>Impact share: ${formatValue(row.sharePct)}%</span><br/><span>|r| with TFR: ${formatValue(
-            row.impact,
-          )}</span><br/><span>Correlation sign: ${row.corr < 0 ? "negative" : "positive"} (${formatValue(
+          `<strong>${row.fullLabel}</strong><br/><span>Signed impact: ${formatValue(row.signedPct)}%</span><br/><span>Correlation with TFR: ${formatValue(
             row.corr,
-          )})</span><br/><span>${formatInteger(row.sampleSize)} country-year observations</span>`,
+          )}</span><br/><span>${row.signedPct < 0 ? "Negative effect on fertility (inward red bar)" : "Positive effect on fertility (outward green bar)"}</span><br/><span>${formatInteger(
+            row.sampleSize,
+          )} country-year observations</span>`,
         );
       })
       .on("mousemove", moveStoryTooltip)
@@ -2330,12 +2347,12 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
     const labels = layer
       .selectAll("g.story-circular-label")
-      .data(rowsWithShare)
+      .data(rowsWithSignedImpact)
       .join("g")
       .attr("class", "story-circular-label")
       .attr("transform", (row) => {
         const a = angle(row.code) + angle.bandwidth() / 2 - Math.PI / 2;
-        const labelRadius = radius(row.sharePct) + 18;
+        const labelRadius = baseRadius + maxBarLength + 18;
         return `translate(${Math.cos(a) * labelRadius},${Math.sin(a) * labelRadius})`;
       });
 
@@ -2356,38 +2373,44 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
         return a > Math.PI ? "end" : "start";
       })
       .attr("class", "story-note")
-      .text((row) => `${d3.format(".1f")(row.sharePct)}%`);
+      .text((row) => `${d3.format(".1f")(row.signedPct)}%`);
 
     layer
       .append("circle")
-      .attr("r", innerRadius - 8)
-      .attr("fill", "#1b7a63")
-      .attr("fill-opacity", 0.92)
-      .attr("stroke", "#0f5a47")
-      .attr("stroke-width", 1.2);
+      .attr("r", 68)
+      .attr("fill", "#f6faf8")
+      .attr("stroke", "#1f2f2a")
+      .attr("stroke-width", 1);
 
     layer
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("fill", "#f3fffa")
-      .style("font-size", "16px")
+      .attr("fill", "#111")
+      .style("font-size", "15px")
       .style("font-weight", "800")
-      .text("Low fertility");
+      .text("Fertility");
     layer
       .append("text")
       .attr("text-anchor", "middle")
       .attr("dy", 18)
-      .attr("fill", "#d7f3ea")
+      .attr("fill", "#1f2f2a")
       .style("font-size", "11px")
-      .text("main drivers");
+      .text("main culprits");
 
-    const strongestFeature = rowsWithShare.slice().sort((a, b) => d3.descending(a.sharePct, b.sharePct))[0];
-    if (strongestFeature) {
+    const strongestNegative = rowsWithSignedImpact
+      .filter((row) => row.signedPct < 0)
+      .sort((a, b) => d3.descending(Math.abs(a.signedPct), Math.abs(b.signedPct)))[0];
+    if (strongestNegative) {
       setText(
         "story-shap-summary",
-        `Circular radial impact chart based on pooled country-year data (${state.story.firstYear}-${state.story.latestYear}). Bars show each factor's share in total relationship strength with fertility. These features are the main drivers behind low fertility in this model view, and ${strongestFeature.label} has the largest share (${formatValue(
-          strongestFeature.sharePct,
+        `The circle marks 0%. Red bars that move inward represent features that suppress fertility, while green bars outward represent features associated with higher fertility. The strongest low-fertility driver is ${strongestNegative.fullLabel} (${formatValue(
+          strongestNegative.signedPct,
         )}%).`,
+      );
+    } else {
+      setText(
+        "story-shap-summary",
+        "The circle marks 0%. Red bars that move inward represent fertility-suppressing effects, while green bars outward represent positive effects on fertility.",
       );
     }
   }
@@ -3259,9 +3282,9 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
   function drawStoryCorrelationChart() {
     const svg = d3.select("#story-correlation-chart");
-    const width = 660;
-    const height = 500;
-    const margin = { top: 108, right: 20, bottom: 20, left: 116 };
+    const width = 680;
+    const height = 520;
+    const margin = { top: 112, right: 20, bottom: 20, left: 118 };
 
     svg.selectAll("*").remove();
 
