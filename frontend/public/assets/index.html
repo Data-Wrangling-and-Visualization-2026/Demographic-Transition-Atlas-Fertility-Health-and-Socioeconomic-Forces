@@ -26,149 +26,200 @@
         <span class="hero-line">Global Patterns</span>
         <span class="hero-line hero-line--accent">of Fertility and Development</span>
       </h1>
-      <p class="hero-subtitle">
-        This is more than a map. We provide a full analytical overview across <strong>217 countries</strong> for
-        <strong>1970-2024</strong>: how fertility changed, where high fertility persists, and how these trends relate
-        to income and education.
-      </p>
-      <div class="hero-chips" aria-label="Atlas highlights">
-        <span class="hero-chip">55 years of trend data</span>
-        <span class="hero-chip">Regional and income profiles</span>
-        <span class="hero-chip">GDP and education correlations</span>
-        <span class="hero-chip">Interactive globe and country profiles</span>
-      </div>
+      <p class="hero-subtitle">This is more than just a map.</p>
     </header>
 
     <main class="layout">
-      <section class="story-intro" data-reveal>
-        <article class="story-card">
-          <h3>What This Research Covers</h3>
-          <p>
-            We analyze how demographic transition unfolds across regions and where it slows down. The goal is to
-            provide ready-to-read conclusions, not force users to click every country manually.
+      <section class="story-brief card" data-reveal>
+        <div class="story-brief-inner">
+          <p class="story-brief-copy">
+            Over the past 55 years, fertility has been steadily declining across the world. This shift is linked to
+            changing life priorities, economic pressures, and urbanization. Demographic decline is a serious issue
+            because it accelerates population ageing, reduces labor supply, slows economic growth, and increases
+            pressure on pension systems.
           </p>
-        </article>
-
-        <article class="story-card">
-          <h3>Key Questions</h3>
-          <p>
-            How fast is fertility falling globally? Why does Sub-Saharan Africa remain above other regions? How are
-            fertility, GDP per capita, and female secondary enrollment connected?
+          <p class="story-brief-copy">
+            We examined the factors shaping demographic change and identified several patterns that you can explore on
+            this site.
           </p>
-        </article>
-
-        <article class="story-card">
-          <h3>How To Read This Page</h3>
-          <ol>
-            <li>Start with the key findings below.</li>
-            <li>Move from global trends to region and country-level views.</li>
-            <li>Use the interactive globe at the end for detailed checks.</li>
-            <li>All charts and tooltips include measurement units.</li>
-          </ol>
-        </article>
-      </section>
-
-      <section class="card findings-card" data-reveal>
-        <div class="section-head">
-          <h2>Key Findings</h2>
-          <p>Automatically computed from the latest available data.</p>
-        </div>
-        <div class="findings-grid">
-          <article class="finding-item">
-            <span class="finding-label">Global trend</span>
-            <p id="finding-global-delta" class="finding-value">Loading...</p>
-          </article>
-          <article class="finding-item">
-            <span class="finding-label">Sub-Saharan Africa</span>
-            <p id="finding-africa-level" class="finding-value">Loading...</p>
-          </article>
-          <article class="finding-item">
-            <span class="finding-label">High income vs Low income</span>
-            <p id="finding-income-gap" class="finding-value">Loading...</p>
-          </article>
-          <article class="finding-item">
-            <span class="finding-label">TFR and GDP per capita</span>
-            <p id="finding-gdp-link" class="finding-value">Loading...</p>
-          </article>
+          <p class="story-brief-copy">
+            If you want to go deeper, use the interactive globe at the end to study each country in detail.
+          </p>
+          <p class="story-brief-meta">Coverage: 217 countries, 1970-2024.</p>
         </div>
       </section>
 
       <section class="card analysis-card" data-reveal>
         <div class="section-head section-head--stack">
-          <h2>1) Global trend: fertility is steadily declining worldwide</h2>
-          <p id="story-global-summary">
-            The line shows the country-average Total fertility rate for each year. Unit: births per woman.
-          </p>
-        </div>
-        <svg id="story-global-chart" viewBox="0 0 980 320" class="story-chart"></svg>
-      </section>
-
-      <section class="card analysis-card" data-reveal>
-        <div class="section-head section-head--stack">
-          <h2>2) Regional divergence: Sub-Saharan Africa remains the highest</h2>
+          <h2>Regional fertility by year</h2>
           <p id="story-region-summary">
-            Regions follow the same broad direction (decline), but at very different speeds and levels.
+            Each line shows the regional average by year. The X-axis shows year, the Y-axis shows TFR, and color
+            shows region.
           </p>
         </div>
-        <div id="story-region-legend" class="story-legend"></div>
-        <svg id="story-region-chart" viewBox="0 0 980 340" class="story-chart"></svg>
+        <div id="story-region-legend" class="story-legend story-legend--compact"></div>
+        <svg id="story-region-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow"></svg>
       </section>
 
       <section class="card analysis-card" data-reveal>
         <div class="section-head section-head--stack">
-          <h2>3) Income profiles: higher income, lower TFR</h2>
-          <p id="story-income-summary">
-            Comparison of average values across income groups. Unit: births per woman.
+          <h2>Regional fertility records: highest vs lowest</h2>
+          <p id="story-records-summary">
+            Select a region to compare the highest and lowest country-level TFR observed in each year.
           </p>
         </div>
-        <div id="story-income-legend" class="story-legend"></div>
-        <svg id="story-income-chart" viewBox="0 0 980 340" class="story-chart"></svg>
+        <div class="story-inline-control">
+          <label class="field field--story">
+            <span>Region</span>
+            <select id="story-records-region-select"></select>
+          </label>
+        </div>
+        <div id="story-records-legend" class="story-legend"></div>
+        <div class="story-chart-scroll story-chart-scroll--compact">
+          <svg id="story-records-chart" viewBox="0 0 660 420" class="story-chart story-chart--narrow"></svg>
+        </div>
       </section>
 
       <section class="card analysis-card" data-reveal>
         <div class="section-head section-head--stack">
-          <h2>4) GDP per capita and fertility</h2>
-          <p id="story-gdp-scatter-summary">
-            Points represent countries in the latest year. X-axis: GDP per capita (current US$), Y-axis: TFR (births
-            per woman).
+          <h2>Adolescent fertility by region</h2>
+          <p id="story-adolescent-summary">
+            Box plots compare country-level adolescent fertility in the latest available year. They show where
+            childbirth among girls ages 15-19 remains most widespread.
           </p>
         </div>
-        <svg id="story-gdp-scatter" viewBox="0 0 980 360" class="story-chart"></svg>
+        <div class="story-chart-scroll story-chart-scroll--compact">
+          <svg id="story-adolescent-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow"></svg>
+        </div>
+        <div class="story-context-block">
+          <h3>Why adolescent fertility stays so high in many Sub-Saharan African settings</h3>
+          <p class="story-context-intro">
+            The pattern is not caused by one factor alone. It is usually shaped by several structural pressures acting
+            at the same time:
+          </p>
+          <ul class="story-context-list">
+            <li><strong>Early and forced marriage.</strong> Some girls are married off in childhood, often for money or to reduce the number of mouths to feed.</li>
+            <li><strong>Poverty and lack of schooling.</strong> When girls are pushed out of school, motherhood may become the only path left, and poorer households often marry daughters earlier.</li>
+            <li><strong>Limited access to contraception.</strong> Even when a girl does not want to become pregnant, contraception may be too expensive, too stigmatized, or blocked by family permission rules.</li>
+            <li><strong>Sexual violence.</strong> Many pregnancies among the youngest girls are linked to rape, coercion, or exploitation rather than voluntary relationships.</li>
+            <li><strong>Cultural traditions.</strong> In some communities, social norms and ritual practices still encourage an early sexual debut, including harmful "cleansing" practices.</li>
+          </ul>
+        </div>
       </section>
 
       <section class="card analysis-card" data-reveal>
         <div class="section-head section-head--stack">
-          <h2>5) Education and adolescent fertility</h2>
-          <p id="story-education-scatter-summary">
-            X-axis: female secondary enrollment (% gross), Y-axis: adolescent fertility (births per 1,000 women ages
-            15-19).
+          <h2>Women's work and fertility in MENA, Afghanistan & Pakistan</h2>
+          <p id="story-work-summary">
+            Bars show average female labor force participation by region in the latest available year, while the line
+            shows regional TFR.
           </p>
         </div>
-        <svg id="story-education-scatter" viewBox="0 0 980 360" class="story-chart"></svg>
+        <div id="story-work-legend" class="story-legend"></div>
+        <div class="story-chart-scroll story-chart-scroll--compact">
+          <svg id="story-work-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow"></svg>
+        </div>
+        <div class="story-context-block">
+          <h3>Why women's labor force participation can stay low in parts of this region</h3>
+          <p class="story-context-intro">
+            In many settings across the region, low participation is shaped by a mix of social, legal, and material
+            constraints:
+          </p>
+          <ul class="story-context-list">
+            <li><strong>Social norms and patriarchy.</strong> Traditional expectations can confine women to the home and childcare, and in some settings paid work still depends on approval from a husband or father.</li>
+            <li><strong>Taliban rule in Afghanistan.</strong> After returning to power in 2021, the Taliban sharply restricted women's access to work and cut them off from most secondary and higher education.</li>
+            <li><strong>Early marriage and high fertility.</strong> Girls may marry young and have many children early, leaving little time for study, training, or paid employment.</li>
+            <li><strong>Legal restrictions.</strong> In some countries, women still face major limits on travel, passports, or opening a business without a male guardian.</li>
+            <li><strong>Weak family infrastructure.</strong> Limited childcare, short leave policies, and unsafe transport can make it nearly impossible to combine paid work with family responsibilities.</li>
+          </ul>
+        </div>
       </section>
 
       <section class="card analysis-card" data-reveal>
         <div class="section-head section-head--stack">
-          <h2>6) Where fertility declined the fastest</h2>
+          <h2>Where fertility fell the most</h2>
           <p id="story-decline-summary">
-            Country comparison between the first and last year in the sample. Change unit: births per woman.
+            Light bars show the first observed level, dark bars show the latest level, and the labels show the total
+            decline.
           </p>
         </div>
+        <div id="story-decline-legend" class="story-legend"></div>
         <div class="decline-layout">
-          <svg id="story-decline-chart" viewBox="0 0 700 360" class="story-chart story-chart--compact"></svg>
+          <svg id="story-decline-chart" viewBox="0 0 660 500" class="story-chart story-chart--compact story-chart--narrow"></svg>
           <div class="decline-list-wrap">
-            <h3>Top 10 countries by TFR decline</h3>
-            <ol id="story-decline-list" class="decline-list"></ol>
+            <h3>Why these cases changed so fast</h3>
+            <ul id="story-decline-list" class="decline-list decline-list--explain"></ul>
           </div>
         </div>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>Correlations across the atlas features</h2>
+          <p id="story-correlation-summary">
+            This heatmap shows Pearson correlations across all available country-year observations from 1970 to 2024.
+            It is a compact view of how the features move together over time.
+          </p>
+        </div>
+        <div class="story-chart-scroll story-chart-scroll--compact">
+          <svg id="story-correlation-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow story-chart--compact-grid"></svg>
+        </div>
+        <div class="story-context-block">
+          <h3>Why child dependency and fertility move together so strongly</h3>
+          <p class="story-context-intro">
+            We see a strong link between child dependency and fertility for a simple reason: children are pure
+            dependents. The only way to have many children in a population is to give birth to many children. And the
+            only way to keep child dependency low is to have relatively few births.
+          </p>
+          <p class="story-context-intro">
+            This is not a statistical artifact. It is a demographic law. If a society has high fertility, it will also
+            carry a high child dependency burden. If fertility falls, child dependency falls with it. In plain terms:
+            the more children a population has, the more children it must support.
+          </p>
+        </div>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>Radial impact chart for low fertility</h2>
+          <p id="story-shap-summary">
+            The center shows low fertility. Surrounding factors show relative influence strength in the data.
+          </p>
+        </div>
+        <div class="story-chart-scroll story-chart-scroll--compact">
+          <svg id="story-shap-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow"></svg>
+        </div>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>Thematic groups contribution to fertility, %</h2>
+          <p id="story-theme-bubble-summary">
+            Horizontal bars show each thematic group's contribution share based on relationship strength with TFR.
+          </p>
+        </div>
+        <div class="story-chart-scroll story-chart-scroll--compact">
+          <svg id="story-theme-bubble-chart" viewBox="0 0 660 500" class="story-chart story-chart--narrow"></svg>
+        </div>
+      </section>
+
+      <section class="card analysis-card" data-reveal>
+        <div class="section-head section-head--stack">
+          <h2>We all know about the hard 1990s and China's one-child policy. Let's see how they shaped demography.</h2>
+          <p>
+            Country-level trajectories make those shocks visible in a way the global average never can.
+          </p>
+        </div>
+        <div id="story-facts-grid" class="story-facts-grid"></div>
       </section>
 
       <section class="card map-card" data-reveal>
         <div class="section-head section-head--stack">
           <h2>Interactive module for detailed hypothesis checks</h2>
           <p>
-            This section is for deeper exploration: selecting countries, checking specific cases, and comparing time
-            series. The main conclusions are already presented above.
+            Change <strong>Indicator</strong>, <strong>Region</strong>, <strong>Income group</strong>, and
+            <strong>Year</strong>. The globe will recolor the matching countries, and clicking a country opens its
+            full profile.
           </p>
         </div>
 
@@ -220,19 +271,13 @@
         <div class="selection-note" id="selection-note" aria-live="polite"></div>
       </section>
 
-      <section class="card region-card" data-reveal>
-        <div class="section-head">
-          <h2>Regional Highlights</h2>
-          <p>Click a region card to instantly filter the map.</p>
-        </div>
-        <div id="region-cards" class="region-cards"></div>
-        <svg id="region-chart" viewBox="0 0 760 240" class="region-chart"></svg>
-      </section>
-
       <section class="card compare-card" data-reveal>
         <div class="section-head">
           <h2>Quick Country Comparison</h2>
-          <p>Choose up to 5 countries and compare their time series.</p>
+          <p>
+            Change <strong>Comparison indicator</strong> and <strong>Countries</strong>. The chart will show the full
+            time series for the selected countries.
+          </p>
         </div>
         <div class="compare-controls">
           <label class="field">
@@ -278,17 +323,19 @@
     </main>
 
     <aside id="country-panel" class="country-panel" aria-label="Country details">
-      <button id="close-panel" class="close-panel" type="button" aria-label="Close panel">×</button>
+      <button id="close-panel" class="close-panel" type="button" aria-label="Close panel">&times;</button>
 
       <div class="panel-header">
         <h3 id="panel-country-name">Country</h3>
-        <p id="panel-country-meta">Region · Income group</p>
+        <p id="panel-country-meta">Region | Income group</p>
       </div>
 
       <div id="panel-kpis" class="panel-kpis"></div>
 
       <div id="chart-grid" class="chart-grid"></div>
     </aside>
+
+    <div id="story-tooltip" class="tooltip tooltip--story" hidden></div>
 
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
