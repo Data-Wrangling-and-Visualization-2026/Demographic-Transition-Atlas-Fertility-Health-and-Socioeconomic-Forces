@@ -19,6 +19,114 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     female_secondary_enrollment: "#b87726",
   };
 
+  const REGION_COLORS = {
+    "East Asia & Pacific": "#4c78a8",
+    "Europe & Central Asia": "#f58518",
+    "Latin America & Caribbean": "#e45756",
+    "Middle East, North Africa, Afghanistan & Pakistan": "#72b7b2",
+    "North America": "#54a24b",
+    "South Asia": "#eeca3b",
+    "Sub-Saharan Africa": "#b279a2",
+  };
+
+  const INDICATOR_SHORT_LABELS = {
+    tfr: "TFR",
+    adolescent_fertility: "Teen fertility",
+    gdp_per_capita: "GDP pc",
+    female_secondary_enrollment: "Girls' secondary",
+    female_labor_force_participation: "Women in labor",
+    urban_population_pct: "Urban pop",
+    median_age: "Median age",
+    mean_age_childbearing: "Childbearing age",
+    health_expenditure_pct_gdp: "Health spend",
+    unmet_need_family_planning: "Unmet FP need",
+    contraceptive_prevalence_modern: "Modern contraception",
+    child_dependency_ratio: "Child dependency",
+    total_dependency_ratio: "Total dependency",
+    population_change: "Population change",
+    crude_net_migration_rate: "Net migration",
+    female_population_15_49: "Women 15-49",
+  };
+
+  const STORY_COUNTRY_CONFIGS = [
+    {
+      iso3: "RUS",
+      title: "Russia",
+      accent: "#1b6b59",
+      markerYear: 1991,
+      focusEndYear: 1999,
+      markerLabel: "Post-Soviet shock",
+    },
+    {
+      iso3: "CHN",
+      title: "China",
+      accent: "#b87726",
+      markerYear: 1980,
+      markerLabel: "One-child policy era",
+    },
+  ];
+
+  const DECLINE_EXPLANATIONS = {
+    MDV: "Tourism growth and urbanization made life in the capital much more expensive.",
+    LBY: "Oil income sharply reduced child mortality, so the old need for very large families faded.",
+    JOR: "Women increasingly marry later, often close to age 30, because of longer education and unemployment pressure.",
+    KWT: "Women participate more actively in the labor market and build careers.",
+    CPV: "Large-scale migration to Europe helped import the European small-family model.",
+    ARE: "Extremely rapid enrichment and a population dominated by expatriates weakened traditional large-family norms within two decades.",
+    SAU: "Vision 2030 reforms expanded women's work opportunities and pushed the country away from early marriage patterns.",
+    BTN: "The arrival of television and the internet in 1999 rapidly changed youth values.",
+    MHL: "Free migration to the United States encouraged a more American two-child family model.",
+    IRN: "The government's very successful 'Two children are enough' campaign in the 1990s worked too well.",
+  };
+
+  const CHINA_ONE_CHILD_FOOTNOTE =
+    "*One-child policy: many parents preferred to keep a son because of a centuries-old tradition: only a son continued the family line, cared for elderly parents, and inherited property, while a daughter was expected to marry into another family. This led to widespread sex-selective abortions and the abandonment of newborn girls. By 2016, the country had an imbalance of roughly 34 million excess men.";
+
+  const MENA_REGION = "Middle East, North Africa, Afghanistan & Pakistan";
+  const STORY_WORLD_REGION_KEY = "__world__";
+
+  const SHAP_FEATURE_CONFIG = [
+    { code: "female_secondary_enrollment", label: "Girls' secondary" },
+    { code: "gdp_per_capita", label: "GDP pc" },
+    { code: "urban_population_pct", label: "Urban pop" },
+    { code: "median_age", label: "Median age" },
+    { code: "contraceptive_prevalence_modern", label: "Modern contraception" },
+  ];
+
+  const TFR_THEME_GROUPS = [
+    {
+      key: "socio_economic",
+      label: "Socio-economic conditions",
+      codes: [
+        "gdp_per_capita",
+        "female_secondary_enrollment",
+        "female_labor_force_participation",
+        "urban_population_pct",
+        "health_expenditure_pct_gdp",
+      ],
+    },
+    {
+      key: "reproductive_behavior",
+      label: "Reproductive behavior and family planning",
+      codes: [
+        "adolescent_fertility",
+        "mean_age_childbearing",
+        "unmet_need_family_planning",
+        "contraceptive_prevalence_modern",
+      ],
+    },
+    {
+      key: "demographic_structure",
+      label: "Demographic structure",
+      codes: ["median_age", "child_dependency_ratio", "total_dependency_ratio", "female_population_15_49"],
+    },
+    {
+      key: "population_dynamics",
+      label: "Population dynamics",
+      codes: ["population_change", "crude_net_migration_rate"],
+    },
+  ];
+
   const ID_TO_ISO3 = {
     4: "AFG",
     8: "ALB",
@@ -228,6 +336,7 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     worldFeatures: [],
     mapRows: [],
     regionSummaryRows: [],
+    regionBaselineRows: [],
     selectedIso3: null,
     selectedYear: 2024,
     selectedIndicator: "tfr",
@@ -263,12 +372,20 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       yearSeries: [],
       tfrByYear: [],
       tfrRowsByYear: new Map(),
+      indicatorSeriesRows: new Map(),
+      correlationMode: "latest",
       latestYear: null,
       firstYear: null,
       latestTfrRows: [],
       latestGdpRows: [],
       latestEnrollmentRows: [],
       latestAdolescentRows: [],
+      latestLaborRows: [],
+      recordsRegion: "",
+      latestIndicatorRows: new Map(),
+      countryStories: new Map(),
+      correlationCodes: [],
+      correlationMatrix: [],
       correlations: {
         gdpVsTfr: null,
         enrollmentVsAdolescent: null,
@@ -304,15 +421,91 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     return d3.format(".2f")(v);
   }
 
+  function formatInteger(value) {
+    if (!Number.isFinite(Number(value))) return "-";
+    return d3.format(",d")(Math.round(Number(value)));
+  }
+
   function formatValueWithUnit(value, unit) {
     const base = formatValue(value);
     if (base === "-" || !unit) return base;
     return `${base} ${unit}`;
   }
 
+  function cleanIndicatorLabel(label) {
+    return String(label || "")
+      .replace(/\s*\([^)]*\)/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  }
+
+  function indicatorLabel(code, clean = false) {
+    const meta = indicatorMeta(code);
+    const label = meta ? meta.label : code;
+    return clean ? cleanIndicatorLabel(label) : label;
+  }
+
+  function indicatorShortLabel(code) {
+    return INDICATOR_SHORT_LABELS[code] || (indicatorMeta(code) ? indicatorMeta(code).label : code);
+  }
+
+  function regionColor(region) {
+    return REGION_COLORS[region] || "#4c78a8";
+  }
+
   function toNumberOrNull(value) {
     const numeric = Number(value);
     return Number.isFinite(numeric) ? numeric : null;
+  }
+
+  function normalizeCorrelationValue(code, value) {
+    const numeric = toNumberOrNull(value);
+    if (numeric == null) return null;
+
+    if (code === "gdp_per_capita" || code === "female_population_15_49") {
+      return numeric > 0 ? Math.log10(numeric) : null;
+    }
+
+    if (code === "population_change") {
+      return Math.sign(numeric) * Math.log10(Math.abs(numeric) + 1);
+    }
+
+    return numeric;
+  }
+
+  function firstFinitePoint(points) {
+    return points.find((point) => Number.isFinite(point.value)) || null;
+  }
+
+  function lastFinitePoint(points) {
+    for (let index = points.length - 1; index >= 0; index -= 1) {
+      if (Number.isFinite(points[index].value)) return points[index];
+    }
+    return null;
+  }
+
+  function findPointByYear(points, year) {
+    return points.find((point) => Number(point.year) === Number(year)) || null;
+  }
+
+  function closestPointByYear(points, year) {
+    if (!points || !points.length) return null;
+    const bisect = d3.bisector((point) => point.year).left;
+    const index = bisect(points, year);
+    const left = points[Math.max(0, index - 1)] || null;
+    const right = points[Math.min(points.length - 1, index)] || null;
+    if (!left) return right;
+    if (!right) return left;
+    return Math.abs(left.year - year) <= Math.abs(right.year - year) ? left : right;
+  }
+
+  function stableHash(value) {
+    let hash = 0;
+    const text = String(value || "");
+    for (let index = 0; index < text.length; index += 1) {
+      hash = (hash * 31 + text.charCodeAt(index)) % 1_000_003;
+    }
+    return hash;
   }
 
   function mean(values) {
@@ -416,6 +609,37 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     return PANEL_COLORS[code] || d3.schemeTableau10[index % d3.schemeTableau10.length];
   }
 
+  function selectedIndicatorContextNote() {
+    if (state.selectedIndicator !== "health_expenditure_pct_gdp") return "";
+    return " GDP means Gross Domestic Product, so this metric shows what share of a country's economy is spent on health.";
+  }
+
+  function showStoryTooltip(event, html) {
+    const tip = el("story-tooltip");
+    if (!tip) return;
+    tip.innerHTML = html;
+    tip.hidden = false;
+    moveStoryTooltip(event);
+  }
+
+  function moveStoryTooltip(event) {
+    const tip = el("story-tooltip");
+    if (!tip || tip.hidden) return;
+    const offset = 14;
+    const width = tip.offsetWidth || 220;
+    const height = tip.offsetHeight || 80;
+    const x = Math.min(event.clientX + offset, window.innerWidth - width - 12);
+    const y = Math.min(event.clientY + offset, window.innerHeight - height - 12);
+    tip.style.left = `${Math.max(12, x)}px`;
+    tip.style.top = `${Math.max(12, y)}px`;
+  }
+
+  function hideStoryTooltip() {
+    const tip = el("story-tooltip");
+    if (!tip) return;
+    tip.hidden = true;
+  }
+
   function canRenderIsoOnMap(iso3) {
     return Boolean(iso3 && state.mapRenderableIsos.has(iso3));
   }
@@ -477,7 +701,7 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     compareSelect.innerHTML = "";
 
     state.indicators.forEach((item) => {
-      const label = `${item.label} (${item.code})`;
+      const label = cleanIndicatorLabel(item.label);
 
       const option1 = document.createElement("option");
       option1.value = item.code;
@@ -546,6 +770,30 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       option.textContent = `${country.name} (${country.iso3})`;
       select.appendChild(option);
     });
+  }
+
+  function populateStoryRecordsRegionSelect() {
+    const select = el("story-records-region-select");
+    if (!select) return;
+
+    select.innerHTML = "";
+    const worldOption = document.createElement("option");
+    worldOption.value = STORY_WORLD_REGION_KEY;
+    worldOption.textContent = "Whole world";
+    select.appendChild(worldOption);
+
+    (state.meta.regions || []).forEach((region) => {
+      const option = document.createElement("option");
+      option.value = region;
+      option.textContent = region.replace(MENA_REGION, "MENA, Afghanistan & Pakistan");
+      select.appendChild(option);
+    });
+
+    if (!state.story.recordsRegion) {
+      state.story.recordsRegion = STORY_WORLD_REGION_KEY;
+    }
+
+    select.value = state.story.recordsRegion;
   }
 
   function initMap() {
@@ -792,7 +1040,7 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     const minEl = el("legend-min");
     const maxEl = el("legend-max");
 
-    legendIndicator.textContent = indicator ? indicator.label : "Indicator scale";
+    legendIndicator.textContent = indicator ? cleanIndicatorLabel(indicator.label) : "Indicator scale";
     legendUnit.textContent = indicator ? indicator.unit : "-";
 
     if (min == null || max == null) {
@@ -813,10 +1061,18 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     const note = el("selection-note");
     if (!note) return;
     const indicator = indicatorMeta(state.selectedIndicator);
-    const indicatorLabel = indicator ? indicator.label : state.selectedIndicator;
+    const indicatorLabel = indicator ? cleanIndicatorLabel(indicator.label) : state.selectedIndicator;
     const unit = indicator && indicator.unit ? indicator.unit : "selected unit";
-    const _ = mapSummary;
-    note.innerHTML = `<strong>What this selection means:</strong> You are viewing <strong>${indicatorLabel}</strong> for <strong>${state.selectedYear}</strong> (${unit}).`;
+    const matchedCountries =
+      mapSummary && Number.isFinite(Number(mapSummary.countries_with_data)) ? Number(mapSummary.countries_with_data) : null;
+    const regionText = state.selectedRegion || "all regions";
+    const incomeText = state.selectedIncome || "all income groups";
+    note.innerHTML = `
+      <strong>Current view:</strong> ${indicatorLabel} in <strong>${state.selectedYear}</strong> (${unit}).
+      Change <strong>Indicator</strong>, <strong>Region</strong>, <strong>Income group</strong>, or <strong>Year</strong>
+      to update the globe.
+      <strong>Active filters:</strong> ${regionText}; ${incomeText}${matchedCountries != null ? `; ${matchedCountries} countries shown.` : "."}${selectedIndicatorContextNote()}
+    `;
   }
 
   function renderSelectionDataTable() {
@@ -880,6 +1136,7 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
   function renderRegionCards() {
     const host = el("region-cards");
+    if (!host) return;
     host.innerHTML = "";
 
     if (!state.regionSummaryRows.length) {
@@ -912,14 +1169,21 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
   }
 
   function renderRegionChart() {
-    const svg = d3.select("#region-chart");
+    const chartNode = el("region-chart");
+    if (!chartNode) return;
+    const svg = d3.select(chartNode);
     const width = 760;
     const height = 240;
-    const margin = { top: 16, right: 16, bottom: 42, left: 70 };
+    const margin = { top: 24, right: 16, bottom: 42, left: 70 };
 
     svg.selectAll("*").remove();
 
     const rows = state.regionSummaryRows.filter((row) => Number.isFinite(Number(row.avg_value)));
+    const baselineByRegion = new Map(
+      state.regionBaselineRows
+        .filter((row) => Number.isFinite(Number(row.avg_value)))
+        .map((row) => [row.region, Number(row.avg_value)]),
+    );
     if (!rows.length) return;
 
     const x = d3
@@ -930,9 +1194,19 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(rows, (row) => Number(row.avg_value)) || 1])
+      .domain([
+        0,
+        d3.max(rows, (row) => Math.max(Number(row.avg_value), baselineByRegion.get(row.region) || 0)) || 1,
+      ])
       .nice()
       .range([height - margin.bottom, margin.top]);
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(5).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove());
 
     svg
       .append("g")
@@ -940,11 +1214,25 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       .data(rows)
       .join("rect")
       .attr("x", (row) => x(row.region))
-      .attr("y", (row) => y(Number(row.avg_value)))
+      .attr("y", (row) => y(baselineByRegion.get(row.region) || 0))
       .attr("width", x.bandwidth())
+      .attr("height", (row) => y(0) - y(baselineByRegion.get(row.region) || 0))
+      .attr("fill", "#dce7e2")
+      .attr("stroke", "#c1d5cc")
+      .attr("opacity", 1);
+
+    svg
+      .append("g")
+      .selectAll("rect.current")
+      .data(rows)
+      .join("rect")
+      .attr("class", "current")
+      .attr("x", (row) => x(row.region) + x.bandwidth() * 0.14)
+      .attr("y", (row) => y(Number(row.avg_value)))
+      .attr("width", x.bandwidth() * 0.72)
       .attr("height", (row) => y(0) - y(Number(row.avg_value)))
       .attr("fill", (row) => (row.region === state.selectedRegion ? "#145f4a" : "#2f9c7f"))
-      .attr("opacity", 0.88)
+      .attr("opacity", 0.95)
       .style("cursor", "pointer")
       .on("click", (_, row) => {
         state.selectedRegion = state.selectedRegion === row.region ? "" : row.region;
@@ -968,17 +1256,19 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     svg.append("g").attr("transform", `translate(${margin.left},0)`).attr("class", "axis").call(d3.axisLeft(y).ticks(5));
 
     const unit = (indicatorMeta(state.selectedIndicator) || {}).unit || "";
+    const baselineYear = Number(state.meta.min_year || 1970);
     svg
       .append("text")
       .attr("x", margin.left)
       .attr("y", margin.top - 6)
       .attr("class", "story-note")
-      .text(unit ? `Unit: ${unit}` : "");
+      .text(unit ? `Unit: ${unit} | Background: ${baselineYear} | Overlay: ${state.selectedYear}` : "");
   }
 
   async function refreshAtlas() {
     const token = ++state.refreshToken;
-    setLoadingMessage("Loading data…");
+    const showLoading = !state.playTimer;
+    if (showLoading) setLoadingMessage("Loading data...");
 
     try {
       const mapParams = {
@@ -988,27 +1278,17 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
         income_group: state.selectedIncome || null,
       };
 
-      const regionsParams = {
-        year: state.selectedYear,
-        indicator: state.selectedIndicator,
-        income_group: state.selectedIncome || null,
-      };
-
-      const [mapData, regions] = await Promise.all([
-        fetchJSON(buildApiUrl("/map-data", mapParams)),
-        fetchJSON(buildApiUrl("/regions/summary", regionsParams)),
-      ]);
+      const mapData = await fetchJSON(buildApiUrl("/map-data", mapParams));
 
       if (token !== state.refreshToken) return;
 
       state.mapRows = mapData.rows || [];
-      state.regionSummaryRows = regions.rows || [];
+      state.regionSummaryRows = [];
+      state.regionBaselineRows = [];
 
       renderMapColors();
       updateSelectionNote(mapData.summary || null);
       renderSelectionDataTable();
-      renderRegionCards();
-      renderRegionChart();
 
       if (state.selectedIso3 && state.panelOpen) {
         await refreshCountryProfileOnly(state.selectedIso3);
@@ -1019,10 +1299,9 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       console.error(error);
       state.mapRows = [];
       state.regionSummaryRows = [];
+      state.regionBaselineRows = [];
       renderMapColors();
       renderSelectionDataTable();
-      renderRegionCards();
-      renderRegionChart();
       setLoadingMessage("Could not load map data. Check backend/API connection.");
       updateSelectionNote(null);
     }
@@ -1337,7 +1616,6 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       .style("display", "none");
 
     const focusGroup = svg.append("g");
-    const bisect = d3.bisector((d) => d.year).left;
 
     svg
       .append("rect")
@@ -1349,13 +1627,13 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       .on("mousemove", (event) => {
         const mouseX = d3.pointer(event)[0];
         const year = x.invert(mouseX);
+        const tooltipRows = [];
 
         hoverLine.style("display", null).attr("x1", mouseX).attr("x2", mouseX);
         focusGroup.selectAll("*").remove();
 
         activeRows.forEach((row) => {
-          const idx = Math.max(0, Math.min(row.points.length - 1, bisect(row.points, year)));
-          const point = row.points[idx];
+          const point = closestPointByYear(row.points, year);
           if (!point) return;
 
           focusGroup
@@ -1366,11 +1644,23 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
             .attr("fill", "#fff")
             .attr("stroke", color(row.iso3))
             .attr("stroke-width", 2);
+
+          tooltipRows.push(
+            `<span style="color:${color(row.iso3)};font-weight:700;">${row.name}</span>: ${point.year}, ${formatValueWithUnit(
+              point.value,
+              unit,
+            )}`,
+          );
         });
+
+        if (tooltipRows.length) {
+          showStoryTooltip(event, tooltipRows.join("<br/>"));
+        }
       })
       .on("mouseleave", () => {
         hoverLine.style("display", "none");
         focusGroup.selectAll("*").remove();
+        hideStoryTooltip();
       });
   }
 
@@ -1417,6 +1707,32 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       result.set(groupKey, d3.mean(groupRows, (row) => Number(row.value)));
     });
     return result;
+  }
+
+  function boxPlotStats(values) {
+    const sorted = values.map(Number).filter(Number.isFinite).sort(d3.ascending);
+    if (!sorted.length) return null;
+
+    const q1 = d3.quantileSorted(sorted, 0.25);
+    const median = d3.quantileSorted(sorted, 0.5);
+    const q3 = d3.quantileSorted(sorted, 0.75);
+    const iqr = q3 - q1;
+    const lowerFence = q1 - iqr * 1.5;
+    const upperFence = q3 + iqr * 1.5;
+    const nonOutliers = sorted.filter((value) => value >= lowerFence && value <= upperFence);
+    const min = nonOutliers.length ? d3.min(nonOutliers) : sorted[0];
+    const max = nonOutliers.length ? d3.max(nonOutliers) : sorted[sorted.length - 1];
+    const outliers = sorted.filter((value) => value < min || value > max);
+
+    return {
+      count: sorted.length,
+      min,
+      q1,
+      median,
+      q3,
+      max,
+      outliers,
+    };
   }
 
   function renderStoryLegend(containerId, items) {
@@ -1543,39 +1859,216 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
   function drawStoryRegionChart() {
     const svg = d3.select("#story-region-chart");
-    const width = 980;
-    const height = 340;
-    const margin = { top: 24, right: 20, bottom: 44, left: 76 };
-    const regions = state.meta.regions || [];
+    const width = 660;
+    const height = 500;
+    const margin = { top: 18, right: 20, bottom: 52, left: 56 };
+    const regionOrder = state.meta.regions || [];
 
     svg.selectAll("*").remove();
-    if (!regions.length || !state.story.tfrByYear.length) return;
+    if (!regionOrder.length || !state.story.tfrByYear.length) return;
 
-    const series = regions.map((region) => ({
-      region,
-      points: state.story.tfrByYear
-        .map((row) => ({ year: row.year, value: row.byRegion.get(region) }))
-        .filter((row) => Number.isFinite(row.value)),
-    }));
+    const series = regionOrder
+      .map((region) => ({
+        region,
+        points: state.story.tfrByYear
+          .map((row) => ({
+            year: row.year,
+            value: row.byRegion.get(region),
+          }))
+          .filter((point) => Number.isFinite(point.value)),
+      }))
+      .filter((row) => row.points.length);
+    if (!series.length) return;
 
     const allPoints = series.flatMap((row) => row.points);
-    if (!allPoints.length) return;
+    const regions = series.map((row) => row.region);
 
     const x = d3
       .scaleLinear()
-      .domain(d3.extent(allPoints, (d) => d.year))
+      .domain(d3.extent(allPoints, (point) => point.year))
       .range([margin.left, width - margin.right]);
     const y = d3
       .scaleLinear()
-      .domain(d3.extent(allPoints, (d) => d.value))
+      .domain([
+        Math.max(0, (d3.min(allPoints, (point) => point.value) || 0) - 0.35),
+        (d3.max(allPoints, (point) => point.value) || 1) + 0.45,
+      ])
       .nice()
       .range([height - margin.bottom, margin.top]);
-    const color = d3.scaleOrdinal(d3.schemeTableau10).domain(regions);
+
+    svg
+      .append("rect")
+      .attr("x", margin.left)
+      .attr("y", margin.top)
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("rx", 12)
+      .attr("fill", "#dde7f2");
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(6).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove())
+      .call((g) => g.selectAll("line").attr("stroke", "rgba(255,255,255,0.88)"));
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(11).tickSize(-(height - margin.top - margin.bottom)).tickFormat(""))
+      .call((g) => g.select(".domain").remove())
+      .call((g) => g.selectAll("line").attr("stroke", "rgba(255,255,255,0.7)"));
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(11).tickFormat(d3.format("d")));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(6));
+
     const line = d3
       .line()
-      .x((d) => x(d.year))
-      .y((d) => y(d.value))
-      .curve(d3.curveMonotoneX);
+      .defined((point) => Number.isFinite(point.value))
+      .x((point) => x(point.year))
+      .y((point) => y(point.value));
+
+    svg
+      .append("g")
+      .attr("class", "story-series-layer")
+      .selectAll("path")
+      .data(series)
+      .join("path")
+      .attr("fill", "none")
+      .attr("stroke", (row) => regionColor(row.region))
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-width", 2.3)
+      .attr("opacity", 0.95)
+      .attr("d", (row) => line(row.points));
+
+    const hoverPoint = svg
+      .append("circle")
+      .attr("class", "chart-hover-point")
+      .attr("r", 4.5)
+      .style("display", "none");
+
+    svg
+      .append("g")
+      .selectAll("circle")
+      .data(series.flatMap((row) => row.points.map((point) => ({ ...point, region: row.region }))))
+      .join("circle")
+      .attr("cx", (point) => x(point.year))
+      .attr("cy", (point) => y(point.value))
+      .attr("r", 8)
+      .attr("fill", "transparent")
+      .style("cursor", "pointer")
+      .on("mouseenter", (event, point) => {
+        hoverPoint
+          .style("display", null)
+          .attr("cx", x(point.year))
+          .attr("cy", y(point.value))
+          .attr("stroke", regionColor(point.region));
+        showStoryTooltip(
+          event,
+          `<strong>${point.region}</strong><br/><span>Year: ${point.year}</span><br/><span>TFR: ${formatValueWithUnit(
+            point.value,
+            "births per woman",
+          )}</span>`,
+        );
+      })
+      .on("mousemove", (event, point) => {
+        hoverPoint
+          .style("display", null)
+          .attr("cx", x(point.year))
+          .attr("cy", y(point.value))
+          .attr("stroke", regionColor(point.region));
+        moveStoryTooltip(event);
+      })
+      .on("mouseleave", () => {
+        hoverPoint.style("display", "none");
+        hideStoryTooltip();
+      });
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 2)
+      .attr("class", "story-axis-label")
+      .text("TFR");
+
+    svg
+      .append("text")
+      .attr("x", (margin.left + width - margin.right) / 2)
+      .attr("y", height - 12)
+      .attr("text-anchor", "middle")
+      .attr("class", "story-axis-label")
+      .text("Year");
+
+    renderStoryLegend(
+      "story-region-legend",
+      regions.map((region) => ({
+        label: region.replace("Middle East, North Africa, Afghanistan & Pakistan", "MENA, Afghanistan & Pakistan"),
+        color: regionColor(region),
+      })),
+    );
+  }
+
+  function drawStoryRecordsChart() {
+    const svg = d3.select("#story-records-chart");
+    const width = 660;
+    const height = 420;
+    const margin = { top: 28, right: 20, bottom: 50, left: 64 };
+
+    svg.selectAll("*").remove();
+
+    const selectedRegion = state.story.recordsRegion;
+    if (!selectedRegion || !state.story.yearSeries.length) return;
+    const isWorld = selectedRegion === STORY_WORLD_REGION_KEY;
+    const selectedRegionLabel = isWorld ? "Whole world" : selectedRegion;
+
+    const series = state.story.yearSeries
+      .map((year) => {
+        const rows = (state.story.tfrRowsByYear.get(year) || [])
+          .filter((row) => (isWorld ? true : row.region === selectedRegion))
+          .map((row) => ({
+            ...row,
+            valueNum: toNumberOrNull(row.value),
+          }))
+          .filter((row) => row.valueNum != null);
+
+        if (!rows.length) return null;
+
+        const minRow = rows.reduce((best, row) => (row.valueNum < best.valueNum ? row : best), rows[0]);
+        const maxRow = rows.reduce((best, row) => (row.valueNum > best.valueNum ? row : best), rows[0]);
+
+        return {
+          year,
+          minValue: minRow.valueNum,
+          minCountry: minRow.name || minRow.iso3,
+          maxValue: maxRow.valueNum,
+          maxCountry: maxRow.name || maxRow.iso3,
+          sampleSize: rows.length,
+        };
+      })
+      .filter(Boolean);
+
+    if (!series.length) return;
+
+    const x = d3
+      .scaleLinear()
+      .domain(d3.extent(series, (row) => row.year))
+      .range([margin.left, width - margin.right]);
+
+    const y = d3
+      .scaleLinear()
+      .domain([
+        Math.max(0, (d3.min(series, (row) => row.minValue) || 0) - 0.22),
+        (d3.max(series, (row) => row.maxValue) || 1) + 0.26,
+      ])
+      .nice()
+      .range([height - margin.bottom, margin.top]);
 
     svg
       .append("g")
@@ -1588,34 +2081,827 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       .append("g")
       .attr("class", "axis")
       .attr("transform", `translate(0,${height - margin.bottom})`)
-      .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format("d")));
+      .call(d3.axisBottom(x).ticks(9).tickFormat(d3.format("d")));
     svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(6));
 
+    const area = d3
+      .area()
+      .x((row) => x(row.year))
+      .y0((row) => y(row.maxValue))
+      .y1((row) => y(row.minValue))
+      .curve(d3.curveMonotoneX);
+    const lineHigh = d3
+      .line()
+      .x((row) => x(row.year))
+      .y((row) => y(row.maxValue))
+      .curve(d3.curveMonotoneX);
+    const lineLow = d3
+      .line()
+      .x((row) => x(row.year))
+      .y((row) => y(row.minValue))
+      .curve(d3.curveMonotoneX);
+
+    svg.append("path").datum(series).attr("fill", "rgba(59, 137, 113, 0.14)").attr("d", area);
     svg
-      .append("g")
-      .selectAll("path")
-      .data(series)
-      .join("path")
+      .append("path")
+      .datum(series)
       .attr("fill", "none")
-      .attr("stroke", (row) => color(row.region))
-      .attr("stroke-width", 2)
-      .attr("opacity", 0.95)
-      .attr("d", (row) => line(row.points));
+      .attr("stroke", "#b14d2f")
+      .attr("stroke-width", 2.4)
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .attr("d", lineHigh);
+    svg
+      .append("path")
+      .datum(series)
+      .attr("fill", "none")
+      .attr("stroke", "#1b7a63")
+      .attr("stroke-width", 2.4)
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .attr("d", lineLow);
+
+    const hoverLine = svg
+      .append("line")
+      .attr("class", "chart-hover-line")
+      .attr("y1", margin.top)
+      .attr("y2", height - margin.bottom)
+      .style("display", "none");
+    const maxFocus = svg.append("circle").attr("class", "chart-hover-point").attr("r", 4.8).style("display", "none");
+    const minFocus = svg.append("circle").attr("class", "chart-hover-point").attr("r", 4.8).style("display", "none");
+
+    const bisect = d3.bisector((row) => row.year).left;
+
+    svg
+      .append("rect")
+      .attr("x", margin.left)
+      .attr("y", margin.top)
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("fill", "transparent")
+      .on("mousemove", (event) => {
+        const pointerX = d3.pointer(event)[0];
+        const year = x.invert(pointerX);
+        const index = bisect(series, year);
+        const left = series[Math.max(0, index - 1)] || null;
+        const right = series[Math.min(series.length - 1, index)] || null;
+        const point = !left ? right : !right ? left : Math.abs(left.year - year) <= Math.abs(right.year - year) ? left : right;
+        if (!point) return;
+
+        const px = x(point.year);
+        hoverLine.style("display", null).attr("x1", px).attr("x2", px);
+        maxFocus.style("display", null).attr("cx", px).attr("cy", y(point.maxValue)).attr("stroke", "#b14d2f");
+        minFocus.style("display", null).attr("cx", px).attr("cy", y(point.minValue)).attr("stroke", "#1b7a63");
+
+        showStoryTooltip(
+          event,
+          `<strong>${selectedRegionLabel}</strong><br/><span>Year: ${point.year}</span><br/><span style="color:#b14d2f;">Highest: ${point.maxCountry}, ${formatValueWithUnit(
+            point.maxValue,
+            "births per woman",
+          )}</span><br/><span style="color:#1b7a63;">Lowest: ${point.minCountry}, ${formatValueWithUnit(
+            point.minValue,
+            "births per woman",
+          )}</span><br/><span>${formatInteger(point.sampleSize)} countries</span>`,
+        );
+      })
+      .on("mouseleave", () => {
+        hoverLine.style("display", "none");
+        maxFocus.style("display", "none");
+        minFocus.style("display", "none");
+        hideStoryTooltip();
+      });
+
+    const highestRecord = series.reduce((best, row) => (row.maxValue > best.maxValue ? row : best), series[0]);
+    const lowestRecord = series.reduce((best, row) => (row.minValue < best.minValue ? row : best), series[0]);
+
+    svg
+      .append("text")
+      .attr("x", x(highestRecord.year) + 6)
+      .attr("y", y(highestRecord.maxValue) - 8)
+      .attr("class", "story-note")
+      .text(`Peak: ${highestRecord.year} ${formatValue(highestRecord.maxValue)}`);
+    svg
+      .append("text")
+      .attr("x", x(lowestRecord.year) + 6)
+      .attr("y", y(lowestRecord.minValue) + 14)
+      .attr("class", "story-note")
+      .text(`Floor: ${lowestRecord.year} ${formatValue(lowestRecord.minValue)}`);
 
     svg
       .append("text")
       .attr("x", margin.left)
       .attr("y", margin.top - 8)
       .attr("class", "story-axis-label")
-      .text("TFR by region (births per woman)");
+      .text("TFR (births per woman)");
 
-    renderStoryLegend(
-      "story-region-legend",
-      regions.map((region) => ({
-        label: region,
-        color: color(region),
-      })),
+    renderStoryLegend("story-records-legend", [
+      { label: "Highest country-level TFR in selected region", color: "#b14d2f" },
+      { label: "Lowest country-level TFR in selected region", color: "#1b7a63" },
+      { label: "Gap between high and low", color: "rgba(59, 137, 113, 0.45)" },
+    ]);
+
+    setText(
+      "story-records-summary",
+      `${selectedRegionLabel}: this chart tracks yearly high and low country-level fertility records. Peak record ${formatValue(
+        highestRecord.maxValue,
+      )} in ${highestRecord.year}; lowest record ${formatValue(lowestRecord.minValue)} in ${lowestRecord.year}.`,
     );
+  }
+
+  function buildStoryRadialImpacts() {
+    const tfrByKey = new Map(
+      (state.story.indicatorSeriesRows.get("tfr") || [])
+        .map((row) => [`${row.iso3}-${row.year}`, toNumberOrNull(row.value)])
+        .filter(([, value]) => value != null),
+    );
+
+    return SHAP_FEATURE_CONFIG.map((feature) => {
+      const joined = (state.story.indicatorSeriesRows.get(feature.code) || [])
+        .map((row) => {
+          const x = normalizeCorrelationValue(feature.code, row.value);
+          const y = tfrByKey.get(`${row.iso3}-${row.year}`);
+          if (x == null || y == null) return null;
+          return { x, y };
+        })
+        .filter(Boolean);
+
+      if (joined.length < 8) return null;
+      const corr = pearsonCorrelation(
+        joined,
+        (row) => row.x,
+        (row) => row.y,
+      );
+      if (corr == null) return null;
+
+      return {
+        ...feature,
+        corr,
+        impact: Math.abs(corr),
+        sampleSize: joined.length,
+      };
+    }).filter(Boolean);
+  }
+
+  function drawStoryShapChart() {
+    const svg = d3.select("#story-shap-chart");
+    const width = 660;
+    const height = 500;
+    const centerX = width / 2;
+    const centerY = height / 2 + 16;
+    const innerRadius = 86;
+    const maxOuterRadius = 224;
+
+    svg.selectAll("*").remove();
+
+    const rows = buildStoryRadialImpacts();
+    if (!rows.length) return;
+    const totalImpact = d3.sum(rows, (row) => row.impact) || 1;
+    const rowsWithShare = rows.map((row) => ({
+      ...row,
+      sharePct: (row.impact / totalImpact) * 100,
+    }));
+    const maxShare = d3.max(rowsWithShare, (row) => row.sharePct) || 1;
+
+    const angle = d3
+      .scaleBand()
+      .domain(rowsWithShare.map((row) => row.code))
+      .range([0, Math.PI * 2])
+      .paddingInner(0.18)
+      .paddingOuter(0.05);
+
+    const radius = d3.scaleLinear().domain([0, maxShare]).range([innerRadius + 18, maxOuterRadius]).clamp(true);
+    const color = d3
+      .scaleOrdinal()
+      .domain(rowsWithShare.map((row) => row.code))
+      .range(["#2d6a8a", "#52508c", "#4ba781", "#8cc253", "#2f8f8b"]);
+
+    const layer = svg.append("g").attr("transform", `translate(${centerX},${centerY})`);
+
+    layer
+      .append("circle")
+      .attr("r", maxOuterRadius + 8)
+      .attr("fill", "none")
+      .attr("stroke", "#cfded7")
+      .attr("stroke-width", 1.4);
+
+    [5, 10, 15, 20, 25, 30].forEach((tick) => {
+      layer
+        .append("circle")
+        .attr("r", radius(Math.min(tick, maxShare)))
+        .attr("fill", "none")
+        .attr("stroke", "#e2ece7")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "3 5");
+    });
+
+    const arc = d3
+      .arc()
+      .innerRadius(innerRadius)
+      .outerRadius((row) => radius(row.sharePct))
+      .startAngle((row) => angle(row.code))
+      .endAngle((row) => angle(row.code) + angle.bandwidth())
+      .padAngle(0.015)
+      .padRadius(innerRadius);
+
+    const bars = layer
+      .selectAll("path")
+      .data(rowsWithShare)
+      .join("path")
+      .attr("d", arc)
+      .attr("fill", (row) => color(row.code))
+      .attr("fill-opacity", 0.93)
+      .attr("stroke", "#ffffff")
+      .attr("stroke-width", 1.5)
+      .style("cursor", "pointer");
+
+    bars
+      .on("mouseenter", (event, row) => {
+        showStoryTooltip(
+          event,
+          `<strong>${row.label}</strong><br/><span>Impact share: ${formatValue(row.sharePct)}%</span><br/><span>|r| with TFR: ${formatValue(
+            row.impact,
+          )}</span><br/><span>Correlation sign: ${row.corr < 0 ? "negative" : "positive"} (${formatValue(
+            row.corr,
+          )})</span><br/><span>${formatInteger(row.sampleSize)} country-year observations</span>`,
+        );
+      })
+      .on("mousemove", moveStoryTooltip)
+      .on("mouseleave", hideStoryTooltip);
+
+    const labels = layer
+      .selectAll("g.story-circular-label")
+      .data(rowsWithShare)
+      .join("g")
+      .attr("class", "story-circular-label")
+      .attr("transform", (row) => {
+        const a = angle(row.code) + angle.bandwidth() / 2 - Math.PI / 2;
+        const labelRadius = radius(row.sharePct) + 18;
+        return `translate(${Math.cos(a) * labelRadius},${Math.sin(a) * labelRadius})`;
+      });
+
+    labels
+      .append("text")
+      .attr("text-anchor", (row) => {
+        const a = angle(row.code) + angle.bandwidth() / 2;
+        return a > Math.PI ? "end" : "start";
+      })
+      .attr("class", "story-axis-label")
+      .text((row) => row.label);
+
+    labels
+      .append("text")
+      .attr("dy", 14)
+      .attr("text-anchor", (row) => {
+        const a = angle(row.code) + angle.bandwidth() / 2;
+        return a > Math.PI ? "end" : "start";
+      })
+      .attr("class", "story-note")
+      .text((row) => `${d3.format(".1f")(row.sharePct)}%`);
+
+    layer
+      .append("circle")
+      .attr("r", innerRadius - 8)
+      .attr("fill", "#1b7a63")
+      .attr("fill-opacity", 0.92)
+      .attr("stroke", "#0f5a47")
+      .attr("stroke-width", 1.2);
+
+    layer
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("fill", "#f3fffa")
+      .style("font-size", "16px")
+      .style("font-weight", "800")
+      .text("Low fertility");
+    layer
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("dy", 18)
+      .attr("fill", "#d7f3ea")
+      .style("font-size", "11px")
+      .text("main drivers");
+
+    const strongestFeature = rowsWithShare.slice().sort((a, b) => d3.descending(a.sharePct, b.sharePct))[0];
+    if (strongestFeature) {
+      setText(
+        "story-shap-summary",
+        `Circular radial impact chart based on pooled country-year data (${state.story.firstYear}-${state.story.latestYear}). Bars show each factor's share in total relationship strength with fertility. These features are the main drivers behind low fertility in this model view, and ${strongestFeature.label} has the largest share (${formatValue(
+          strongestFeature.sharePct,
+        )}%).`,
+      );
+    }
+  }
+
+  function buildIndicatorTfrCorrelationMap(codes) {
+    const tfrByKey = new Map(
+      (state.story.indicatorSeriesRows.get("tfr") || [])
+        .map((row) => [`${row.iso3}-${row.year}`, toNumberOrNull(row.value)])
+        .filter(([, value]) => value != null),
+    );
+
+    return new Map(
+      codes.map((code) => {
+        const joined = (state.story.indicatorSeriesRows.get(code) || [])
+          .map((row) => {
+            const x = normalizeCorrelationValue(code, row.value);
+            const y = tfrByKey.get(`${row.iso3}-${row.year}`);
+            if (x == null || y == null) return null;
+            return { x, y };
+          })
+          .filter(Boolean);
+
+        const corr = pearsonCorrelation(
+          joined,
+          (row) => row.x,
+          (row) => row.y,
+        );
+
+        return [code, { corr, count: joined.length }];
+      }),
+    );
+  }
+
+  function drawStoryThemeBubbleChart() {
+    const svg = d3.select("#story-theme-bubble-chart");
+    const width = 660;
+    const height = 500;
+    const margin = { top: 26, right: 28, bottom: 52, left: 246 };
+    svg.selectAll("*").remove();
+
+    const allCodes = TFR_THEME_GROUPS.flatMap((group) => group.codes);
+    const corrByCode = buildIndicatorTfrCorrelationMap(allCodes);
+
+    const rows = TFR_THEME_GROUPS.map((group) => {
+      const indicators = group.codes
+        .map((code) => ({
+          code,
+          label: indicatorShortLabel(code),
+          corr: (corrByCode.get(code) || {}).corr,
+          count: (corrByCode.get(code) || {}).count || 0,
+        }))
+        .filter((item) => item.corr != null);
+      if (!indicators.length) return null;
+      return {
+        key: group.key,
+        label: group.label,
+        indicators,
+        avgAbsCorr: d3.mean(indicators, (item) => Math.abs(item.corr)) || 0,
+      };
+    }).filter(Boolean);
+
+    if (!rows.length) return;
+
+    const totalWeight = d3.sum(rows, (row) => row.avgAbsCorr) || 1;
+    const bars = rows
+      .map((row) => ({
+        ...row,
+        contributionPct: (row.avgAbsCorr / totalWeight) * 100,
+      }))
+      .sort((a, b) => d3.descending(a.contributionPct, b.contributionPct));
+
+    const x = d3
+      .scaleLinear()
+      .domain([0, (d3.max(bars, (row) => row.contributionPct) || 1) * 1.14])
+      .nice()
+      .range([margin.left, width - margin.right]);
+    const y = d3
+      .scaleBand()
+      .domain(bars.map((row) => row.label))
+      .range([margin.top, height - margin.bottom])
+      .paddingInner(0.34);
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(6).tickFormat("").tickSize(-(height - margin.top - margin.bottom)))
+      .call((g) => g.select(".domain").remove());
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(6).tickFormat((value) => `${d3.format(".0f")(value)}%`));
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).tickSize(0))
+      .call((g) => g.select(".domain").remove());
+
+    svg
+      .append("g")
+      .selectAll("rect")
+      .data(bars)
+      .join("rect")
+      .attr("x", margin.left)
+      .attr("y", (row) => y(row.label))
+      .attr("width", (row) => x(row.contributionPct) - margin.left)
+      .attr("height", y.bandwidth())
+      .attr("rx", 9)
+      .attr("fill", "#2f8d71")
+      .attr("opacity", 0.9)
+      .style("cursor", "pointer")
+      .on("mouseenter", (event, row) => {
+        showStoryTooltip(
+          event,
+          `<strong>${row.label}</strong><br/><span>Group contribution: ${formatValue(row.contributionPct)}%</span><br/><span>Average |r| with TFR: ${formatValue(
+            row.avgAbsCorr,
+          )}</span><br/><span>${row.indicators
+            .map((item) => `${item.label}: ${formatValue(item.corr)}`)
+            .join("<br/>")}</span>`,
+        );
+      })
+      .on("mousemove", moveStoryTooltip)
+      .on("mouseleave", hideStoryTooltip);
+
+    svg
+      .append("g")
+      .selectAll("text")
+      .data(bars)
+      .join("text")
+      .attr("x", (row) => x(row.contributionPct) + 6)
+      .attr("y", (row) => y(row.label) + y.bandwidth() / 2 + 4)
+      .attr("text-anchor", "start")
+      .attr("class", "story-note")
+      .attr("fill", "#22463b")
+      .style("font-weight", "700")
+      .text((row) => `${d3.format(".1f")(row.contributionPct)}%`);
+
+    svg
+      .append("text")
+      .attr("x", (margin.left + width - margin.right) / 2)
+      .attr("y", height - 12)
+      .attr("text-anchor", "middle")
+      .attr("class", "story-axis-label")
+      .text("Group contribution, %");
+
+    const strongest = bars[0];
+    if (strongest) {
+      setText(
+        "story-theme-bubble-summary",
+        `${strongest.label} contributes the largest share in this grouped decomposition (${formatValue(
+          strongest.contributionPct,
+        )}%). Bars are normalized to 100% across thematic groups.`,
+      );
+    }
+  }
+
+  function drawStoryAdolescentChart() {
+    const svg = d3.select("#story-adolescent-chart");
+    const width = 660;
+    const height = 500;
+    const margin = { top: 24, right: 20, bottom: 130, left: 72 };
+
+    svg.selectAll("*").remove();
+    if (!state.story.latestAdolescentRows.length) return;
+
+    const stats = d3
+      .groups(
+        state.story.latestAdolescentRows.filter(
+          (row) => row.region && row.region !== "Unknown" && Number.isFinite(toNumberOrNull(row.value)),
+        ),
+        (row) => row.region,
+      )
+      .map(([region, rows]) => {
+        const summary = boxPlotStats(rows.map((row) => Number(row.value)));
+        if (!summary) return null;
+        return {
+          region,
+          ...summary,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => d3.descending(a.median, b.median));
+
+    if (!stats.length) return;
+
+    const x = d3
+      .scaleBand()
+      .domain(stats.map((row) => row.region))
+      .range([margin.left, width - margin.right])
+      .paddingInner(0.22)
+      .paddingOuter(0.08);
+    const y = d3
+      .scaleLinear()
+      .domain([0, (d3.max(stats, (row) => Math.max(row.max, d3.max(row.outliers) || 0)) || 1) + 12])
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    svg
+      .append("rect")
+      .attr("x", margin.left)
+      .attr("y", margin.top)
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("rx", 12)
+      .attr("fill", "#dde7f2");
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(5).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove())
+      .call((g) => g.selectAll("line").attr("stroke", "rgba(255,255,255,0.78)"));
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(
+        d3
+          .axisBottom(x)
+          .tickFormat((value) => value.replace("Middle East, North Africa, Afghanistan & Pakistan", "MENA, Afghanistan & Pakistan")),
+      )
+      .selectAll("text")
+      .attr("transform", "rotate(-24)")
+      .style("text-anchor", "end");
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5));
+
+    const boxLayer = svg.append("g");
+
+    stats.forEach((row) => {
+      const bandX = x(row.region);
+      const center = bandX + x.bandwidth() / 2;
+      const boxWidth = x.bandwidth() * 0.58;
+      const color = regionColor(row.region);
+      const isAfrica = row.region === "Sub-Saharan Africa";
+      const fillOpacity = isAfrica ? 0.44 : 0.24;
+      const strokeWidth = isAfrica ? 2.5 : 2;
+      const fillColor = d3.color(color);
+      if (fillColor) fillColor.opacity = fillOpacity;
+
+      boxLayer
+        .append("line")
+        .attr("x1", center)
+        .attr("x2", center)
+        .attr("y1", y(row.min))
+        .attr("y2", y(row.max))
+        .attr("stroke", color)
+        .attr("stroke-width", strokeWidth)
+        .attr("opacity", 0.92);
+
+      boxLayer
+        .append("line")
+        .attr("x1", center - boxWidth * 0.22)
+        .attr("x2", center + boxWidth * 0.22)
+        .attr("y1", y(row.min))
+        .attr("y2", y(row.min))
+        .attr("stroke", color)
+        .attr("stroke-width", strokeWidth);
+
+      boxLayer
+        .append("line")
+        .attr("x1", center - boxWidth * 0.22)
+        .attr("x2", center + boxWidth * 0.22)
+        .attr("y1", y(row.max))
+        .attr("y2", y(row.max))
+        .attr("stroke", color)
+        .attr("stroke-width", strokeWidth);
+
+      boxLayer
+        .append("rect")
+        .attr("x", center - boxWidth / 2)
+        .attr("y", y(row.q3))
+        .attr("width", boxWidth)
+        .attr("height", Math.max(2, y(row.q1) - y(row.q3)))
+        .attr("fill", fillColor ? `${fillColor}` : color)
+        .attr("stroke", color)
+        .attr("stroke-width", strokeWidth);
+
+      boxLayer
+        .append("line")
+        .attr("x1", center - boxWidth / 2)
+        .attr("x2", center + boxWidth / 2)
+        .attr("y1", y(row.median))
+        .attr("y2", y(row.median))
+        .attr("stroke", color)
+        .attr("stroke-width", strokeWidth + 0.2);
+
+      boxLayer
+        .append("rect")
+        .attr("x", bandX)
+        .attr("y", margin.top)
+        .attr("width", x.bandwidth())
+        .attr("height", height - margin.top - margin.bottom)
+        .attr("fill", "transparent")
+        .style("cursor", "pointer")
+        .on("mouseenter", (event) => {
+          showStoryTooltip(
+            event,
+            `<strong>${row.region}</strong><br/><span>Countries: ${formatInteger(row.count)}</span><br/><span>Median: ${formatValueWithUnit(
+              row.median,
+              "births per 1,000 women ages 15-19",
+            )}</span><br/><span>IQR: ${formatValue(row.q1)} to ${formatValue(row.q3)}</span><br/><span>Whiskers: ${formatValue(
+              row.min,
+            )} to ${formatValue(row.max)}</span>`,
+          );
+        })
+        .on("mousemove", moveStoryTooltip)
+        .on("mouseleave", hideStoryTooltip);
+
+      boxLayer
+        .append("g")
+        .selectAll("circle")
+        .data(row.outliers.map((value, index) => ({ value, index })))
+        .join("circle")
+        .attr("cx", ({ index }) => center + ((stableHash(`${row.region}-${index}`) % 1000) / 1000 - 0.5) * boxWidth * 0.42)
+        .attr("cy", (point) => y(point.value))
+        .attr("r", 3.2)
+        .attr("fill", color)
+        .attr("opacity", 0.85)
+        .style("cursor", "pointer")
+        .on("mouseenter", (event, point) => {
+          showStoryTooltip(
+            event,
+            `<strong>${row.region}</strong><br/><span>Outlier: ${formatValueWithUnit(
+              point.value,
+              "births per 1,000 women ages 15-19",
+            )}</span>`,
+          );
+        })
+        .on("mousemove", moveStoryTooltip)
+        .on("mouseleave", hideStoryTooltip);
+    });
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 8)
+      .attr("class", "story-axis-label")
+      .text("Adolescent fertility (births per 1,000 women ages 15-19)");
+  }
+
+  function drawStoryWomenWorkChart() {
+    const svg = d3.select("#story-work-chart");
+    const width = 660;
+    const height = 500;
+    const margin = { top: 28, right: 72, bottom: 130, left: 74 };
+
+    svg.selectAll("*").remove();
+    if (!state.story.latestLaborRows.length || !state.story.latestTfrRows.length) return;
+
+    const laborByRegion = averageBy(state.story.latestLaborRows, "region");
+    const tfrByRegion = averageBy(state.story.latestTfrRows, "region");
+    const rows = (state.meta.regions || [])
+      .map((region) => ({
+        region,
+        labor: laborByRegion.get(region),
+        tfr: tfrByRegion.get(region),
+      }))
+      .filter((row) => Number.isFinite(row.labor) && Number.isFinite(row.tfr))
+      .sort((a, b) => d3.ascending(a.labor, b.labor));
+
+    if (!rows.length) return;
+
+    const x = d3
+      .scaleBand()
+      .domain(rows.map((row) => row.region))
+      .range([margin.left, width - margin.right])
+      .paddingInner(0.18)
+      .paddingOuter(0.08);
+    const yLeft = d3
+      .scaleLinear()
+      .domain([0, (d3.max(rows, (row) => row.labor) || 1) + 6])
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+    const yRight = d3
+      .scaleLinear()
+      .domain([0, (d3.max(rows, (row) => row.tfr) || 1) + 0.45])
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    svg
+      .append("rect")
+      .attr("x", margin.left)
+      .attr("y", margin.top)
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("rx", 12)
+      .attr("fill", "#eef4ef");
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(yLeft).ticks(5).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove());
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).tickFormat((value) => value.replace(MENA_REGION, "MENA, Afghanistan & Pakistan")))
+      .selectAll("text")
+      .attr("transform", "rotate(-22)")
+      .style("text-anchor", "end");
+
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(yLeft).ticks(5));
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(${width - margin.right},0)`)
+      .call(d3.axisRight(yRight).ticks(5));
+
+    svg
+      .append("g")
+      .selectAll("rect")
+      .data(rows)
+      .join("rect")
+      .attr("x", (row) => x(row.region))
+      .attr("y", (row) => yLeft(row.labor))
+      .attr("width", x.bandwidth())
+      .attr("height", (row) => yLeft(0) - yLeft(row.labor))
+      .attr("fill", (row) => (row.region === MENA_REGION ? "#145f4a" : "#93c0ae"))
+      .attr("opacity", (row) => (row.region === MENA_REGION ? 0.98 : 0.84))
+      .attr("rx", 8);
+
+    const line = d3
+      .line()
+      .x((row) => x(row.region) + x.bandwidth() / 2)
+      .y((row) => yRight(row.tfr))
+      .curve(d3.curveMonotoneX);
+
+    svg
+      .append("path")
+      .datum(rows)
+      .attr("fill", "none")
+      .attr("stroke", "#b14d2f")
+      .attr("stroke-width", 2.6)
+      .attr("d", line);
+
+    svg
+      .append("g")
+      .selectAll("circle")
+      .data(rows)
+      .join("circle")
+      .attr("cx", (row) => x(row.region) + x.bandwidth() / 2)
+      .attr("cy", (row) => yRight(row.tfr))
+      .attr("r", (row) => (row.region === MENA_REGION ? 5.2 : 4.1))
+      .attr("fill", "#b14d2f")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 1.6);
+
+    const focusDot = svg
+      .append("circle")
+      .attr("class", "chart-hover-point")
+      .attr("r", 5.2)
+      .attr("stroke", "#b14d2f")
+      .style("display", "none");
+
+    svg
+      .append("g")
+      .selectAll("rect.interaction")
+      .data(rows)
+      .join("rect")
+      .attr("class", "interaction")
+      .attr("x", (row) => x(row.region))
+      .attr("y", margin.top)
+      .attr("width", x.bandwidth())
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("fill", "transparent")
+      .style("cursor", "pointer")
+      .on("mouseenter", (event, row) => {
+        focusDot
+          .style("display", null)
+          .attr("cx", x(row.region) + x.bandwidth() / 2)
+          .attr("cy", yRight(row.tfr));
+        showStoryTooltip(
+          event,
+          `<strong>${row.region}</strong><br/><span>Female labor force participation: ${formatValueWithUnit(
+            row.labor,
+            "% ages 15+",
+          )}</span><br/><span>TFR: ${formatValueWithUnit(row.tfr, "births per woman")}</span>`,
+        );
+      })
+      .on("mousemove", moveStoryTooltip)
+      .on("mouseleave", () => {
+        focusDot.style("display", "none");
+        hideStoryTooltip();
+      });
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 10)
+      .attr("class", "story-axis-label")
+      .text("Female labor force participation (% ages 15+)");
+
+    svg
+      .append("text")
+      .attr("x", width - margin.right)
+      .attr("y", margin.top - 10)
+      .attr("text-anchor", "end")
+      .attr("class", "story-axis-label")
+      .text("TFR (births per woman)");
+
+    renderStoryLegend("story-work-legend", [
+      { label: "Female labor force participation", color: "#93c0ae" },
+      { label: "TFR", color: "#b14d2f" },
+      { label: "Highlighted: MENA, Afghanistan & Pakistan", color: "#145f4a" },
+    ]);
   }
 
   function drawStoryIncomeChart() {
@@ -1810,9 +3096,9 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
   function drawStoryDeclineChart() {
     const svg = d3.select("#story-decline-chart");
-    const width = 700;
-    const height = 360;
-    const margin = { top: 20, right: 18, bottom: 28, left: 210 };
+    const width = 660;
+    const height = 500;
+    const margin = { top: 24, right: 18, bottom: 32, left: 186 };
     svg.selectAll("*").remove();
 
     const firstRows = state.story.tfrRowsByYear.get(state.story.firstYear) || [];
@@ -1841,7 +3127,7 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
     const x = d3
       .scaleLinear()
-      .domain([0, d3.max(declines, (d) => d.drop) || 1])
+      .domain([0, d3.max(declines, (d) => Math.max(d.firstValue, d.latestValue)) || 1])
       .nice()
       .range([margin.left, width - margin.right]);
     const y = d3
@@ -1864,17 +3150,30 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       .join("rect")
       .attr("x", margin.left)
       .attr("y", (d) => y(d.name))
-      .attr("width", (d) => x(d.drop) - margin.left)
+      .attr("width", (d) => x(d.firstValue) - margin.left)
       .attr("height", y.bandwidth())
+      .attr("fill", "#dbe7e1")
+      .attr("stroke", "#bfd4ca");
+
+    svg
+      .append("g")
+      .selectAll("rect.latest")
+      .data(declines)
+      .join("rect")
+      .attr("class", "latest")
+      .attr("x", margin.left)
+      .attr("y", (d) => y(d.name) + y.bandwidth() * 0.18)
+      .attr("width", (d) => x(d.latestValue) - margin.left)
+      .attr("height", y.bandwidth() * 0.64)
       .attr("fill", "#2f8d71")
-      .attr("opacity", 0.88);
+      .attr("opacity", 0.94);
 
     svg
       .append("g")
       .selectAll("text.value")
       .data(declines)
       .join("text")
-      .attr("x", (d) => x(d.drop) + 6)
+      .attr("x", (d) => x(d.firstValue) + 6)
       .attr("y", (d) => y(d.name) + y.bandwidth() / 2 + 4)
       .attr("class", "story-note")
       .text((d) => `-${formatValue(d.drop)}`);
@@ -1884,19 +3183,415 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       .attr("x", margin.left)
       .attr("y", margin.top - 8)
       .attr("class", "story-axis-label")
-      .text("TFR decline from first to latest year (births per woman)");
+      .text("TFR level: first year vs latest year (births per woman)");
+
+    renderStoryLegend("story-decline-legend", [
+      { label: `${state.story.firstYear}`, color: "#dbe7e1" },
+      { label: `${state.story.latestYear}`, color: "#2f8d71" },
+    ]);
 
     const list = el("story-decline-list");
     if (list) {
       list.innerHTML = "";
       declines.forEach((row) => {
         const item = document.createElement("li");
-        item.textContent = `${row.name}: ${formatValue(row.firstValue)} -> ${formatValue(row.latestValue)} (-${formatValue(
-          row.drop,
-        )} births per woman)`;
+        const explanation = DECLINE_EXPLANATIONS[row.iso3];
+        if (explanation) {
+          item.innerHTML = `<strong>${row.name}:</strong> ${explanation}`;
+        } else {
+          item.textContent = `${row.name}: ${state.story.firstYear} ${formatValue(row.firstValue)} -> ${state.story.latestYear} ${formatValue(
+            row.latestValue,
+          )} (-${formatValue(row.drop)} births per woman)`;
+        }
         list.appendChild(item);
       });
     }
+  }
+
+  function buildStoryCorrelationMatrix() {
+    const codes = panelIndicatorCodes().filter((code) => state.story.indicatorSeriesRows.has(code));
+    const valuesByCode = new Map(
+      codes.map((code) => {
+        const rows = state.story.indicatorSeriesRows.get(code) || [];
+        return [
+          code,
+          new Map(
+            rows
+              .map((row) => [`${row.iso3}-${row.year}`, normalizeCorrelationValue(code, row.value)])
+              .filter(([, value]) => value != null),
+          ),
+        ];
+      }),
+    );
+
+    const matrix = [];
+    codes.forEach((yCode) => {
+      codes.forEach((xCode) => {
+        const xValues = valuesByCode.get(xCode) || new Map();
+        const yValues = valuesByCode.get(yCode) || new Map();
+        const sharedKeys = Array.from(xValues.keys()).filter((key) => yValues.has(key));
+        const rows = sharedKeys.map((key) => ({
+          x: xValues.get(key),
+          y: yValues.get(key),
+        }));
+        const value = xCode === yCode ? (rows.length ? 1 : null) : pearsonCorrelation(rows, (row) => row.x, (row) => row.y);
+        matrix.push({
+          xCode,
+          yCode,
+          value,
+          count: rows.length,
+        });
+      });
+    });
+
+    state.story.correlationCodes = codes;
+    state.story.correlationMatrix = matrix;
+  }
+
+  function strongestStoryCorrelation() {
+    const order = new Map((state.story.correlationCodes || []).map((code, index) => [code, index]));
+    return state.story.correlationMatrix
+      .filter(
+        (cell) => cell.xCode !== cell.yCode && cell.value != null && (order.get(cell.xCode) || 0) < (order.get(cell.yCode) || 0),
+      )
+      .sort((a, b) => d3.descending(Math.abs(a.value), Math.abs(b.value)))[0];
+  }
+
+  function drawStoryCorrelationChart() {
+    const svg = d3.select("#story-correlation-chart");
+    const width = 660;
+    const height = 500;
+    const margin = { top: 108, right: 20, bottom: 20, left: 116 };
+
+    svg.selectAll("*").remove();
+
+    const codes = state.story.correlationCodes || [];
+    const matrix = state.story.correlationMatrix || [];
+    if (!codes.length || !matrix.length) return;
+
+    const x = d3.scaleBand().domain(codes).range([margin.left, width - margin.right]).paddingInner(0.04);
+    const y = d3.scaleBand().domain(codes).range([margin.top, height - margin.bottom]).paddingInner(0.04);
+    const color = d3
+      .scaleLinear()
+      .domain([-1, 0, 1])
+      .range(["#b14d2f", "#f7f4ed", "#1b7a63"])
+      .clamp(true);
+
+    const cells = svg.append("g");
+    cells
+      .selectAll("rect")
+      .data(matrix)
+      .join("rect")
+      .attr("x", (cell) => x(cell.xCode))
+      .attr("y", (cell) => y(cell.yCode))
+      .attr("width", x.bandwidth())
+      .attr("height", y.bandwidth())
+      .attr("rx", 4)
+      .attr("fill", (cell) => (cell.value == null ? "#eef3f0" : color(cell.value)))
+      .attr("stroke", "#d9e3de")
+      .style("cursor", "pointer")
+      .on("mouseenter", (event, cell) => {
+        const xMeta = indicatorMeta(cell.xCode);
+        const yMeta = indicatorMeta(cell.yCode);
+        const sampleLabel = state.story.correlationMode === "pooled" ? "country-year observations" : "countries";
+        showStoryTooltip(
+          event,
+          `<strong>${xMeta ? xMeta.label : cell.xCode}</strong> vs <strong>${yMeta ? yMeta.label : cell.yCode}</strong><br/><span>r = ${formatValue(
+            cell.value,
+          )}</span><br/><span>${formatInteger(cell.count)} ${sampleLabel}</span>`,
+        );
+      })
+      .on("mousemove", moveStoryTooltip)
+      .on("mouseleave", hideStoryTooltip);
+
+    svg
+      .append("g")
+      .selectAll("text")
+      .data(matrix.filter((cell) => cell.value != null))
+      .join("text")
+      .attr("x", (cell) => x(cell.xCode) + x.bandwidth() / 2)
+      .attr("y", (cell) => y(cell.yCode) + y.bandwidth() / 2 + 2.5)
+      .attr("text-anchor", "middle")
+      .attr("class", "story-correlation-value")
+      .attr("fill", (cell) => (Math.abs(cell.value) >= 0.42 ? "#ffffff" : "#26453c"))
+      .text((cell) => d3.format(".2f")(cell.value));
+
+    svg
+      .append("g")
+      .selectAll("text")
+      .data(codes)
+      .join("text")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("text-anchor", "start")
+      .attr("transform", (code) => `translate(${x(code) + x.bandwidth() / 2},${margin.top - 10}) rotate(-34)`)
+      .attr("class", "story-axis-label")
+      .text((code) => indicatorShortLabel(code))
+      .append("title")
+      .text((code) => (indicatorMeta(code) ? indicatorMeta(code).label : code));
+
+    svg
+      .append("g")
+      .selectAll("text")
+      .data(codes)
+      .join("text")
+      .attr("x", margin.left - 6)
+      .attr("y", (code) => y(code) + y.bandwidth() / 2 + 3.5)
+      .attr("text-anchor", "end")
+      .attr("class", "story-axis-label")
+      .text((code) => indicatorShortLabel(code))
+      .append("title")
+      .text((code) => (indicatorMeta(code) ? indicatorMeta(code).label : code));
+
+    const legendSteps = d3.range(-1, 1.001, 0.1);
+    const legendWidth = legendSteps.length * 9;
+    const legend = svg.append("g").attr("transform", `translate(${width - legendWidth - 18},20)`);
+    legend
+      .selectAll("rect")
+      .data(legendSteps)
+      .join("rect")
+      .attr("x", (_, index) => index * 9)
+      .attr("y", 0)
+      .attr("width", 9)
+      .attr("height", 8)
+      .attr("fill", (value) => color(value));
+
+    legend
+      .append("text")
+      .attr("x", 0)
+      .attr("y", -6)
+      .attr("class", "story-note")
+      .text("Pearson correlation");
+    legend
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 18)
+      .attr("class", "story-note")
+      .text("-1.0");
+    legend
+      .append("text")
+      .attr("x", legendWidth / 2)
+      .attr("y", 18)
+      .attr("class", "story-note")
+      .attr("text-anchor", "middle")
+      .text("0");
+    legend
+      .append("text")
+      .attr("x", legendWidth)
+      .attr("y", 18)
+      .attr("class", "story-note")
+      .attr("text-anchor", "end")
+      .text("+1.0");
+  }
+
+  function describeStoryCountry(story, config) {
+    if (!story) return "Country story unavailable.";
+
+    const tfrPoints = (story.series.tfr || []).map((point) => ({ year: Number(point.year), value: Number(point.value) }));
+    const populationPoints = (story.series.population_change || []).map((point) => ({
+      year: Number(point.year),
+      value: Number(point.value),
+    }));
+
+    const last = lastFinitePoint(tfrPoints);
+    if (!last) return "Country story unavailable.";
+
+    if (config.iso3 === "RUS") {
+      const preShock = findPointByYear(tfrPoints, 1990) || firstFinitePoint(tfrPoints);
+      const trough = tfrPoints.reduce((lowest, point) => (point.value < lowest.value ? point : lowest), tfrPoints[0]);
+      const negativeTurn = populationPoints.find((point) => point.value < 0);
+      return `Russia shows a sharp break through the 1990s: TFR falls from ${formatValue(preShock.value)} in ${
+        preShock.year
+      } to ${formatValue(trough.value)} in ${trough.year}. Annual population change turns negative in ${
+        negativeTurn ? negativeTurn.year : "the 1990s"
+      }, and the latest TFR is ${formatValue(last.value)} in ${last.year}.`;
+    }
+
+    if (config.iso3 === "CHN") {
+      const start = findPointByYear(tfrPoints, 1970) || firstFinitePoint(tfrPoints);
+      const policyPoint = findPointByYear(tfrPoints, config.markerYear) || firstFinitePoint(tfrPoints);
+      const belowReplacement = tfrPoints.find((point) => point.value < 2.1);
+      const negativeTurn = populationPoints.find((point) => point.value < 0);
+      return `China moves from ${formatValue(start.value)} births per woman in ${start.year} to ${formatValue(
+        policyPoint.value,
+      )} in ${policyPoint.year}. The line drops below replacement in ${
+        belowReplacement ? belowReplacement.year : "the early 1990s"
+      }, and annual population change turns negative in ${negativeTurn ? negativeTurn.year : "the 2020s"}.`;
+    }
+
+    return `${story.name || config.title} ends at ${formatValue(last.value)} births per woman in ${last.year}.`;
+  }
+
+  function drawStoryCountryChart(svgId, story, config) {
+    const svg = d3.select(svgId);
+    const width = 460;
+    const height = 220;
+    const margin = { top: 20, right: 18, bottom: 34, left: 46 };
+    svg.selectAll("*").remove();
+
+    if (!story) return;
+
+    const points = (story.series.tfr || [])
+      .map((point) => ({ year: Number(point.year), value: Number(point.value) }))
+      .filter((point) => Number.isFinite(point.year) && Number.isFinite(point.value));
+    if (!points.length) return;
+
+    const x = d3
+      .scaleLinear()
+      .domain(d3.extent(points, (point) => point.year))
+      .range([margin.left, width - margin.right]);
+    const y = d3
+      .scaleLinear()
+      .domain(d3.extent(points, (point) => point.value))
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    svg
+      .append("g")
+      .attr("class", "story-gridline")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(4).tickSize(-(width - margin.left - margin.right)).tickFormat(""))
+      .call((g) => g.select(".domain").remove());
+
+    if (config.focusEndYear) {
+      svg
+        .append("rect")
+        .attr("x", x(config.markerYear))
+        .attr("y", margin.top)
+        .attr("width", x(config.focusEndYear) - x(config.markerYear))
+        .attr("height", height - margin.top - margin.bottom)
+        .attr("fill", config.accent)
+        .attr("opacity", 0.08);
+    }
+
+    svg
+      .append("line")
+      .attr("x1", x(config.markerYear))
+      .attr("x2", x(config.markerYear))
+      .attr("y1", margin.top)
+      .attr("y2", height - margin.bottom)
+      .attr("stroke", config.accent)
+      .attr("stroke-dasharray", "5 4")
+      .attr("opacity", 0.7);
+
+    svg
+      .append("text")
+      .attr("x", x(config.markerYear) + 6)
+      .attr("y", margin.top + 10)
+      .attr("class", "story-note")
+      .text(`${config.markerYear}: ${config.markerLabel}`);
+
+    svg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format("d")));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(4));
+
+    svg
+      .append("path")
+      .datum(points)
+      .attr("fill", "none")
+      .attr("stroke", config.accent)
+      .attr("stroke-width", 2.6)
+      .attr(
+        "d",
+        d3
+          .line()
+          .x((point) => x(point.year))
+          .y((point) => y(point.value))
+          .curve(d3.curveMonotoneX),
+      );
+
+    const hoverPoint = svg
+      .append("circle")
+      .attr("class", "chart-hover-point")
+      .attr("r", 4.5)
+      .attr("stroke", config.accent)
+      .style("display", "none");
+
+    const trough = points.reduce((lowest, point) => (point.value < lowest.value ? point : lowest), points[0]);
+    const last = lastFinitePoint(points);
+    const highlightPoints =
+      last && trough.year === last.year && trough.value === last.value ? [trough] : [trough, last].filter(Boolean);
+
+    highlightPoints.forEach((point, index) => {
+      svg
+        .append("circle")
+        .attr("cx", x(point.year))
+        .attr("cy", y(point.value))
+        .attr("r", 4)
+        .attr("fill", config.accent);
+
+      svg
+        .append("text")
+        .attr("x", x(point.year) + (index ? -6 : 6))
+        .attr("y", y(point.value) - 8)
+        .attr("text-anchor", index ? "end" : "start")
+        .attr("class", "story-note")
+        .text(`${point.year}: ${formatValue(point.value)}`);
+    });
+
+    svg
+      .append("g")
+      .selectAll("circle")
+      .data(points)
+      .join("circle")
+      .attr("cx", (point) => x(point.year))
+      .attr("cy", (point) => y(point.value))
+      .attr("r", 8)
+      .attr("fill", "transparent")
+      .style("cursor", "pointer")
+      .on("mouseenter", (event, point) => {
+        hoverPoint.style("display", null).attr("cx", x(point.year)).attr("cy", y(point.value));
+        showStoryTooltip(
+          event,
+          `<strong>${config.title}</strong><br/><span>Year: ${point.year}</span><br/><span>TFR: ${formatValueWithUnit(
+            point.value,
+            "births per woman",
+          )}</span>`,
+        );
+      })
+      .on("mousemove", (event, point) => {
+        hoverPoint.style("display", null).attr("cx", x(point.year)).attr("cy", y(point.value));
+        moveStoryTooltip(event);
+      })
+      .on("mouseleave", () => {
+        hoverPoint.style("display", "none");
+        hideStoryTooltip();
+      });
+
+    svg
+      .append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 6)
+      .attr("class", "story-axis-label")
+      .text("TFR (births per woman)");
+  }
+
+  function renderStoryCountryFacts() {
+    const host = el("story-facts-grid");
+    if (!host) return;
+    host.innerHTML = "";
+
+    STORY_COUNTRY_CONFIGS.forEach((config) => {
+      const story = state.story.countryStories.get(config.iso3);
+      const article = document.createElement("article");
+      article.className = "story-fact-card";
+      const footnote =
+        config.iso3 === "CHN" ? `<p class="story-fact-footnote">${CHINA_ONE_CHILD_FOOTNOTE}</p>` : "";
+      article.innerHTML = `
+        <div class="story-fact-copy">
+          <p class="story-fact-kicker">${story ? `${story.name} | ${story.region || "Country profile"}` : config.title}</p>
+          <h3>${config.title}</h3>
+          <p class="story-fact-text">${describeStoryCountry(story, config)}</p>
+          ${footnote}
+        </div>
+        <svg id="story-fact-chart-${config.iso3}" viewBox="0 0 460 220" class="story-fact-chart"></svg>
+      `;
+      host.appendChild(article);
+      drawStoryCountryChart(`#story-fact-chart-${config.iso3}`, story, config);
+    });
   }
 
   function renderStoryFindings() {
@@ -1937,44 +3632,78 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
           : `Inverse relationship is present (r=${formatValue(corr)}).`;
     setText("finding-gdp-link", corrText);
 
-    if (first && last) {
-      setText(
-        "story-global-summary",
-        `From ${first.year} to ${last.year}, global average TFR declined from ${formatValue(first.globalAvg)} to ${formatValue(
-          last.globalAvg,
-        )} births per woman.`,
-      );
-    }
-
     if (last) {
       const topRegion = Array.from(last.byRegion.entries()).sort((a, b) => d3.descending(a[1], b[1]))[0];
       if (topRegion) {
         setText(
           "story-region-summary",
-          `In the latest year (${state.story.latestYear}), the highest regional average TFR is in ${topRegion[0]}: ${formatValueWithUnit(
-            topRegion[1],
-            "births per woman",
+          `Each line shows the regional average by year. In ${state.story.latestYear}, the highest regional average TFR is still in ${
+            topRegion[0]
+          } at ${formatValueWithUnit(topRegion[1], "births per woman")}.`,
+        );
+      }
+    }
+
+    if (state.story.latestAdolescentRows.length) {
+      const adolescentStats = d3
+        .groups(
+          state.story.latestAdolescentRows.filter(
+            (row) => row.region && row.region !== "Unknown" && Number.isFinite(toNumberOrNull(row.value)),
+          ),
+          (row) => row.region,
+        )
+        .map(([region, rows]) => ({
+          region,
+          summary: boxPlotStats(rows.map((row) => Number(row.value))),
+        }))
+        .filter((row) => row.summary)
+        .sort((a, b) => d3.descending(a.summary.median, b.summary.median));
+
+      if (adolescentStats.length) {
+        const africa = adolescentStats.find((row) => row.region === "Sub-Saharan Africa") || adolescentStats[0];
+        setText(
+          "story-adolescent-summary",
+          `Box plots compare country-level adolescent fertility in ${state.story.latestYear}. Sub-Saharan Africa stands out most clearly, with the highest regional median at ${formatValueWithUnit(
+            africa.summary.median,
+            "births per 1,000 women ages 15-19",
           )}.`,
         );
       }
     }
 
-    if (highIncome != null && lowIncome != null) {
-      setText(
-        "story-income-summary",
-        `The gap between Low income and High income in ${state.story.latestYear} is ${formatValue(
-          lowIncome - highIncome,
-        )} births per woman.`,
-      );
+    if (state.story.latestLaborRows.length && state.story.latestTfrRows.length) {
+      const laborByRegion = averageBy(state.story.latestLaborRows, "region");
+      const tfrByRegion = averageBy(state.story.latestTfrRows, "region");
+      const menaLabor = laborByRegion.get(MENA_REGION);
+      const menaTfr = tfrByRegion.get(MENA_REGION);
+      if (Number.isFinite(menaLabor) && Number.isFinite(menaTfr)) {
+        setText(
+          "story-work-summary",
+          `Bars show average female labor force participation by region in ${state.story.latestYear}, while the line shows regional TFR. ${MENA_REGION} is highlighted because it combines only ${formatValueWithUnit(
+            menaLabor,
+            "% ages 15+",
+          )} in women's labor force participation with ${formatValueWithUnit(menaTfr, "births per woman")} in TFR.`,
+        );
+      }
     }
 
-    const corrEdu = state.story.correlations.enrollmentVsAdolescent;
-    if (corrEdu != null) {
+    setText(
+      "story-decline-summary",
+      `Countries are sorted by total TFR decline from ${state.story.firstYear} to ${state.story.latestYear}. The pale bar shows the starting level and the dark bar shows where it ended.`,
+    );
+
+    const strongestCorr = strongestStoryCorrelation();
+    if (strongestCorr) {
+      const summaryPrefix =
+        state.story.correlationMode === "pooled"
+          ? `The matrix is based on all available country-year observations from ${state.story.firstYear} to ${state.story.latestYear}.`
+          : `The matrix is currently based on country values in ${state.story.latestYear} because the extended all-years endpoint is unavailable.`;
+      const relationshipLabel = state.story.correlationMode === "pooled" ? "strongest pooled relationship" : "strongest latest-year relationship";
       setText(
-        "story-education-scatter-summary",
-        `At country level, there is an inverse relationship between female secondary enrollment and adolescent fertility (r=${formatValue(
-          corrEdu,
-        )}).`,
+        "story-correlation-summary",
+        `${summaryPrefix} The ${relationshipLabel} is between ${
+          indicatorShortLabel(strongestCorr.xCode)
+        } and ${indicatorShortLabel(strongestCorr.yCode)} (r=${formatValue(strongestCorr.value)}). GDP per capita and women ages 15-49 are log-scaled for readability.`,
       );
     }
   }
@@ -2063,24 +3792,75 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       state.story.latestYear = years[years.length - 1];
       state.story.latestTfrRows = state.story.tfrRowsByYear.get(state.story.latestYear) || [];
 
-      const [gdpLatest, enrollmentLatest, adolescentLatest] = await Promise.all([
-        fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: "gdp_per_capita" })),
-        fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: "female_secondary_enrollment" })),
-        fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: "adolescent_fertility" })),
-      ]);
+      const tfrAllRows = tfrSeriesRaw.flatMap((response, index) =>
+        (response.rows || []).map((row) => ({
+          ...row,
+          year: years[index],
+        })),
+      );
 
-      state.story.latestGdpRows = gdpLatest.rows || [];
-      state.story.latestEnrollmentRows = enrollmentLatest.rows || [];
-      state.story.latestAdolescentRows = adolescentLatest.rows || [];
+      const latestIndicatorResponses = await Promise.all(
+        state.indicators.map(async (item) => {
+          if (item.code === "tfr") return [item.code, state.story.latestTfrRows];
+          const response = await fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: item.code }));
+          return [item.code, response.rows || []];
+        }),
+      );
 
-      const latestTfrByIso = new Map(state.story.latestTfrRows.map((row) => [row.iso3, row]));
-      const corrRowsGdp = state.story.latestGdpRows
+      state.story.latestIndicatorRows = new Map(latestIndicatorResponses);
+
+      try {
+        const indicatorResponses = await Promise.all(
+          state.indicators.map(async (item) => {
+            if (item.code === "tfr") return [item.code, tfrAllRows];
+            const response = await fetchJSON(
+              buildApiUrl("/indicator-series", {
+                indicator: item.code,
+                min_year: state.story.firstYear,
+                max_year: state.story.latestYear,
+              }),
+            );
+            return [item.code, response.rows || []];
+          }),
+        );
+
+        state.story.indicatorSeriesRows = new Map(indicatorResponses);
+        state.story.correlationMode = "pooled";
+      } catch (seriesError) {
+        console.warn("Falling back to latest-year correlations because /indicator-series is unavailable.", seriesError);
+        state.story.indicatorSeriesRows = new Map(
+          latestIndicatorResponses.map(([code, rows]) => [
+            code,
+            rows.map((row) => ({
+              ...row,
+              year: state.story.latestYear,
+            })),
+          ]),
+        );
+        state.story.correlationMode = "latest";
+      }
+
+      const latestGdpRows = state.story.latestIndicatorRows.get("gdp_per_capita") || [];
+      const latestEnrollmentRows = state.story.latestIndicatorRows.get("female_secondary_enrollment") || [];
+      const latestAdolescentRows = state.story.latestIndicatorRows.get("adolescent_fertility") || [];
+      const latestLaborRows = state.story.latestIndicatorRows.get("female_labor_force_participation") || [];
+      state.story.latestGdpRows = latestGdpRows;
+      state.story.latestEnrollmentRows = latestEnrollmentRows;
+      state.story.latestAdolescentRows = latestAdolescentRows;
+      state.story.latestLaborRows = latestLaborRows;
+      const tfrByCountryYear = new Map(
+        tfrAllRows
+          .map((row) => [`${row.iso3}-${row.year}`, toNumberOrNull(row.value)])
+          .filter(([, value]) => value != null),
+      );
+
+      const corrRowsGdp = (state.story.indicatorSeriesRows.get("gdp_per_capita") || [])
         .map((row) => {
-          const tfr = latestTfrByIso.get(row.iso3);
-          if (!tfr) return null;
+          const tfr = tfrByCountryYear.get(`${row.iso3}-${row.year}`);
+          if (tfr == null) return null;
           return {
             gdp: toNumberOrNull(row.value),
-            tfr: toNumberOrNull(tfr.value),
+            tfr,
           };
         })
         .filter((row) => row && row.gdp != null && row.gdp > 0 && row.tfr != null)
@@ -2092,13 +3872,17 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
         (row) => row.tfr,
       );
 
-      const enrollmentByIso = new Map(state.story.latestEnrollmentRows.map((row) => [row.iso3, row]));
-      const corrRowsEducation = state.story.latestAdolescentRows
+      const enrollmentByCountryYear = new Map(
+        (state.story.indicatorSeriesRows.get("female_secondary_enrollment") || [])
+          .map((row) => [`${row.iso3}-${row.year}`, toNumberOrNull(row.value)])
+          .filter(([, value]) => value != null),
+      );
+      const corrRowsEducation = (state.story.indicatorSeriesRows.get("adolescent_fertility") || [])
         .map((row) => {
-          const enrollment = enrollmentByIso.get(row.iso3);
-          if (!enrollment) return null;
+          const enrollment = enrollmentByCountryYear.get(`${row.iso3}-${row.year}`);
+          if (enrollment == null) return null;
           return {
-            enrollment: toNumberOrNull(enrollment.value),
+            enrollment,
             adolescent: toNumberOrNull(row.value),
           };
         })
@@ -2110,13 +3894,28 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
         (row) => row.adolescent,
       );
 
-      state.story.ready = true;
+      const countryStoryResponses = await Promise.all(
+        STORY_COUNTRY_CONFIGS.map(async (config) => {
+          const response = await fetchJSON(buildApiUrl(`/country/${config.iso3}/timeseries`, { indicators: "tfr,population_change" }));
+          return [config.iso3, response];
+        }),
+      );
+      state.story.countryStories = new Map(countryStoryResponses);
 
-      drawStoryGlobalChart();
+      buildStoryCorrelationMatrix();
+
+      state.story.ready = true;
+      populateStoryRecordsRegionSelect();
+
       drawStoryRegionChart();
-      drawStoryIncomeChart();
-      drawStoryScatters();
+      drawStoryRecordsChart();
+      drawStoryAdolescentChart();
+      drawStoryWomenWorkChart();
       drawStoryDeclineChart();
+      drawStoryCorrelationChart();
+      drawStoryShapChart();
+      drawStoryThemeBubbleChart();
+      renderStoryCountryFacts();
       renderStoryFindings();
     } catch (error) {
       console.error(error);
@@ -2198,6 +3997,14 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
       state.compareHiddenCountries.clear();
       await refreshCompareChart();
     });
+
+    const recordsRegionSelect = el("story-records-region-select");
+    if (recordsRegionSelect) {
+      recordsRegionSelect.addEventListener("change", (event) => {
+        state.story.recordsRegion = event.target.value;
+        drawStoryRecordsChart();
+      });
+    }
 
     el("close-panel").addEventListener("click", () => {
       state.selectedIso3 = null;

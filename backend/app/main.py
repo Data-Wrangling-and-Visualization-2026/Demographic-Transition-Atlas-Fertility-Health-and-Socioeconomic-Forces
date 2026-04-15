@@ -359,6 +359,72 @@ def get_map_data(
         raise HTTPException(status_code=503, detail="db not available") from exc
 
 
+@app.get("/indicator-series")
+def get_indicator_series(
+    indicator: str = Query(..., min_length=1),
+    region: str | None = Query(None),
+    income_group: str | None = Query(None),
+    min_year: int | None = Query(None, ge=1900, le=2100),
+    max_year: int | None = Query(None, ge=1900, le=2100),
+) -> dict[str, Any]:
+    _fail_invalid_indicator(indicator)
+
+    stmt = text(
+        f"""
+        SELECT
+            year,
+            country_iso3 AS iso3,
+            name,
+            region,
+            income_group,
+            {indicator} AS value
+        FROM atlas_country_year_imputed
+        WHERE {indicator} IS NOT NULL
+          AND (:region IS NULL OR region = :region)
+          AND (:income_group IS NULL OR income_group = :income_group)
+          AND (:min_year IS NULL OR year >= :min_year)
+          AND (:max_year IS NULL OR year <= :max_year)
+        ORDER BY year, name
+        """
+    )
+
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(
+                stmt,
+                {
+                    "region": region,
+                    "income_group": income_group,
+                    "min_year": min_year,
+                    "max_year": max_year,
+                },
+            ).mappings().all()
+
+        items = _rows_to_dict(rows)
+        years = [int(row["year"]) for row in items if row.get("year") is not None]
+        countries = {row["iso3"] for row in items if row.get("iso3")}
+
+        return {
+            "indicator": indicator,
+            "indicator_meta": INDICATORS[indicator],
+            "filters": {
+                "region": region,
+                "income_group": income_group,
+                "min_year": min_year,
+                "max_year": max_year,
+            },
+            "rows": items,
+            "summary": {
+                "country_year_points": len(items),
+                "countries_with_data": len(countries),
+                "min_year": min(years) if years else None,
+                "max_year": max(years) if years else None,
+            },
+        }
+    except SQLAlchemyError as exc:  # pragma: no cover
+        raise HTTPException(status_code=503, detail="db not available") from exc
+
+
 @app.get("/country/{iso3}/profile")
 def country_profile(
     iso3: str = Path(..., min_length=3, max_length=3),
