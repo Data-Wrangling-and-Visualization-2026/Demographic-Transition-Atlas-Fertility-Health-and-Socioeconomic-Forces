@@ -1745,24 +1745,6 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     node.textContent = value;
   }
 
-  async function fetchMapSeries(indicator, years, concurrency) {
-    const out = new Array(years.length);
-    let cursor = 0;
-    const workerCount = Math.min(concurrency, years.length);
-
-    async function worker() {
-      while (cursor < years.length) {
-        const index = cursor;
-        cursor += 1;
-        const year = years[index];
-        out[index] = await fetchJSON(buildApiUrl("/map-data", { year, indicator }));
-      }
-    }
-
-    await Promise.all(d3.range(workerCount).map(() => worker()));
-    return out;
-  }
-
   function drawStoryGlobalChart() {
     const svg = d3.select("#story-global-chart");
     const width = 980;
@@ -3793,13 +3775,31 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
     try {
       const minYear = Number(state.meta.min_year || 1970);
       const maxYear = Number(state.meta.max_year || 2024);
-      const years = createYearRange(minYear, maxYear);
+      const analytics = await fetchJSON(
+        buildApiUrl("/story/analytics", {
+          min_year: minYear,
+          max_year: maxYear,
+          indicators: state.indicators.map((item) => item.code).join(","),
+          story_countries: STORY_COUNTRY_CONFIGS.map((config) => config.iso3).join(","),
+          country_indicators: "tfr,population_change",
+        }),
+      );
 
-      const tfrSeriesRaw = await fetchMapSeries("tfr", years, 8);
+      const years =
+        Array.isArray(analytics.years) && analytics.years.length
+          ? analytics.years.map((year) => Number(year)).filter(Number.isFinite)
+          : createYearRange(minYear, maxYear);
 
-      const tfrByYear = tfrSeriesRaw.map((response, index) => {
-        const year = years[index];
-        const rows = response.rows || [];
+      if (!years.length) throw new Error("No story years returned from /story/analytics.");
+
+      const tfrSeriesRaw = (analytics.tfr_map_series || []).map((entry) => ({
+        year: Number(entry.year),
+        rows: Array.isArray(entry.rows) ? entry.rows : [],
+      }));
+
+      const tfrRowsByYear = new Map(tfrSeriesRaw.map((entry) => [entry.year, entry.rows]));
+      const tfrByYear = years.map((year) => {
+        const rows = tfrRowsByYear.get(year) || [];
         return {
           year,
           globalAvg: mean(rows.map((row) => Number(row.value))),
@@ -3810,57 +3810,34 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
 
       state.story.yearSeries = years;
       state.story.tfrByYear = tfrByYear;
-      state.story.tfrRowsByYear = new Map(tfrSeriesRaw.map((response, index) => [years[index], response.rows || []]));
-      state.story.firstYear = years[0];
-      state.story.latestYear = years[years.length - 1];
+      state.story.tfrRowsByYear = tfrRowsByYear;
+      state.story.firstYear = Number(analytics.first_year ?? years[0]);
+      state.story.latestYear = Number(analytics.latest_year ?? years[years.length - 1]);
       state.story.latestTfrRows = state.story.tfrRowsByYear.get(state.story.latestYear) || [];
 
-      const tfrAllRows = tfrSeriesRaw.flatMap((response, index) =>
-        (response.rows || []).map((row) => ({
-          ...row,
-          year: years[index],
-        })),
-      );
-
-      const latestIndicatorResponses = await Promise.all(
-        state.indicators.map(async (item) => {
-          if (item.code === "tfr") return [item.code, state.story.latestTfrRows];
-          const response = await fetchJSON(buildApiUrl("/map-data", { year: state.story.latestYear, indicator: item.code }));
-          return [item.code, response.rows || []];
-        }),
-      );
-
+      const latestIndicatorRowsRaw = analytics.latest_indicator_rows || {};
+      const latestIndicatorResponses = state.indicators.map((item) => [
+        item.code,
+        Array.isArray(latestIndicatorRowsRaw[item.code]) ? latestIndicatorRowsRaw[item.code] : [],
+      ]);
       state.story.latestIndicatorRows = new Map(latestIndicatorResponses);
 
-      try {
-        const indicatorResponses = await Promise.all(
-          state.indicators.map(async (item) => {
-            if (item.code === "tfr") return [item.code, tfrAllRows];
-            const response = await fetchJSON(
-              buildApiUrl("/indicator-series", {
-                indicator: item.code,
-                min_year: state.story.firstYear,
-                max_year: state.story.latestYear,
-              }),
-            );
-            return [item.code, response.rows || []];
-          }),
-        );
+      const indicatorSeriesRowsRaw = analytics.indicator_series_rows || {};
+      const indicatorResponses = state.indicators.map((item) => [
+        item.code,
+        Array.isArray(indicatorSeriesRowsRaw[item.code]) ? indicatorSeriesRowsRaw[item.code] : [],
+      ]);
+      state.story.indicatorSeriesRows = new Map(indicatorResponses);
+      state.story.correlationMode = "pooled";
 
-        state.story.indicatorSeriesRows = new Map(indicatorResponses);
-        state.story.correlationMode = "pooled";
-      } catch (seriesError) {
-        console.warn("Falling back to latest-year correlations because /indicator-series is unavailable.", seriesError);
-        state.story.indicatorSeriesRows = new Map(
-          latestIndicatorResponses.map(([code, rows]) => [
-            code,
-            rows.map((row) => ({
-              ...row,
-              year: state.story.latestYear,
-            })),
-          ]),
+      let tfrAllRows = state.story.indicatorSeriesRows.get("tfr") || [];
+      if (!tfrAllRows.length) {
+        tfrAllRows = tfrSeriesRaw.flatMap((entry) =>
+          (entry.rows || []).map((row) => ({
+            ...row,
+            year: entry.year,
+          })),
         );
-        state.story.correlationMode = "latest";
       }
 
       const latestGdpRows = state.story.latestIndicatorRows.get("gdp_per_capita") || [];
@@ -3917,13 +3894,22 @@ const WORLD_TOPOJSON_PATH = "/assets/world-countries-110m.json";
         (row) => row.adolescent,
       );
 
-      const countryStoryResponses = await Promise.all(
-        STORY_COUNTRY_CONFIGS.map(async (config) => {
-          const response = await fetchJSON(buildApiUrl(`/country/${config.iso3}/timeseries`, { indicators: "tfr,population_change" }));
-          return [config.iso3, response];
+      const countryTimeseriesRaw = analytics.country_timeseries || {};
+      state.story.countryStories = new Map(
+        STORY_COUNTRY_CONFIGS.map((config) => {
+          const fallback = {
+            iso3: config.iso3,
+            name: config.iso3,
+            region: null,
+            income_group: null,
+            series: {
+              tfr: [],
+              population_change: [],
+            },
+          };
+          return [config.iso3, countryTimeseriesRaw[config.iso3] || fallback];
         }),
       );
-      state.story.countryStories = new Map(countryStoryResponses);
 
       buildStoryCorrelationMatrix();
 
