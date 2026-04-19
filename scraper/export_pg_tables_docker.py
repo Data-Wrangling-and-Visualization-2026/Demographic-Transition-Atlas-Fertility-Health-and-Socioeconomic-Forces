@@ -16,7 +16,6 @@ TABLES = [
     "dim_country",
     "dim_indicator",
     "fact_indicator_value",
-    "raw_in_wpp",
 ]
 
 def main() -> None:

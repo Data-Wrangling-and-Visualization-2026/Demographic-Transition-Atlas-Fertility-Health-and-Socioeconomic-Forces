@@ -1,21 +1,24 @@
-# Scraper Project
+# Scraper / Data Pipeline
 
-## Структура проекта
+This directory contains ingestion, transformation, and validation scripts for demographic datasets.
 
-- `main.py` - проверка подключения к базам данных
-- `scheduler.py` - планировщик запуска пауков
-- `scrapy.cfg` - конфигурация Scrapy
-- `scraper/` - основной модуль Scrapy
-  - `settings.py` - настройки Scrapy
-  - `items.py` - модели данных
-  - `pipelines.py` - обработка данных (сохранение в MongoDB)
-  - `spiders/` - папка с пауками
-    - `base_spider.py` - шаблон для создания новых пауков
-- `requirements.txt` - зависимости проекта
-- `Dockerfile` - инструкция для Docker
+## What is used now
 
-## Как запустить тестового паука
+- `scheduler.py` - runs `SCRAPER_COMMAND` on an interval (used by `docker-compose`).
+- `main.py` - service connectivity smoke-check command.
+- `pipeline/` - World Bank and UN ingestion/transformation scripts.
+- `export_pg_tables_docker.py` - optional CSV export from Postgres.
+- `data/`, `docs/` - artifacts and documentation for data processing.
+
+## Typical commands
 
 ```bash
-cd scraper
-scrapy crawl base_spider
+python scheduler.py
+python pipeline/ingest/ingest_wb_countries.py
+python pipeline/ingest/ingest_wb_indicators.py
+python pipeline/ingest/ingest_wb_raw.py
+python pipeline/transform/transform_wb_to_fact.py
+python pipeline/ingest/ingest_un_raw.py
+python pipeline/transform/transform_un_to_fact.py
+python pipeline/transform/load_un_to_marts.py
+```
