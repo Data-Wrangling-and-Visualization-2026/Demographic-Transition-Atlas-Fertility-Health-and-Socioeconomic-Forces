@@ -63,7 +63,7 @@ services:
       POSTGRES_USER: "dwv"
       POSTGRES_PASSWORD: "dwv"
       SCRAPE_INTERVAL_MINUTES: "60"
-      SCRAPER_COMMAND: "python main.py"
+      SCRAPER_COMMAND: "python -m pipeline.smoke_db"
       LOG_DIR: "/logs"
     volumes:
       - ./scraper:/app

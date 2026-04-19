@@ -5,7 +5,7 @@ This directory contains ingestion, transformation, and validation scripts for de
 ## What is used now
 
 - `scheduler.py` - runs `SCRAPER_COMMAND` on an interval (used by `docker-compose`).
-- `main.py` - service connectivity smoke-check command.
+- `pipeline/smoke_db.py` - Postgres connectivity smoke-check command.
 - `pipeline/` - World Bank and UN ingestion/transformation scripts.
 - `export_pg_tables_docker.py` - optional CSV export from Postgres.
 - `data/`, `docs/` - artifacts and documentation for data processing.
@@ -14,6 +14,7 @@ This directory contains ingestion, transformation, and validation scripts for de
 
 ```bash
 python scheduler.py
+python -m pipeline.smoke_db
 python pipeline/ingest/ingest_wb_countries.py
 python pipeline/ingest/ingest_wb_indicators.py
 python pipeline/ingest/ingest_wb_raw.py
