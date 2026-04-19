@@ -1,47 +1,105 @@
 # Demographic-Transition-Atlas-Fertility-Health-and-Socioeconomic-Forces
+Interactive web atlas for exploring fertility trends across countries and their relationship with socioeconomic and health indicators.
 
-## Idea (Elevator pitch)
-We are building an interactive web atlas to explore how fertility changes over time across countries and how it relates to socioeconomic and health indicators.  
-The app will let users select a country or a world map view, choose a year and indicators, and compare time-series trends. In the final stage we will add an “event layer” (news/policy context) to help explain major changes using AI-assisted parsing.
+## Live Demo
+The application is available online:
+https://demographylens.space/
+
+## Overview
+DemographyLens is an interactive web atlas designed to explore global fertility dynamics and their relationship with socioeconomic and health indicators.
+The platform enables users to analyze how demographic processes evolve across countries and over time, combining data from multiple authoritative sources such as the World Bank and the United Nations. By integrating heterogeneous datasets into a unified analytical model, the project provides a consistent country-year view of key indicators.
+Users can navigate through countries, compare trends, and identify significant shifts in fertility patterns. The system is built with a data-engineering-first approach, ensuring transparency through raw data storage, reproducible pipelines, and validated transformations.
+The project aims to bridge the gap between raw demographic data and intuitive exploration, supporting research, education, and data-driven insights into population dynamics.
+
+### Features
+- Explore countries on an interactive map
+- Analyze fertility trends over time  
+- View visualizations
+- Select time ranges
+- Cross-country comparison  
+
+## Local Setup
+### Prerequisites
+- Docker and Docker Compose
+- Git
+### Quick Start
+1. Clone the repository
+```bash
+git clone https://github.com/Data-Wrangling-and-Visualization-2026/Demographic-Transition-Atlas-Fertility-Health-and-Socioeconomic-Forces.git
+cd Demographic-Transition-Atlas-Fertility-Health-and-Socioeconomic-Forces
+```
+2. Start all services
+```bash
+docker compose up -d
+```
+3. Open the application
+- Frontend 
+```bash 
+cd frontend/public/assets
+python -m http.server 3000
+```
+http://localhost:3000
+- Backend
+API: http://localhost:8000
+
+Docs: http://localhost:8000/docs
+- PgAdmin
+http://localhost:5050
+
+## Project Structure
+- `backend/` — server-side logic and API
+- `db/` — database schema and initialization
+- `frontend/` — web interface (interactive atlas)
+- `logs/` — pipeline execution logs
+- `notebooks/` — data cleaning and exploratory analysis
+- `scraper/pipeline/` — data ingestion and transformation (World Bank, UN)
+- `docker-compose.yml` — infrastructure setup
 
 ## Data sources
 - **World Bank API** — country-level indicators (fertility, GDP, health expenditure, etc.)
 - **UN Population Data Portal / WPP** — demographic indicators (e.g., mean age of childbearing / maternal age)
-- **GDELT** — news/event context for selected country-year “change points”
 
 ## What we have implemented
-### Infrastructure
-- Dockerized environment with **PostgreSQL** (main storage) and **pgAdmin** for GUI inspection.
-- SQL schema initialized via `db/init.sql`.
+### Data Pipeline
+- Collected data from external sources (World Bank API, UN Population datasets)
+- Cleaned and standardized raw datasets into a unified format
+- Converted processed data into structured CSV files for loading
+### Database Layer
+- Designed relational schema for demographic and socioeconomic indicators
+- Created dimension tables for country and indicator metadata
+- Built a main fact table at the country-year level
+- Loaded processed CSV datasets into PostgreSQL
+### Backend System
+- Implemented REST API using FastAPI
+- Provides access to country profiles, time series, and map-ready datasets
+- Supports filtering by year, indicator, region, and income group
+### Frontend Application
+- Interactive web atlas built with Vanilla JavaScript
+- Data visualizations implemented using D3.js
+- Map-based exploration and time-series analysis
+- Cross-country comparison functionality
 
-### Database tables
-- `dim_country` — country dictionary (ISO3, name, region, income group)
-- `dim_indicator` — indicator dictionary (source, code, name)
-- `raw_ingest` — raw API payloads (JSONB) for provenance and debugging
-- `fact_indicator_value` — cleaned long-format table: (country_iso3, year, source, indicator_code, value)
+## Data Flow
 
-### World Bank ingestion pipeline (API-first)
-- Loaded **217 countries** into `dim_country` (filtered out aggregates).
-- Selected an MVP set of World Bank indicators and stored them in `dim_indicator`.
-- Downloaded World Bank indicator data **page-by-page** into `raw_ingest` (currently ~696 raw pages).
-- Transformed raw pages into the clean fact table `fact_indicator_value` (currently **135,720 rows**).
-- Generated validation/EDA reports:
-  - `docs/validation_wb.md`
-  - `docs/change_points_fertility.csv` (top fertility change points to be used later for GDELT events)
+1. Scraper collects raw data from external APIs
+2. Data is transformed and cleaned
+3. Data is loaded into PostgreSQL
+4. Backend queries optimized tables
+5. Frontend requests data via REST API
+6. User interacts with interactive map and charts
 
-### UN Data Portal integration (multi-source pipeline)
-- Implemented UN API client (`get_indicators`, `get_locations`, `get_data`) and country reconciliation support.
-- Downloaded UN data in batches and stored **raw payloads** in `raw_ingest` (`source='un'`).
-- Transformed UN raw payloads into `fact_indicator_value` (`source='un'`) using an MVP slice (consistent “one value per country-year” logic).
-- Result: **~12k cleaned UN rows** in `fact_indicator_value`, demonstrating a working **multi-source** pipeline (World Bank + UN) with unified country-year facts.
+## Tech Stack
+Backend:
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
 
-## Project structure (high level)
-- `docker-compose.yml` — services (postgres, pgadmin, scraper container)
-- `db/init.sql` — database schema
-- `scraper/pipeline/` — ingestion + transforms (WB now; UN/GDELT next)
-- `docs/` — reports and audit-friendly artifacts (validation, change points, etc.)
+Frontend:
+- Vanilla JS
+- D3.js
+- TopoJSON
+- Fetch API
 
-## How to run (local)
-### 1) Start services
-```bash
-docker compose up -d
+Infrastructure:
+- Docker
+- Docker Compose
