@@ -43,3 +43,7 @@ __pycache__/
 .venv/
 .env
 .profiles_settings.xml
+
+# local runtime artifacts (do not commit)
+/backups/
+/docs/

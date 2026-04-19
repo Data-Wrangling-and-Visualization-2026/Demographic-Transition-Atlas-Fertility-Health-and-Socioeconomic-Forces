@@ -169,6 +169,23 @@ def build_indicator_query(indicators):
 
     return "SELECT " + ", ".join(parts) + " FROM atlas_country_year_imputed"
 
+
+def _parse_csv_list(raw: str | None) -> list[str]:
+    if not raw:
+        return []
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+def _unique_preserve_order(items: list[str]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        out.append(item)
+    return out
+
 def register_routes(app: FastAPI):
     @app.get("/")
     def root():
@@ -687,6 +704,201 @@ def register_routes(app: FastAPI):
             }
         except SQLAlchemyError as exc:  # pragma: no cover
             raise HTTPException(status_code=503, detail="db not available") from exc
+
+
+    @app.get("/story/analytics")
+    def story_analytics(
+        min_year: int | None = Query(None, ge=1900, le=2100),
+        max_year: int | None = Query(None, ge=1900, le=2100),
+        indicators: str | None = Query(None, description="Comma-separated indicator list"),
+        story_countries: str | None = Query("RUS,CHN", description="Comma-separated ISO3 list"),
+        country_indicators: str | None = Query(
+            "tfr,population_change",
+            description="Comma-separated indicator list for story country cards",
+        ),
+    ) -> dict[str, Any]:
+        indicator_codes = _unique_preserve_order(_parse_csv_list(indicators) or list(INDICATORS.keys()))
+        country_indicator_codes = _unique_preserve_order(_parse_csv_list(country_indicators) or ["tfr", "population_change"])
+        story_iso3_list = _unique_preserve_order([iso.upper() for iso in _parse_csv_list(story_countries)])
+        story_iso3_set = set(story_iso3_list)
+
+        invalid = [code for code in indicator_codes + country_indicator_codes if code not in INDICATORS]
+        if invalid:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "message": f"Unknown indicators: {', '.join(sorted(set(invalid)))}",
+                    "allowed_indicators": sorted(INDICATORS.keys()),
+                },
+            )
+
+        select_indicator_codes = _unique_preserve_order(indicator_codes + country_indicator_codes)
+        indicator_cols = ", ".join(select_indicator_codes)
+
+        where_parts: list[str] = []
+        params: dict[str, Any] = {}
+        if min_year is not None:
+            where_parts.append("year >= :min_year")
+            params["min_year"] = min_year
+        if max_year is not None:
+            where_parts.append("year <= :max_year")
+            params["max_year"] = max_year
+        where_clause = f"WHERE {' AND '.join(where_parts)}" if where_parts else ""
+
+        stmt = text(
+            f"""
+            SELECT
+                year,
+                country_iso3 AS iso3,
+                name,
+                region,
+                income_group,
+                {indicator_cols}
+            FROM atlas_country_year_imputed
+            {where_clause}
+            ORDER BY year, country_iso3
+            """
+        )
+
+        try:
+            with engine.connect() as conn:
+                rows = conn.execute(stmt, params).mappings().all()
+        except SQLAlchemyError as exc:  # pragma: no cover
+            raise HTTPException(status_code=503, detail="db not available") from exc
+
+        if not rows:
+            return {
+                "first_year": None,
+                "latest_year": None,
+                "years": [],
+                "tfr_map_series": [],
+                "latest_indicator_rows": {code: [] for code in indicator_codes},
+                "indicator_series_rows": {code: [] for code in indicator_codes},
+                "country_timeseries": {
+                    iso3: {
+                        "iso3": iso3,
+                        "name": iso3,
+                        "region": None,
+                        "income_group": None,
+                        "series": {code: [] for code in country_indicator_codes},
+                    }
+                    for iso3 in story_iso3_list
+                },
+            }
+
+        years = sorted({int(row["year"]) for row in rows if row.get("year") is not None})
+        first_year = years[0] if years else None
+        latest_year = years[-1] if years else None
+
+        indicator_series_rows: dict[str, list[dict[str, Any]]] = {code: [] for code in indicator_codes}
+        tfr_rows_by_year: dict[int, list[dict[str, Any]]] = {}
+
+        country_series: dict[str, dict[str, list[dict[str, float | int]]]] = {
+            iso3: {code: [] for code in country_indicator_codes}
+            for iso3 in story_iso3_list
+        }
+        country_latest_meta: dict[str, dict[str, Any]] = {}
+
+        for row in rows:
+            year = int(row["year"])
+            iso3 = str(row["iso3"]).upper() if row.get("iso3") else ""
+            base_map = {
+                "iso3": iso3,
+                "name": row.get("name"),
+                "region": row.get("region"),
+                "income_group": row.get("income_group"),
+            }
+
+            for code in indicator_codes:
+                value = _to_float_or_none(row.get(code))
+                if value is None:
+                    continue
+                indicator_series_rows[code].append(
+                    {
+                        "year": year,
+                        **base_map,
+                        "value": value,
+                    }
+                )
+
+                if code == "tfr":
+                    tfr_rows_by_year.setdefault(year, []).append(
+                        {
+                            **base_map,
+                            "value": value,
+                        }
+                    )
+
+            if iso3 in story_iso3_set:
+                prev_meta = country_latest_meta.get(iso3)
+                if prev_meta is None or year >= prev_meta["year"]:
+                    country_latest_meta[iso3] = {
+                        "year": year,
+                        "name": row.get("name"),
+                        "region": row.get("region"),
+                        "income_group": row.get("income_group"),
+                    }
+
+                for code in country_indicator_codes:
+                    value = _to_float_or_none(row.get(code))
+                    if value is None:
+                        continue
+                    country_series[iso3][code].append({"year": year, "value": value})
+
+        for code, code_rows in indicator_series_rows.items():
+            code_rows.sort(key=lambda r: (int(r["year"]), str(r.get("name") or ""), str(r.get("iso3") or "")))
+
+        for year_rows in tfr_rows_by_year.values():
+            year_rows.sort(key=lambda r: (str(r.get("name") or ""), str(r.get("iso3") or "")))
+
+        latest_indicator_rows: dict[str, list[dict[str, Any]]] = {}
+        for code, code_rows in indicator_series_rows.items():
+            latest_rows = []
+            for item in code_rows:
+                if int(item["year"]) != latest_year:
+                    continue
+                latest_rows.append(
+                    {
+                        "iso3": item["iso3"],
+                        "name": item["name"],
+                        "region": item["region"],
+                        "income_group": item["income_group"],
+                        "value": item["value"],
+                    }
+                )
+            latest_indicator_rows[code] = latest_rows
+
+        tfr_map_series = [
+            {
+                "year": year,
+                "rows": tfr_rows_by_year.get(year, []),
+            }
+            for year in years
+        ]
+
+        country_timeseries: dict[str, dict[str, Any]] = {}
+        for iso3 in story_iso3_list:
+            for code in country_indicator_codes:
+                country_series[iso3][code].sort(key=lambda p: int(p["year"]))
+
+            meta = country_latest_meta.get(iso3)
+            country_timeseries[iso3] = {
+                "iso3": iso3,
+                "name": (meta or {}).get("name") or iso3,
+                "region": (meta or {}).get("region"),
+                "income_group": (meta or {}).get("income_group"),
+                "series": country_series[iso3],
+            }
+
+        return {
+            "first_year": first_year,
+            "latest_year": latest_year,
+            "years": years,
+            "tfr_map_series": tfr_map_series,
+            "latest_indicator_rows": latest_indicator_rows,
+            "indicator_series_rows": indicator_series_rows,
+            "country_timeseries": country_timeseries,
+        }
 
 
     @app.get("/map")
