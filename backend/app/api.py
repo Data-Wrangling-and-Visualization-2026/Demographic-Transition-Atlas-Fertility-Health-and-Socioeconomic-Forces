@@ -320,7 +320,7 @@ def register_routes(app: FastAPI):
 
             return out
 
-        except Exception as e:
+        except Exception:
             raise HTTPException(status_code=503, detail="db error")
 
     @app.get("/map-data")
