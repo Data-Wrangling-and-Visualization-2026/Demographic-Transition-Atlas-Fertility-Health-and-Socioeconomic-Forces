@@ -41,6 +41,7 @@ python -m http.server 3000
 http://localhost:3000
 - Backend
 API: http://localhost:8000
+
 Docs: http://localhost:8000/docs
 - PgAdmin
 http://localhost:5050
@@ -48,7 +49,6 @@ http://localhost:5050
 ## Project Structure
 - `backend/` — server-side logic and API
 - `db/` — database schema and initialization
-- `docs/` — validation reports and analytical artifacts
 - `frontend/` — web interface (interactive atlas)
 - `logs/` — pipeline execution logs
 - `notebooks/` — data cleaning and exploratory analysis
@@ -60,27 +60,46 @@ http://localhost:5050
 - **UN Population Data Portal / WPP** — demographic indicators (e.g., mean age of childbearing / maternal age)
 
 ## What we have implemented
+### Data Pipeline
+- Collected data from external sources (World Bank API, UN Population datasets)
+- Cleaned and standardized raw datasets into a unified format
+- Converted processed data into structured CSV files for loading
+### Database Layer
+- Designed relational schema for demographic and socioeconomic indicators
+- Created dimension tables for country and indicator metadata
+- Built a main fact table at the country-year level
+- Loaded processed CSV datasets into PostgreSQL
+### Backend System
+- Implemented REST API using FastAPI
+- Provides access to country profiles, time series, and map-ready datasets
+- Supports filtering by year, indicator, region, and income group
+### Frontend Application
+- Interactive web atlas built with Vanilla JavaScript
+- Data visualizations implemented using D3.js
+- Map-based exploration and time-series analysis
+- Cross-country comparison functionality
 
-### Infrastructure
-- Dockerized environment with **PostgreSQL** (main storage) and **pgAdmin** for GUI inspection.
-- SQL schema initialized via `db/init.sql`.
+## Data Flow
 
-### Database tables
-- `dim_country_clean` — country dictionary (ISO3, name, region, income group, ISO2)
-- `dim_indicator_enriched` — indicator metadata (source, code, name, project label, theme group, narrative role)
-- `atlas_country_year_imputed` — main fact table (country-year level data with socioeconomic, health, demographic indicators)
+1. Scraper collects raw data from external APIs
+2. Data is transformed and cleaned
+3. Data is loaded into PostgreSQL
+4. Backend queries optimized tables
+5. Frontend requests data via REST API
+6. User interacts with interactive map and charts
 
-### World Bank ingestion pipeline (API-first)
-- Loaded **217 countries** into `dim_country` (filtered out aggregates).
-- Selected an MVP set of World Bank indicators and stored them in `dim_indicator`.
-- Downloaded World Bank indicator data **page-by-page** into `raw_ingest` (currently ~696 raw pages).
-- Transformed raw pages into the clean fact table `fact_indicator_value` (currently **135,720 rows**).
-- Generated validation/EDA reports:
-  - `docs/validation_wb.md`
-  - `docs/change_points_fertility.csv` (top fertility change points to be used later for GDELT events)
+## Tech Stack
+Backend:
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
 
-### UN Data Portal integration (multi-source pipeline)
-- Implemented UN API client (`get_indicators`, `get_locations`, `get_data`) and country reconciliation support.
-- Downloaded UN data in batches and stored **raw payloads** in `raw_ingest` (`source='un'`).
-- Transformed UN raw payloads into `fact_indicator_value` (`source='un'`) using an MVP slice (consistent “one value per country-year” logic).
-- Result: **~12k cleaned UN rows** in `fact_indicator_value`, demonstrating a working **multi-source** pipeline (World Bank + UN) with unified country-year facts.
+Frontend:
+- Vanilla JS
+- D3.js
+- TopoJSON
+- Fetch API
+
+Infrastructure:
+- Docker
+- Docker Compose
