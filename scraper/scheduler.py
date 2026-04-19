@@ -19,7 +19,7 @@ logging.basicConfig(
 
 SCRAPE_INTERVAL_MINUTES = int(os.getenv("SCRAPE_INTERVAL_MINUTES", "60"))
 
-SCRAPER_COMMAND = os.getenv("SCRAPER_COMMAND", "python main.py")
+SCRAPER_COMMAND = os.getenv("SCRAPER_COMMAND", "python -m pipeline.smoke_db")
 
 def run_scraper():
     logging.info(f"Starting scraper: {SCRAPER_COMMAND}")
